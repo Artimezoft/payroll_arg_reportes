@@ -7,7 +7,6 @@ from reportlab.pdfgen import canvas
 
 from base_reports.recibo_base_1 import my_base_recibo
 from config import config_constants
-from tables.base_tables import TABLA_TIPO_LIQUIDACIONES
 from tools.recibos_utils import (
     draw_text_with_end_coordinate,
     draw_text_with_max_width,
@@ -72,7 +71,7 @@ def get_recibo_info(json_data: dict) -> dict:
             },
             "liquidacion": {
                 "nro_liq": 0,
-                "tipo_liquidacion": 3,
+                "tipo_liquidacion": "Mensual",
                 "periodo": {
                     "periodo": "2023-12"
                 },
@@ -166,7 +165,7 @@ def get_recibo_info(json_data: dict) -> dict:
             },
             "liquidacion": {
                 "nro_liq": 0,
-                "tipo_liquidacion": 3,
+                "tipo_liquidacion": "Mensual",
                 "periodo": {
                     "periodo": "2023-12"
                 },
@@ -279,7 +278,7 @@ def get_recibo_info(json_data: dict) -> dict:
 
 def get_info_final_for_recibo(api_dict: dict) -> dict:
     periodo = api_dict["liquidacion"]["periodo"]["periodo"]
-    tipo_liq = api_dict["liquidacion"]["tipo_liquidacion"]
+    tipo_liquidacion = api_dict["liquidacion"]["tipo_liquidacion"]
     company_name = api_dict["empresa"]["name"]
     cuit = api_dict["empresa"]["cuit"]
     domicilio_obj = api_dict["empresa"]["domicilio"]
@@ -294,8 +293,7 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
     domicilio += f', {localidad}, {provincia}'
 
     periodo = api_dict["liquidacion"]["periodo"]["periodo"]
-    tipo_liq = api_dict["liquidacion"]["tipo_liquidacion"]
-    tipo_liquidacion = TABLA_TIPO_LIQUIDACIONES[str(tipo_liq).zfill(2)]
+    tipo_liquidacion = api_dict["liquidacion"]["tipo_liquidacion"]
     fecha_pago = formatted_date_str(api_dict["liquidacion"]["fecha_pago"])
     ultimo_pago_ss = api_dict["empresa"]["ultimo_pago_seguridad_social"]
 
@@ -350,7 +348,6 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
     resp = {
         # Período y Compañía
         "periodo": periodo,
-        "tipo_liq": tipo_liq,
         "company_name": company_name,
         "cuit": cuit,
         "domicilio": domicilio,
@@ -500,6 +497,7 @@ def descargar_recibo(liquidacion_id: int, secuencia: int) -> str:
     my_path = f'./download/{liquidacion_id}/'
     if not os.path.exists(my_path):
         os.makedirs(my_path)
+    # TODO: Change to output path
     my_file_path = f'{my_path}recibo_sueldo_{info_recibo["periodo"]}__{info_recibo["tipo_liq"]}.pdf'
 
     # Create a canvas
