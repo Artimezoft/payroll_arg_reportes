@@ -1,0 +1,2 @@
+numero-a-letras==0.0.4
+reportlab==4.0.8

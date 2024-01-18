@@ -1,0 +1,11 @@
+.env
+
+# Otros
+Todo.txt
+__pycache__/
+temp/
+/carpetas
+*.log
+
+/docs/html/
+/payroll/static/
