@@ -8,4 +8,6 @@ temp/
 *.log
 
 /docs/html/
-/payroll/static/
+
+# Downloads
+downloads/

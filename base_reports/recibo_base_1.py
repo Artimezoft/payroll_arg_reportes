@@ -1,7 +1,7 @@
 from reportlab.lib.units import cm
 from reportlab.pdfgen.canvas import Canvas
 
-from reports.config import config_constants
+from config import config_constants
 
 FONT_FAMILY = config_constants['FONT_FAMILY']
 FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']

@@ -232,7 +232,7 @@ def get_recibo_info(json_data: dict) -> dict:
         "error": "",
     }
 
-    serialized_emp_liqs = json_data
+    serialized_emp_liqs = json_data['results']
 
     # Empresa info ---------------------------------------------------------------------------
     empresa_info = serialized_emp_liqs[0]['empresa']
@@ -480,12 +480,12 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     return resp
 
 
-def descargar_recibo(liquidacion_id: int, secuencia: int) -> str:
+def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
     """ Descarga el recibo de sueldo en formato PDF,
         Retorna error si lo hay
     """
     resp = ''
-    recibo_info = get_recibo_info(liquidacion_id, secuencia)
+    recibo_info = get_recibo_info(json_data)
     if recibo_info.get("error"):
         error_detail = recibo_info["error"]
         return error_detail
@@ -494,11 +494,10 @@ def descargar_recibo(liquidacion_id: int, secuencia: int) -> str:
     info_recibo = get_info_final_for_recibo(recibo_info)
 
     # Cada liquidación va a tener su propia carpeta en download
-    my_path = f'./download/{liquidacion_id}/'
+    my_path = f'./{output_path}/'
     if not os.path.exists(my_path):
         os.makedirs(my_path)
-    # TODO: Change to output path
-    my_file_path = f'{my_path}recibo_sueldo_{info_recibo["periodo"]}__{info_recibo["tipo_liq"]}.pdf'
+    my_file_path = f'{my_path}{filename}.pdf'
 
     # Create a canvas
     c = canvas.Canvas(
