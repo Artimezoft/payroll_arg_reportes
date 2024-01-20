@@ -494,14 +494,14 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
     info_recibo = get_info_final_for_recibo(recibo_info)
 
     # Cada liquidación va a tener su propia carpeta en download
-    my_path = f'./{output_path}/'
+    my_path = output_path
     if not os.path.exists(my_path):
         os.makedirs(my_path)
     my_file_path = f'{my_path}{filename}.pdf'
 
     # Create a canvas
     c = canvas.Canvas(
-        my_file_path,
+        filename=my_file_path,
         pagesize=landscape(A4),
     )
     # Variables Base ----------------------------------------------------------------------------

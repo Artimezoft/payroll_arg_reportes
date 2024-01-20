@@ -14,7 +14,7 @@ def my_base_recibo(c: Canvas) -> dict:
     """
     tot_y = 21 * cm
     tot_x = 29.7 * cm
-    half_of_width = tot_x / 2
+    half_of_width = tot_x / 2 - 0.4 * cm
     mid_margin = 0 * cm
     margin_between_lines = 0.2 * cm
     def_radius = 7
@@ -45,7 +45,7 @@ def my_base_recibo(c: Canvas) -> dict:
     gray_value = 0.93
     c.setFillColorRGB(gray_value, gray_value, gray_value)
 
-    company_name_width = 10.3 * cm
+    company_name_width = 10.5 * cm
     starting_y = tot_y - margin_y - company_name_height
     resp['company_info_y'] = starting_y
     resp['company_info_height'] = company_name_height
