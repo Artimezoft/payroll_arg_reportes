@@ -36,7 +36,6 @@ jobs:
         --max-line-length=130 \
         --statistics
 
-    # TODO: Add tests
-    # - name: Run Tests
-    #   run: |
-    #     python -m unittest test.test_numero_a_letras
+    - name: Run Tests
+      run: |
+        python -m unittest

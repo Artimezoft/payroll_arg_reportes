@@ -223,6 +223,32 @@ def get_recibo_info(json_data: dict) -> dict:
     ]
 }
     """
+    # Si el json está vacío, no se puede descargar
+    if not json_data:
+        return {
+            "error": "No se puede descargar el recibo, no hay datos"
+        }
+
+    # Si no está results en el json, no se puede descargar
+    if not json_data.get('results'):
+        return {
+            "error": "No se puede descargar el recibo, faltan datos"
+        }
+
+    # Si no hay ningún resultado, no se puede descargar
+    if not json_data['results']:
+        return {
+            "error": "No se puede descargar el recibo, faltan datos"
+        }
+
+    # Si faltan algunas de las keys en results, no se puede descargar
+    keys_to_check = ['empresa', 'liquidacion', 'empleado', 'conceptos_liquidados', 'totales_liquidacion']
+    for key in keys_to_check:
+        if key not in json_data['results'][0]:
+            return {
+                "error": f"No se puede descargar el recibo, no se observa {key} en los datos"
+            }
+
     resp = {
         "empresa": {},
         "liquidacion": {},
@@ -485,6 +511,7 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
         Retorna error si lo hay
     """
     resp = ''
+
     recibo_info = get_recibo_info(json_data)
     if recibo_info.get("error"):
         error_detail = recibo_info["error"]

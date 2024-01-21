@@ -2,7 +2,7 @@ import json
 
 from reporters.recibo_sueldo import descargar_recibo
 
-with open('./test_cases/liquidacion.json', 'r') as f:
+with open('./test_cases/liquidacion_completa.json', 'r') as f:
     liquidacion = json.load(f)
 
 # Llamo a la función descargar_recibo
