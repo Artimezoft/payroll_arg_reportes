@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "payroll_arg_reportes"
+version = "0.0.1"
+dependencies = [
+]
+requires-python = ">=3.10"
+authors = [
+  { name="Eugenio", email="coding_with@eugeniovazquez.com.ar" },
+]
+maintainers = [
+  { name="Eugenio", email="coding_with@eugeniovazquez.com.ar" },
+]
+description = "Reportes para Payroll en Argentina"
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/Artimezoft/payroll_arg_reportes"
+Issues = "https://github.com/Artimezoft/payroll_arg_reportes/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/reporters"]

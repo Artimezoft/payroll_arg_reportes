@@ -11,3 +11,8 @@ temp/
 
 # Downloads
 downloads/
+
+# Pypi
+dist/
+build/
+*.egg-info/
