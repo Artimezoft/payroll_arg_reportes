@@ -11,20 +11,23 @@ from reporters.recibo_sueldo import descargar_recibo
 class TestDownloadRecibo(unittest.TestCase):
     """ Testing para Descargar Recibos
     """
-    def setUp(self):
+    @classmethod
+    def setUpClass(cls):
         # Specify the path where the temporary folder should be created
         temp_folder_path = "./"
         # Create a temporary folder for testing in the specified path
-        self.temp_folder = tempfile.mkdtemp(dir=temp_folder_path)
-        if self.temp_folder[-1] != '/':
-            self.temp_folder += '/'
+        cls.temp_folder = tempfile.mkdtemp(dir=temp_folder_path)
+        if cls.temp_folder[-1] != '/':
+            cls.temp_folder += '/'
 
-        with open('./test_cases/liquidacion_completa.json', 'r') as f:
-            self.long_json = json.load(f)
+        current_path = os.getcwd()
+        with open(f'{current_path}/src/test_cases/liquidacion_completa.json', 'r') as f:
+            cls.long_json = json.load(f)
 
-        with open('./test_cases/liquidacion_corta.json', 'r') as f:
-            self.short_json = json.load(f)
+        with open(f'{current_path}/src/test_cases/liquidacion_corta.json', 'r') as f:
+            cls.short_json = json.load(f)
 
+    def setUp(self):
         self.empty_json = {}
         self.no_results_json = {'results': []}
         self.key_missing_json = {'results': [{
@@ -34,15 +37,16 @@ class TestDownloadRecibo(unittest.TestCase):
             'liquidacion': 'Liquidacion',
             }]}
 
-    def tearDown(self):
+    @classmethod
+    def tearDownClass(cls):
         # Clean up: Delete the temporary folder and its contents
-        if os.path.exists(self.temp_folder):
-            for root, dirs, files in os.walk(self.temp_folder, topdown=False):
+        if os.path.exists(cls.temp_folder):
+            for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
                 for file in files:
                     os.remove(os.path.join(root, file))
                 for dir in dirs:
                     os.rmdir(os.path.join(root, dir))
-            os.rmdir(self.temp_folder)
+            os.rmdir(cls.temp_folder)
 
     def test_descarga_recibo_1(self):
         """ Prueba la descarga del archivo
