@@ -5,9 +5,9 @@ from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 
-from base_reports.recibo_base_1 import my_base_recibo
-from config import config_constants
-from tools.recibos_utils import (
+from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo
+from py_arg_reports.config import config_constants
+from py_arg_reports.tools.recibos_utils import (
     draw_text_with_end_coordinate,
     draw_text_with_max_width,
     float_to_format_currency,

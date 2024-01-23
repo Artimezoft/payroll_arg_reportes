@@ -14,17 +14,16 @@ class TestDownloadRecibo(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Specify the path where the temporary folder should be created
-        current_path = os.getcwd()
-        temp_folder_path = current_path
+        temp_folder_path = './tests/temp/'
         # Create a temporary folder for testing in the specified path
         cls.temp_folder = tempfile.mkdtemp(dir=temp_folder_path)
         if cls.temp_folder[-1] != '/':
             cls.temp_folder += '/'
 
-        with open(f'{current_path}/src/test_cases/liquidacion_completa.json', 'r') as f:
+        with open('./py_arg_reports/test_cases/liquidacion_completa.json', 'r') as f:
             cls.long_json = json.load(f)
 
-        with open(f'{current_path}/src/test_cases/liquidacion_corta.json', 'r') as f:
+        with open('./py_arg_reports/test_cases/liquidacion_corta.json', 'r') as f:
             cls.short_json = json.load(f)
 
     def setUp(self):

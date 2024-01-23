@@ -4,8 +4,10 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll_arg_reportes"
-version = "0.0.1"
+version = "0.0.10"
 dependencies = [
+  "numero-a-letras==0.0.4",
+  "reportlab==4.0.8",
 ]
 requires-python = ">=3.10"
 authors = [
@@ -28,4 +30,4 @@ Homepage = "https://github.com/Artimezoft/payroll_arg_reportes"
 Issues = "https://github.com/Artimezoft/payroll_arg_reportes/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["src/reporters"]
+packages = ["py_arg_reports"]
