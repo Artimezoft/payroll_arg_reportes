@@ -3,7 +3,6 @@
 # Otros
 Todo.txt
 __pycache__/
-temp/
 /carpetas
 *.log
 tmp*/
