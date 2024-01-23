@@ -666,6 +666,10 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
             tipo_concepto = concepto['tipo_concepto']
             cantidad = concepto['cantidad']
             importe = concepto['importe']
+            # Si tipo de no es ni 1, ni 2, ni 3, no se muestra
+            # Si bien no debería pasar por el filtro del QS, por las dudas
+            if tipo_concepto not in [1, 2, 3]:
+                continue
 
             # TODO: Ver si conviene agregar code
             c.drawString(coordinates['conceptos_x'], this_y, name)
