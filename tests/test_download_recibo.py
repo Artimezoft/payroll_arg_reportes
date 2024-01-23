@@ -28,13 +28,12 @@ class TestDownloadRecibo(unittest.TestCase):
 
     def setUp(self):
         self.empty_json = {}
-        self.no_results_json = {'results': []}
-        self.key_missing_json = {'results': [{
+        self.key_missing_json = [{
             'empleado': 'Juan',
             'empresa': 'Empresa',
             'conceptos_liquidados': 'Conceptos',
             'liquidacion': 'Liquidacion',
-            }]}
+            }]
 
     @classmethod
     def tearDownClass(cls):
@@ -103,17 +102,6 @@ class TestDownloadRecibo(unittest.TestCase):
         )
 
         self.assertEqual(resp_descarga, 'No se puede descargar el recibo, no hay datos')
-
-    def test_no_results_json(self):
-        """ Prueba la descarga del archivo para un json sin resultados
-        """
-        resp_descarga = descargar_recibo(
-            json_data=self.no_results_json,
-            output_path=self.temp_folder,
-            filename='recibo_prueba_4',
-        )
-
-        self.assertEqual(resp_descarga, 'No se puede descargar el recibo, faltan datos')
 
     def test_key_missing_json(self):
         """ Prueba la descarga del archivo para un json sin la key 'results'
