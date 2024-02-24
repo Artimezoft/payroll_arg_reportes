@@ -2,9 +2,10 @@ import io
 
 import xlsxwriter
 
+from config import config_constants
 
-DEFAULT_FONT = 'Arial'
-DEFAULT_FONT_SIZE = 8
+DEFAULT_FONT = config_constants['EXCEL_FONT_FAMILY']
+DEFAULT_FONT_SIZE = config_constants['EXCEL_FONT_SIZE']
 
 
 def descarga_excel(info_dict: dict, sheet_name: str = 'Reporte'):

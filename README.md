@@ -386,3 +386,33 @@ resultado_descarga = descargar_recibo(
     filename='recibo_prueba',
 )
 ```
+
+#### Descarga de Excel
+Genera la información binaria para descargar un archivo excel.
+
+El formato de info_dict debe venir de esta manera:
+
+```
+info_dict = {
+    'headers': {
+        'header1': {
+            'name': 'Es Texto',
+            'format': {'font_name': 'Arial', 'font_size': 8}
+        },
+        'header2': {
+            'name': 'Es Dinero',
+            'format': {'num_format': '$#,##0.00'},
+            'is_number': True,
+        },
+        'header3': {
+            'name': 'Es un número',
+            'format': {'num_format': '0.00'},
+            'is_number': True,
+        },
+    },
+    'data': [
+        {'header1': 'valor1', 'header2': 1320.10, 'header3': 0.123},
+        {'header1': 'valor3', 'header2': 12312.10, 'header3': 2.23},
+    ],
+}
+```
