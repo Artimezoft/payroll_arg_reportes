@@ -2,7 +2,7 @@ import io
 
 import xlsxwriter
 
-from config import config_constants
+from py_arg_reports.config import config_constants
 
 DEFAULT_FONT = config_constants['EXCEL_FONT_FAMILY']
 DEFAULT_FONT_SIZE = config_constants['EXCEL_FONT_SIZE']
