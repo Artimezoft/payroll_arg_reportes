@@ -785,7 +785,7 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
 
     # Add the format to the file
     my_recibo_info = my_base_recibo(c)
-    c = my_recibo_info['canvas']
+    # c = my_recibo_info['canvas']
 
     # Get coordinates for recibo
     coordinates = get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
@@ -794,6 +794,12 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
     # Loop through all the employees -------------------------------------------------------------
     # --------------------------------------------------------------------------------------------
     for legajo in info_recibo['legajos']:
+        # Add the format to the file
+        # TODO: Chequear porque debo hacerlo, antes funcionaba ok
+        if legajo != info_recibo['legajos'][0]:
+            my_recibo_info = my_base_recibo(c)
+
+        # Draw the employee
         draw_empleado(
             c=c,
             coordinates=coordinates,
