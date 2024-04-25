@@ -6,6 +6,7 @@ __pycache__/
 /carpetas
 *.log
 tmp*/
+.vscode
 
 /docs/html/
 
