@@ -1,0 +1,190 @@
+[
+    {
+        "empresa": {
+            "pk": 1,
+            "name": "Empresa de Prueba",
+            "cuit": "20333333333",
+            "domicilio": {
+                "pk": 1,
+                "calle": "Calle de Prueba",
+                "numero": "123",
+                "piso": null,
+                "oficina": null,
+                "barrio": null,
+                "localidad": {
+                    "pk": 1252,
+                    "provincia": {
+                        "pk": 10,
+                        "name": "Formosa",
+                        "pais": {
+                            "pk": 11,
+                            "code": "AR",
+                            "name": "Argentina"
+                        }
+                    },
+                    "name": "10",
+                    "text": "10 (Formosa)"
+                },
+                "cod_postal": null
+            },
+            "ultimo_pago_seguridad_social": {
+                "id": 31,
+                "banco": "Banco De La Ciudad De Buenos Aires",
+                "mes": 12,
+                "anio": 2023,
+                "fecha_pago": "2024-01-09",
+                "empresa": 1
+            }
+        },
+        "liquidacion": {
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "periodo": {
+                "periodo": "2023-12"
+            },
+            "fecha_pago": "2024-01-04"
+        },
+        "empleado": {
+            "legajo": 6410,
+            "first_name": "Adriana Anahí",
+            "last_name": "Poblete",
+            "cuil": "20188712648",
+            "fecha_ingreso": "1990-10-01",
+            "fecha_ingreso_2": null,
+            "categoria": "Vendedor C",
+            "contrato": "A tiempo parcial: Indeterminado /permanente",
+            "obra_social": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES",
+            "area": "Area 1",
+            "posicion": "Posicion 1",
+            "basico": 112520.15,
+            "lugar_trabajo": "Mendiolaza",
+            "relacion_bancaria": {
+                "forma_pago": "EFVO",
+                "numero_cuenta": null,
+                "cbu": null
+            }
+        },
+        "conceptos_liquidados": [
+            {
+                "concepto": {
+                    "code": "SUELDO",
+                    "tipo_concepto": 1,
+                    "name": "Sueldo Básico"
+                },
+                "orden": 12,
+                "cantidad": 30.0,
+                "importe": 112520.15
+            },
+            {
+                "concepto": {
+                    "code": "ANTIGU",
+                    "tipo_concepto": 1,
+                    "name": "Antiguedad"
+                },
+                "orden": 49,
+                "cantidad": 33.0,
+                "importe": 37131.6495
+            }
+        ],
+        "totales_liquidacion": {
+            "total_remunerativo": 162122.78279166666,
+            "total_no_remunerativo": 36477.626128125004,
+            "total_retenciones": 32625.883297578122,
+            "neto_liquidacion": 165974.52562221355
+        }
+    },
+    {
+        "empresa": {
+            "pk": 1,
+            "name": "Empresa de Prueba",
+            "cuit": "20333333333",
+            "domicilio": {
+                "pk": 1,
+                "calle": "Calle de Prueba",
+                "numero": "123",
+                "piso": null,
+                "oficina": null,
+                "barrio": null,
+                "localidad": {
+                    "pk": 1252,
+                    "provincia": {
+                        "pk": 10,
+                        "name": "Formosa",
+                        "pais": {
+                            "pk": 11,
+                            "code": "AR",
+                            "name": "Argentina"
+                        }
+                    },
+                    "name": "10",
+                    "text": "10 (Formosa)"
+                },
+                "cod_postal": null
+            },
+            "ultimo_pago_seguridad_social": {
+                "id": 31,
+                "banco": "Banco De La Ciudad De Buenos Aires",
+                "mes": 12,
+                "anio": 2023,
+                "fecha_pago": "2024-01-09",
+                "empresa": 1
+            }
+        },
+        "liquidacion": {
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "periodo": {
+                "periodo": "2023-12"
+            },
+            "fecha_pago": "2024-01-04"
+        },
+        "empleado": {
+            "legajo": 7720,
+            "first_name": "Eduardo Viviana",
+            "last_name": "Monteverde",
+            "cuil": "20674648438",
+            "fecha_ingreso": "1990-10-01",
+            "fecha_ingreso_2": null,
+            "categoria": "Cajero C",
+            "contrato": "A tiempo parcial: Indeterminado /permanente",
+            "obra_social": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES",
+            "area": "Area 1",
+            "posicion": "Posicion 1",
+            "basico": 110645.24,
+            "lugar_trabajo": "25 de Mayo",
+            "relacion_bancaria": {
+                "forma_pago": "EFVO",
+                "numero_cuenta": null,
+                "cbu": null
+            }
+        },
+        "conceptos_liquidados": [
+            {
+                "concepto": {
+                    "code": "SUELDO",
+                    "tipo_concepto": 1,
+                    "name": "Sueldo Básico"
+                },
+                "orden": 12,
+                "cantidad": 30.0,
+                "importe": 110645.24
+            },
+            {
+                "concepto": {
+                    "code": "ANTIGU",
+                    "tipo_concepto": 1,
+                    "name": "Antiguedad"
+                },
+                "orden": 49,
+                "cantidad": 33.0,
+                "importe": 36512.929200000006
+            }
+        ],
+        "totales_liquidacion": {
+            "total_remunerativo": 159421.34996666666,
+            "total_no_remunerativo": 35869.8037425,
+            "total_retenciones": 32083.9083370625,
+            "neto_liquidacion": 163207.24537210417
+        }
+    }
+]
