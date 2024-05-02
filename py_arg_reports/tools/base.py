@@ -120,8 +120,8 @@ class CanvaPDFBlock:
         self.canvas.setStrokeColorRGB(*color)
         self.canvas.line(*rect)
         # volver el puntero abajo de la linea
-        self.current_x = rect.x + self.margin_w
-        self.current_y = rect.y + self.margin_h
+        self.current_x = rect.x
+        self.current_y = rect.y
 
     def text(self, text, align='left', x=None, y=None, format_: Format = None):
         """ Dibuja un texto en el canvas c """
