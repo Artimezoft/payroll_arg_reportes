@@ -1,23 +1,20 @@
 import os
-
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.pdfgen import canvas
-
-from py_arg_reports.reporters.libro_sueldo.base import my_base_libro_sueldo
-from py_arg_reports.reporters.libro_sueldo.coords import draw_empleado, get_coordinates_for_libro_sueldo
 from py_arg_reports.reporters.libro_sueldo.info import get_recibo_info, get_info_final_for_libro_sueldo
+from py_arg_reports.tools.base import CanvasPDF, CanvaPDFBlock, Format, Rect
 
 
 def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     """ Descarga el libro sueldo en formato PDF,
         Retorna error si lo hay
     """
-    resp = ''
 
-    recibo_info = get_recibo_info(json_data)
-    if recibo_info.get("error"):
-        error_detail = recibo_info["error"]
-        return error_detail
+    # recibo_info = get_recibo_info(json_data)
+    # if recibo_info.get("error"):
+    #     error_detail = recibo_info["error"]
+    #     return error_detail
+
+    # # Get info from recibo_info
+    # info_recibo = get_info_final_for_libro_sueldo(recibo_info)
 
     # Cada liquidación va a tener su propia carpeta en download
     my_path = output_path
@@ -25,44 +22,26 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
         os.makedirs(my_path)
     my_file_path = f'{my_path}{filename}.pdf'
 
-    # Create a canvas
-    c = canvas.Canvas(
-        filename=my_file_path,
-        pagesize=landscape(A4),
-    )
+    PDF = CanvasPDF(file_path=my_file_path, title='Libro Sueldo')
 
-    # Get info from recibo_info
-    info_recibo = get_info_final_for_libro_sueldo(recibo_info)
+    # Agregar headers
+    header_format = Format(font_size=14)
+    normal_format = Format(font_size=10)
+    header_rect = Rect(0, 0, PDF.width, 5)
+    header = CanvaPDFBlock(PDF, header_rect, header_format)
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', x=header.width / 2)
+    header.text('Hecho con PayrollT', format_=Format(font_size=8))
+    header.text('Nombre de la empresa', y=2, format_=normal_format)
+    header.text('Direccion de la empresa', format_=normal_format)
 
-    # Add the format to the file
-    my_recibo_info = my_base_libro_sueldo(c)
-    # c = my_recibo_info['canvas']
+    PDF.canvas.showPage()
+    PDF.canvas.save()
 
-    # Get coordinates for recibo
-    coordinates = get_coordinates_for_libro_sueldo(my_recibo_info=my_recibo_info)
 
-    # --------------------------------------------------------------------------------------------
-    # Loop through all the employees -------------------------------------------------------------
-    # --------------------------------------------------------------------------------------------
-    for legajo in info_recibo['legajos']:
-        # Add the format to the file
-        # TODO: Chequear porque debo hacerlo, antes funcionaba ok
-        if legajo != info_recibo['legajos'][0]:
-            my_recibo_info = my_base_libro_sueldo(c)
-
-        # Draw the employee
-        draw_empleado(
-            c=c,
-            coordinates=coordinates,
-            info_recibo=info_recibo,
-            legajo=legajo,
-        )
-        # Save the page
-        c.showPage()
-
-        # --------------------------------------------------------------------------------------------
-        # End of Loop through all the employees ------------------------------------------------------
-        # --------------------------------------------------------------------------------------------
-    c.save()
-
-    return resp
+if __name__ == '__main__':
+    # Descargar el libro
+    json_data = {}
+    output_path = 'download/'
+    filename = 'libro_sueldo'
+    descargar_libro(json_data, output_path, filename)
+    print(f'Libro sueldo descargado en {output_path}{filename}.pdf')
