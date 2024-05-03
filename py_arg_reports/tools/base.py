@@ -1,8 +1,12 @@
 import json
+import logging
 from reportlab.lib.colors import HexColor
 from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen.canvas import Canvas
+
+
+log = logging.getLogger(__name__)
 
 
 class Rect:
@@ -25,14 +29,12 @@ class Rect:
         h = round(self.h / self.units, 2) if self.h else '-'
         return f'Rect({x}, {y}, {w}, {h})'
 
-    def as_dict(self):
-        return {
-            'x': round(self.x, 2),
-            'y': round(self.y, 2),
-            'w': round(self.w, 2),
-            'h': round(self.h, 2),
-            'units': round(self.units, 2),
-        }
+    def as_dict(self, units=False):
+        x = round(self.x, 2) if not units else round(self.x / self.units, 2)
+        y = round(self.y, 2) if not units else round(self.y / self.units, 2)
+        w = round(self.w, 2) if not units else round(self.w / self.units, 2)
+        h = round(self.h, 2) if not units else round(self.h / self.units, 2)
+        return {'x': x, 'y': y, 'w': w, 'h': h, 'units': round(self.units, 2)}
 
 
 class Format:
@@ -62,8 +64,9 @@ class CanvasPDF:
         self.canvas = Canvas(file_path, pagesize=pagesize)
         self.pagesize = pagesize
         self.units = units
-        self.width = pagesize[0] / units
-        self.height = pagesize[1] / units
+        self.width_raw, self.height_raw = pagesize
+        self.width = self.width_raw / units
+        self.height = self.height_raw / units
         self.margin_x = margin_x
         self.margin_y = margin_y
         if title:
@@ -105,7 +108,10 @@ class CanvasPDF:
         try:
             f.write(json.dumps(self.content, indent=4))
         except Exception as e:
-            print(f'Error exporting PDF content: {e}\n{self.content}')
+            log.error(f'Error exporting PDF content: {e}\n{self.content}')
+            raise e
+        else:
+            log.info(f'PDF content exported to {file_path}')
         f.close()
 
 
@@ -140,7 +146,7 @@ class CanvaPDFBlock:
         self.start_y = rect.y
         # Yo podrìa no saber el ancho y alto, por eso los inicializo en None si es necesario
         max_width = self.base_pdf.width - (self.base_pdf.margin_x * 2)
-        if rect.w is None or rect.w == 0:
+        if rect.w is None or rect.w == 0 or rect.w > max_width:
             # Default es todo el ancho menos los márgenes
             rect.w = max_width
         elif rect.w < 0:
@@ -155,10 +161,6 @@ class CanvaPDFBlock:
 
         self.format = format_ if format_ else Format()
 
-        # Tratar de mantener un puntero / cursor para saber donde estamos
-        self.current_x = self.start_x
-        self.current_y = self.start_y
-
         # Registrar este bloque
         self.base_pdf.content.append(
             {
@@ -169,59 +171,65 @@ class CanvaPDFBlock:
         )
         # Dibujar rectángulos del bloque
         if with_rectangles:
-            self.rectangle(rect, color=self.format.color, fill_color=self.format.fill_color)
+            self.rectangle(
+                rect, color=self.format.color,
+                fill_color=self.format.fill_color,
+                move_start=False
+            )
 
-    def _rect_to_units(self, rect):
+    def _rect_to_units(self, rect, move_start=True):
         """ Convierte un rectángulo relativo a uno absoluto """
+        # move to start coords
         u = self.base_pdf.units
-        x = rect.x * u
-        y = rect.y * u
+        x2 = rect.x
+        y2 = rect.y + 10
+        if move_start:
+            # El rectangulo de bloque inicial ya tiene esto considerado
+            x2 += self.start_x
+            y2 += self.start_y
+
+        x2 = x2 * u
+        y2 = y2 * u
 
         w = rect.w * u if rect.w else 0
         h = rect.h * u if rect.h else 0
 
-        start_x = self.start_x * u
-        start_y = self.start_y * u
+        page_h = self.base_pdf.height * u
+        y3 = page_h - y2
+        print(f'y: {rect.y}::{y2/u} y3: {y3/u}, page height: {self.base_pdf.height}')
+        r = Rect(x2, y3, w, h, units=self.base_pdf.units)
+        print(r)
+        return r
 
-        x = start_x + x
-        y = start_y + y
-
-        # Invertir la coordenada Y
-        print(f'BH {self.base_pdf.height}::{self.base_pdf.height * u} Y {y}')
-        y = (self.base_pdf.height * u) - y
-        print(f'BH2 {y}')
-        return Rect(x, y, w, h, units=self.base_pdf.units)
-
-    def rectangle(self, rect: Rect, color=None, fill_color=None, rounded=True):
+    def rectangle(self, rect: Rect, color=None, fill_color=None, rounded=True, move_start=True):
         """ Dibuja un rectángulo en el canvas c """
         # reubicar el rectángulo en el canvas globalself.start_y + rect.y
-        rect2 = self._rect_to_units(rect)
+        rect2 = self._rect_to_units(rect, move_start=move_start)
         self.base_pdf.content.append(
             {
                 'type': 'rectangle',
                 'rect1': rect.as_dict(),
-                'rect2': rect2.as_dict(),
+                'rect2': rect2.as_dict(units=True),
                 'color': color,
                 'fill_color': fill_color,
                 'rounded': rounded,
             }
         )
-        color = color if color else self.format.color
 
+        color = color if color else self.format.color
         has_alpha = len(color) == 9
         self.canvas.setStrokeColor(HexColor(color, hasAlpha=has_alpha))
+
         fill_color = fill_color if fill_color else self.format.fill_color
         has_alpha = len(fill_color) == 9
         self.canvas.setFillColor(HexColor(fill_color, hasAlpha=has_alpha))
-        print(f'Drawing rect {rect} with color {color} and fill {fill_color}')
+
+        print(f'final rect {rect2.as_dict(units=True)}')
         if rounded:
-            self.canvas.roundRect(*rect2, radius=5, stroke=1, fill=1)
+            # self.canvas.roundRect(rect2.x, rect2.y, rect2.w, rect2.h, radius=3, stroke=1, fill=1)
+            self.canvas.roundRect(*rect2, radius=3, stroke=1, fill=1)
         else:
             self.canvas.rect(*rect2, stroke=1, fill=1)
-
-        # volver el puntero a donde inicia este bloque
-        self.current_x = rect.x
-        self.current_y = rect.y
 
     def line(self, rect: Rect, color=None):
         """ Dibujar una linea, en este caso Rect es un punto de inicio y otro de fin """
@@ -230,35 +238,33 @@ class CanvaPDFBlock:
             {
                 'type': 'line',
                 'rect1': rect.as_dict(),
-                'rect2': rect2.as_dict(),
+                'rect2': rect2.as_dict(units=True),
                 'color': color,
             }
         )
         color = color or self.format.color
-        print(f'Drawing line {rect} with color {color}')
         self.canvas.setStrokeColor(HexColor(color))
         self.canvas.line(*rect2)
-        # volver el puntero abajo de la linea
-        self.current_x = rect.x
-        self.current_y = rect.y
 
-    def text(self, text, align='left', x=None, y=None, format_: Format = None):
+    def text(self, text, x, y, align='left', format_: Format = None):
         """ Dibuja un texto en el canvas c """
-        x2 = x * self.base_pdf.units if x else self.current_x
-        y2 = y * self.base_pdf.units if y else self.current_y
-        y2 = (self.base_pdf.height * self.base_pdf.units) - y2
         # Pasar de coordenadas relativas a absolutas
-        x2 = self.start_x + x2
-        y2 = self.start_y + y2
+        u = self.base_pdf.units
+        x2 = self.start_x + x
+        y2 = self.start_y + y
+
+        x2 = x2 * u
+        y2 = y2 * u
+        y2 = (self.base_pdf.height * u) - y2
         self.base_pdf.content.append(
             {
                 'type': 'text',
                 'text': text,
                 'align': align,
                 'x': round(x, 2),
-                'x2': round(x2, 2),
+                'x2': round(x2/u, 2),
                 'y': round(y, 2),
-                'y2': round(y2, 2),
+                'y2': round(y2/u, 2),
             }
         )
 
@@ -267,7 +273,6 @@ class CanvaPDFBlock:
         color = format_.color if format_ else self.format.color
         self.canvas.setFont(font, font_size)
         self.canvas.setFillColor(HexColor(color))
-        print(f'Drawing text {text} at ({x},{y}) with font {font} and size {font_size} at {x}, {y}')
         if align == 'left':
             self.canvas.drawString(x2, y2, text)
         elif align == 'right':
@@ -275,7 +280,3 @@ class CanvaPDFBlock:
         elif align == 'center':
             # x aqui es el centro del texto
             self.canvas.drawCentredString(x2, y2, text)
-        # actualizar el puntero
-        self.current_x = x + self.canvas.stringWidth(text, font, font_size)
-        # Move Y considering margin_h and this line
-        self.current_y = y + font_size
