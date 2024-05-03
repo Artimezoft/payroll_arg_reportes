@@ -34,18 +34,14 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     header.text('Hecho con PayrollT', format_=Format(font_size=8), x=3, y=1.5)
     header.text('Nombre de la empresa', x=4, y=2, format_=normal_format)
     header.text('Direccion de la empresa', format_=normal_format, x=4, y=2.3)
-    header.rectangle(Rect(0, 9, 19, 6), fill_color=(0.9, 0.9, 0.9))
-    header.line(Rect(10, 5, 11, 15), (44, 55, 66))
-    header.line(Rect(12, 7, 10, 7), (44, 55, 66))
-    # header.rectangle(Rect(10, 10, 11, 15), fill_color=(0.8, 0.8, 0.8))
-    # PDF.canvas.showPage()
-    # body = CanvaPDFBlock(PDF, Rect(15, 15, PDF.width, 5), normal_format)
-    # body.text('Cuerpo del libro')
-    # body.rectangle(Rect(15, 15, 11, 15), fill_color=(0.8, 0.8, 0.8))
+    header.rectangle(Rect(0, 9, 19, 6), fill_color='#F0F0F0AA')
+    header.line(Rect(10, 5, 11, 15), '#AACC00')
+    header.line(Rect(12, 7, 10, 7), '#3300DDBB')
 
     PDF.canvas.showPage()
     PDF.canvas.save()
-    PDF.export('libro-sueldo.json')
+
+    PDF.export('py_arg_reports/reporters/libro_sueldo/samples/libro-sueldo-test.json')
 
 
 if __name__ == '__main__':

@@ -1,4 +1,5 @@
 import json
+from reportlab.lib.colors import HexColor
 from reportlab.lib.units import cm
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen.canvas import Canvas
@@ -36,9 +37,10 @@ class Rect:
 
 class Format:
     """ A format for a block """
-    def __init__(self, font='Helvetica', font_size=10, color=(0, 0, 0), fill_color=(0.9, 0.9, 0.9)):
+    def __init__(self, font='Helvetica', font_size=10, color='#000000', fill_color='#F0F0F0'):
         self.font = font
         self.font_size = font_size
+        # Los colores son como los de HTML #RRGGBBAA, despues los transformamos al pintar
         self.color = color
         self.fill_color = fill_color
 
@@ -81,12 +83,12 @@ class CanvasPDF:
         self.content.append(
             {
                 'type': 'init',
-                'width': self.width,
-                'height': self.height,
+                'width': round(self.width, 2),
+                'height': round(self.height, 2),
                 'margin_x': self.margin_x,
                 'margin_y': self.margin_y,
                 'pagesize': list(pagesize),
-                'units': units,
+                'units': round(units, 2),
             }
         )
 
@@ -205,9 +207,10 @@ class CanvaPDFBlock:
             }
         )
         color = color if color else self.format.color
-        self.canvas.setStrokeColorRGB(*color)
+
+        self.canvas.setStrokeColor(HexColor(color))
         fill_color = fill_color if fill_color else self.format.fill_color
-        self.canvas.setFillColorRGB(*fill_color)
+        self.canvas.setFillColor(HexColor(fill_color))
         print(f'Drawing rect {rect} with color {color} and fill {fill_color}')
         if rounded:
             self.canvas.roundRect(*rect2, radius=5)
@@ -231,7 +234,7 @@ class CanvaPDFBlock:
         )
         color = color or self.format.color
         print(f'Drawing line {rect} with color {color}')
-        self.canvas.setStrokeColorRGB(*color)
+        self.canvas.setStrokeColor(HexColor(color))
         self.canvas.line(*rect2)
         # volver el puntero abajo de la linea
         self.current_x = rect.x
@@ -261,7 +264,7 @@ class CanvaPDFBlock:
         font_size = format_.font_size if format_ else self.format.font_size
         color = format_.color if format_ else self.format.color
         self.canvas.setFont(font, font_size)
-        self.canvas.setFillColorRGB(*color)
+        self.canvas.setFillColor(HexColor(color))
         print(f'Drawing text {text} at ({x},{y}) with font {font} and size {font_size} at {x}, {y}')
         if align == 'left':
             self.canvas.drawString(x2, y2, text)
