@@ -1,6 +1,7 @@
 import os
 from py_arg_reports.reporters.libro_sueldo.info import get_recibo_info, get_info_final_for_libro_sueldo
 from py_arg_reports.tools.base import CanvasPDF, CanvaPDFBlock, Format, Rect
+from reportlab.lib.units import cm
 
 
 def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
@@ -27,22 +28,24 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     # Agregar headers
     header_format = Format(font_size=14)
     normal_format = Format(font_size=10)
-    header_rect = Rect(0, 0, PDF.width, 5)
+    header_rect = Rect(0, 0, 0, 8)
     header = CanvaPDFBlock(PDF, header_rect, header_format)
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', x=header.width / 2)
-    header.text('Hecho con PayrollT', format_=Format(font_size=8))
-    header.text('Nombre de la empresa', y=2, format_=normal_format)
-    header.text('Direccion de la empresa', format_=normal_format, x=8, y=12)
-    header.line(Rect(10, 10, 11, 15), (44, 55, 66))
-    header.line(Rect(100, 100, 110, 150), (44, 55, 66))
-    header.rectangle(Rect(10, 10, 11, 15), fill_color=(0.8, 0.8, 0.8))
-    PDF.canvas.showPage()
-    body = CanvaPDFBlock(PDF, Rect(15, 15, PDF.width, 5), normal_format)
-    body.text('Cuerpo del libro')
-    body.rectangle(Rect(15, 15, 11, 15), fill_color=(0.8, 0.8, 0.8))
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', x=header.width / 2, y=1)
+    header.text('Hecho con PayrollT', format_=Format(font_size=8), x=3, y=1.5)
+    header.text('Nombre de la empresa', x=4, y=2, format_=normal_format)
+    header.text('Direccion de la empresa', format_=normal_format, x=4, y=2.3)
+    header.rectangle(Rect(0, 9, 19, 6), fill_color=(0.9, 0.9, 0.9))
+    header.line(Rect(10, 5, 11, 15), (44, 55, 66))
+    header.line(Rect(12, 7, 10, 7), (44, 55, 66))
+    # header.rectangle(Rect(10, 10, 11, 15), fill_color=(0.8, 0.8, 0.8))
+    # PDF.canvas.showPage()
+    # body = CanvaPDFBlock(PDF, Rect(15, 15, PDF.width, 5), normal_format)
+    # body.text('Cuerpo del libro')
+    # body.rectangle(Rect(15, 15, 11, 15), fill_color=(0.8, 0.8, 0.8))
 
     PDF.canvas.showPage()
     PDF.canvas.save()
+    PDF.export('libro-sueldo.json')
 
 
 if __name__ == '__main__':
