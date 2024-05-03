@@ -26,7 +26,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     PDF = CanvasPDF(file_path=my_file_path, title='Libro Sueldo')
 
     # Agregar headers
-    header_format = Format(font_size=14)
+    header_format = Format(font_size=14, color='#0000FF', fill_color='#FF000033')
     normal_format = Format(font_size=10)
     header_rect = Rect(0, 0, 0, 8)
     header = CanvaPDFBlock(PDF, header_rect, header_format)

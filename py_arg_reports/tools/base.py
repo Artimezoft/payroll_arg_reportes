@@ -27,11 +27,11 @@ class Rect:
 
     def as_dict(self):
         return {
-            'x': self.x,
-            'y': self.y,
-            'w': self.w,
-            'h': self.h,
-            'units': self.units,
+            'x': round(self.x, 2),
+            'y': round(self.y, 2),
+            'w': round(self.w, 2),
+            'h': round(self.h, 2),
+            'units': round(self.units, 2),
         }
 
 
@@ -169,7 +169,7 @@ class CanvaPDFBlock:
         )
         # Dibujar rectángulos del bloque
         if with_rectangles:
-            self.rectangle(rect)
+            self.rectangle(rect, color=self.format.color, fill_color=self.format.fill_color)
 
     def _rect_to_units(self, rect):
         """ Convierte un rectángulo relativo a uno absoluto """
@@ -208,14 +208,16 @@ class CanvaPDFBlock:
         )
         color = color if color else self.format.color
 
-        self.canvas.setStrokeColor(HexColor(color))
+        has_alpha = len(color) == 9
+        self.canvas.setStrokeColor(HexColor(color, hasAlpha=has_alpha))
         fill_color = fill_color if fill_color else self.format.fill_color
-        self.canvas.setFillColor(HexColor(fill_color))
+        has_alpha = len(fill_color) == 9
+        self.canvas.setFillColor(HexColor(fill_color, hasAlpha=has_alpha))
         print(f'Drawing rect {rect} with color {color} and fill {fill_color}')
         if rounded:
-            self.canvas.roundRect(*rect2, radius=5)
+            self.canvas.roundRect(*rect2, radius=5, stroke=1, fill=1)
         else:
-            self.canvas.rect(*rect2)
+            self.canvas.rect(*rect2, stroke=1, fill=1)
 
         # volver el puntero a donde inicia este bloque
         self.current_x = rect.x
@@ -253,10 +255,10 @@ class CanvaPDFBlock:
                 'type': 'text',
                 'text': text,
                 'align': align,
-                'x': x,
-                'x2': x2,
-                'y': y,
-                'y2': y2,
+                'x': round(x, 2),
+                'x2': round(x2, 2),
+                'y': round(y, 2),
+                'y2': round(y2, 2),
             }
         )
 
