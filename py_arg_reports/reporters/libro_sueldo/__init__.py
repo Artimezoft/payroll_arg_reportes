@@ -49,6 +49,9 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
 
     pos_y = PDF.last_y + 0.1
     empleado_h = 5
+    total_rem = 0
+    total_no_rem = 0
+    total_desc = 0
     for legajo in info_recibo['legajos']:
         log.info(f'Generando empleado {legajo}')
         empleado = {
@@ -70,6 +73,24 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
         }
         draw_empleado(PDF, empleado, start_y=pos_y, height=empleado_h)
         pos_y = PDF.last_y + 0.3
+        total_rem += empleado['totales_liquidacion']['total_remunerativo']
+        total_no_rem += empleado['totales_liquidacion']['total_no_remunerativo']
+        total_desc += empleado['totales_liquidacion']['total_retenciones']
+
+    # Agregar bloque de totales
+    totales = CanvaPDFBlock(PDF, Rect(0, pos_y, 0, 3), Format(font_size=10, fill_color='#F0F0F099'))
+    totales.text('Totales', bold=True, x=1, y=0.5, format_=F14)
+
+    total_rem2 = str(round(total_rem, 2))
+    totales.text(f'Remunerativos $ {total_rem2}', bold=True, x=1, y=1.5)
+    total_no_rem2 = str(round(total_no_rem, 2))
+    totales.text(f'No Remunerativos $ {total_no_rem2}', bold=True, x=7.3, y=1.5)
+    total_desc2 = str(round(total_desc, 2))
+    totales.text(f'Descuentos {total_desc2}', bold=True, x=14, y=1.5)
+
+    neto = total_rem + total_no_rem - total_desc
+    neto = str(round(neto, 2))
+    totales.text(f'Neto a cobrar $ {neto}', bold=True, x=1, y=2.5, format_=F14)
 
     PDF.finish_page()
     PDF.save()
@@ -81,7 +102,7 @@ def draw_header(PDF: CanvasPDF):
     # Agregar el bloque de headers izquiero
     header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 3.3), format_=Format(font_size=10, fill_color='#D0D0D0CC'))
     header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14)
-    header.text(f'Folio {PDF.page}', x=17.5, y=0.7, format_=F10)
+    header.text('Folio {page}', x=17.5, y=0.7, format_=F10)
     col = [info_recibo['company_name'], info_recibo['domicilio']]
     header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
     # actividades
@@ -104,7 +125,7 @@ def draw_footer(PDF: CanvasPDF):
         PDF, is_footer=True,
         rect=Rect(0, PDF.height-1, 0, 0.5), format_=Format(font_size=8, fill_color='#D0D0D0')
     )
-    footer.text(f'Hojas Móviles Libro Art. 52 Ley 20744 -pagina {PDF.page}', align='center', y=0.3)
+    footer.text('Hojas Móviles Libro Art. 52 Ley 20744 -pagina {page}', align='center', y=0.3)
     return footer
 
 

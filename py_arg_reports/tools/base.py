@@ -311,6 +311,11 @@ class CanvaPDFBlock:
                 'format_': format_,
             }
         )
+
+        # Puede haber valores dinamicos. Por ahora la página
+        # Esto podria ser mejor si hay mas valores
+        text = text.replace('{page}', str(self.base_pdf.page))
+
         # Si es centrado y no me da x propongo la mitad del ancho de este bloque
         if align == 'center' and x == 0:
             x = self.width / 2
