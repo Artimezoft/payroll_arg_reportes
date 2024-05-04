@@ -61,7 +61,7 @@ class Format:
 class CanvasPDF:
     """ A PDF file from scratch """
     def __init__(self, file_path, title=None, pagesize=A4, units=cm, margin_x=1, margin_y=1):
-        self.canvas = Canvas(file_path, pagesize=pagesize)
+        self.canvas = Canvas(file_path, pagesize=pagesize, bottomup=False)
         self.pagesize = pagesize
         self.units = units
         self.width_raw, self.height_raw = pagesize
@@ -133,9 +133,7 @@ class CanvaPDFBlock:
                 'format': format_.as_dict() if format_ else None,
             }
         )
-        # La coordenada Y empieza abajo de todo de la pagina
-        # y se va moviendo hacia arriba
-        # asi que dejo a los usuarios sean normales y lidiamos aca con las coordenadas
+        # La coordenada Y empieza abajo de todo de la pagina si no ponemos bottomup=False
         # start_x, start_y: coordenadas iniciales para que los numeros internos sean siempre relativos
         # Un cero aqui significa que el bloque está en la esquina superior izquierda de este objeto, no de la página.
         if rect.x < self.base_pdf.margin_x:
@@ -182,7 +180,7 @@ class CanvaPDFBlock:
         # move to start coords
         u = self.base_pdf.units
         x2 = rect.x
-        y2 = rect.y + 10
+        y2 = rect.y
         if move_start:
             # El rectangulo de bloque inicial ya tiene esto considerado
             x2 += self.start_x
@@ -194,11 +192,10 @@ class CanvaPDFBlock:
         w = rect.w * u if rect.w else 0
         h = rect.h * u if rect.h else 0
 
-        page_h = self.base_pdf.height * u
-        y3 = page_h - y2
-        print(f'y: {rect.y}::{y2/u} y3: {y3/u}, page height: {self.base_pdf.height}')
-        r = Rect(x2, y3, w, h, units=self.base_pdf.units)
-        print(r)
+        # Si bottomup fuera True necesitaria algo asi
+        # page_h = self.base_pdf.height * u
+        # y3 = page_h - y2
+        r = Rect(x2, y2, w, h, units=self.base_pdf.units)
         return r
 
     def rectangle(self, rect: Rect, color=None, fill_color=None, rounded=True, move_start=True):
@@ -224,9 +221,7 @@ class CanvaPDFBlock:
         has_alpha = len(fill_color) == 9
         self.canvas.setFillColor(HexColor(fill_color, hasAlpha=has_alpha))
 
-        print(f'final rect {rect2.as_dict(units=True)}')
         if rounded:
-            # self.canvas.roundRect(rect2.x, rect2.y, rect2.w, rect2.h, radius=3, stroke=1, fill=1)
             self.canvas.roundRect(*rect2, radius=3, stroke=1, fill=1)
         else:
             self.canvas.rect(*rect2, stroke=1, fill=1)
@@ -255,7 +250,8 @@ class CanvaPDFBlock:
 
         x2 = x2 * u
         y2 = y2 * u
-        y2 = (self.base_pdf.height * u) - y2
+        # Si bottomup fuera True necesitaria algo asi
+        # y2 = (self.base_pdf.height * u) - y2
         self.base_pdf.content.append(
             {
                 'type': 'text',
