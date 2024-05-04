@@ -114,6 +114,14 @@ class CanvasPDF:
             log.info(f'PDF content exported to {file_path}')
         f.close()
 
+    def finish_page(self):
+        """ Terminar la página actual """
+        self.canvas.showPage()
+
+    def save(self):
+        """ Guardar el PDF """
+        self.canvas.save()
+
 
 class CanvaPDFBlock:
     """ A Canvas PDF block with something, even pages"""
@@ -241,8 +249,11 @@ class CanvaPDFBlock:
         self.canvas.setStrokeColor(HexColor(color))
         self.canvas.line(*rect2)
 
-    def text(self, text, x, y, align='left', format_: Format = None):
+    def text(self, text, x=0, y=0, align='left', format_: Format = None):
         """ Dibuja un texto en el canvas c """
+        # Si es centrado y no me da x propongo la mitad del ancho de este bloque
+        if align == 'center' and x == 0:
+            x = self.width / 2
         # Pasar de coordenadas relativas a absolutas
         u = self.base_pdf.units
         x2 = self.start_x + x
