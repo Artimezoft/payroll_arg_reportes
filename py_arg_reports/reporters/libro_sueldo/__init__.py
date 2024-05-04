@@ -10,7 +10,7 @@ F14 = Format(font_size=14)
 F10 = Format(font_size=10)
 F9 = Format(font_size=9)
 t10_line_sep = 0.5
-t9_line_sep = 0.35
+t9_line_sep = 0.3
 
 
 def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
@@ -48,7 +48,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     draw_footer(PDF)
 
     pos_y = PDF.last_y + 0.1
-    empleado_h = 5.5
+    empleado_h = 5
     for legajo in info_recibo['legajos']:
         log.info(f'Generando empleado {legajo}')
         empleado = {
@@ -128,9 +128,9 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     lista = [empleado["cuil"], empleado["categoria"], empleado["area"]]
     empleado_block.text_column(lista, start_x=16, start_y=y, line_sep=t9_line_sep, format_=F9)
 
-    empleado_block.line(Rect(2, 2, 16, 2), line_with=2)
+    empleado_block.line(Rect(2, 1.8, 16, 1.8), line_with=2)
 
-    y_titles = 2.5
+    y_titles = 2.3
     # Los tipos de conceptos son:
     # 1 Remunerativos
     # 2 No Remunerativos
@@ -184,9 +184,11 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     lista = [str(round(cpt['importe'], 2)) for cpt in descuentos]
     empleado_block.text_column(lista, start_x=18.7, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
 
-    empleado_block.rectangle(Rect(1, y_titles+2, 6, 0.6), fill_color='#D0D0D0AA')
+    # NETO
+
+    empleado_block.rectangle(Rect(1, y_titles+1.6, 6, 0.6), fill_color='#D0D0D0AA')
     neto_a_cobrar = round(empleado["totales_liquidacion"]["neto_liquidacion"], 2)
-    empleado_block.text(f'Neto a cobrar $ {neto_a_cobrar}', bold=True, x=1.2, y=y_titles+2.4, format_=F10)
+    empleado_block.text(f'Neto a cobrar   $ {neto_a_cobrar}', bold=True, x=1.2, y=y_titles+2, format_=F10)
 
 
 if __name__ == '__main__':
