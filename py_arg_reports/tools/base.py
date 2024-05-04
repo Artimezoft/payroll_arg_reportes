@@ -69,6 +69,11 @@ class CanvasPDF:
         self.height = self.height_raw / units
         self.margin_x = margin_x
         self.margin_y = margin_y
+        # Se van agregando bloques y algunos se pasan de la pagina y empieza otra nueva
+        # entonces giuardo registro de donde voy para seguir de donde deje
+        self.last_y = margin_y
+        # llevo registro de la pagina actual
+        self.page = 1
         if title:
             # Define a PDF title
             self.canvas.setTitle(title)
@@ -141,6 +146,13 @@ class CanvaPDFBlock:
                 'format': format_.as_dict() if format_ else None,
             }
         )
+        # Si este bloque pasa la pagina actual, terminar la pagina
+        if rect.y + rect.h > self.base_pdf.height:
+            log.info(f'Block {rect} is going to pass the page, finishing page')
+            self.base_pdf.finish_page()
+            # Recomenzar Y
+            rect.y = self.base_pdf.margin_y
+            self.base_pdf.page += 1
         # La coordenada Y empieza abajo de todo de la pagina si no ponemos bottomup=False
         # start_x, start_y: coordenadas iniciales para que los numeros internos sean siempre relativos
         # Un cero aqui significa que el bloque está en la esquina superior izquierda de este objeto, no de la página.
@@ -182,6 +194,8 @@ class CanvaPDFBlock:
                 fill_color=self.format.fill_color,
                 move_start=False
             )
+        # Como no se si pase pagina y se creo otra guardo registro del Y maximo donde termine
+        self.base_pdf.last_y = self.start_y + self.height
 
     def _rect_to_units(self, rect, move_start=True):
         """ Convierte un rectángulo relativo a uno absoluto """
@@ -287,3 +301,8 @@ class CanvaPDFBlock:
         elif align == 'center':
             # x aqui es el centro del texto
             self.canvas.drawCentredString(x2, y2, text)
+
+    def text_column(self, text_list, line_sep=0.4, start_x=0, start_y=0, format_: Format = None):
+        """ Escribir una columna de textos """
+        for i, text in enumerate(text_list):
+            self.text(text, x=start_x, y=start_y + (line_sep * i), format_=format_)

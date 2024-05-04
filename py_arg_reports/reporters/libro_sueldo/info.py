@@ -181,4 +181,3 @@ def get_info_final_for_libro_sueldo(api_dict: dict) -> dict:
         "relaciones_bancarias": relaciones_bancarias,
     }
     return resp
-

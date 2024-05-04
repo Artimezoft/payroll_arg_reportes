@@ -6,6 +6,9 @@ from reportlab.lib.units import cm
 
 
 log = logging.getLogger(__name__)
+F14 = Format(font_size=14)
+F10 = Format(font_size=10)
+F9 = Format(font_size=9)
 
 
 def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
@@ -16,10 +19,13 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     recibo_info = get_recibo_info(json_data)
     if recibo_info.get("error"):
         error_detail = recibo_info["error"]
+        log.error(f'Error al obtener la info del recibo: {error_detail}')
         return error_detail
 
     # Get info from recibo_info
     info_recibo = get_info_final_for_libro_sueldo(recibo_info)
+    test_info_tecibo = 'py_arg_reports/reporters/libro_sueldo/samples/imfo-recibo.json'
+    info_recibo = json.load(open(test_info_tecibo))
 
     # Cada liquidación va a tener su propia carpeta en download
     my_path = output_path
@@ -30,12 +36,48 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
 
     # Mi PDF general donde voy a agregar los bloques
     PDF = CanvasPDF(file_path=my_file_path, title='Libro Sueldo', units=cm)
+    log.info(f'Creando PDF en {my_file_path}')
 
-    # Agregar el bloque de headers
-    header = CanvaPDFBlock(PDF, Rect(0, 0, 0, 4), Format(font_size=14, fill_color='#F0F0F0'))
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7)
-    print(info_recibo['company_name'])
-    header.text(info_recibo['company_name'], format_=Format(font_size=10), x=0.1, y=1)
+    # Agregar el bloque de headers izquiero
+    header = CanvaPDFBlock(PDF, Rect(0, 0, 0, 4), Format(font_size=10, fill_color='#D0D0D0'))
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14)
+    col = [info_recibo['company_name'], info_recibo['domicilio'], "CUIT: " + info_recibo['cuit']]
+    header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
+    # actividades
+    actividades = ['No tenemos actividades 7777', 'Esta deberia ser la secundaria 1', 'Esta deberia ser la secundaria 2']
+    apri = f'Actividad principal: {actividades[0]}'
+    asec = [f'Actividad secundaria: {act}' for act in actividades[1:]]
+    col = [apri] + asec
+    header.text_column(col, start_x=0.4, start_y=2.7, format_=F9)
+
+    # Agregar el bloque de headers derecho
+    per = f'Periodo {info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
+    col = [per, 'Folio 1/1']
+    header.text_column(col, start_x=13, start_y=1.3, format_=F10)
+
+    pos_y = PDF.last_y + 0.1
+    empleado_h = 6
+    for legajo in info_recibo['legajos']:
+        log.info(f'Generando empleado {legajo}')
+        empleado = {
+            'nombre': info_recibo['nombres_completos'].get(legajo),
+            'cuil': info_recibo['cuiles'].get(legajo),
+            'legajo': legajo,
+            'categoria': info_recibo['categorias'].get(legajo),
+            'fecha_ingreso': info_recibo['fechas_ingreso'].get(legajo),
+            'fecha_ingreso_2': info_recibo['fechas_ingreso_2'].get(legajo),
+            'contrato': info_recibo['contratos'].get(legajo),
+            'obra_social': info_recibo['obras_sociales'].get(legajo),
+            'area': info_recibo['areas'].get(legajo),
+            'posicion': info_recibo['posiciones'].get(legajo),
+            'basico': info_recibo['basicos'].get(legajo),
+            'lugar_trabajo': info_recibo['lugares_trabajo'].get(legajo),
+            'conceptos_liquidados': info_recibo['conceptos_liquidados'].get(legajo),
+            'totales_liquidacion': info_recibo['totales_liquidacion'].get(legajo),
+            'relacion_bancaria': info_recibo['relaciones_bancarias'].get(legajo),
+        }
+        draw_empleado(PDF, empleado, start_y=pos_y, height=empleado_h)
+        pos_y = PDF.last_y + 0.1
 
     PDF.finish_page()
     PDF.save()
@@ -43,16 +85,29 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     PDF.export('py_arg_reports/reporters/libro_sueldo/samples/libro-sueldo-test.json')
 
 
+def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
+    empleado_block = CanvaPDFBlock(PDF, Rect(0, start_y, 0, height), Format(font_size=10, fill_color='#FDFDFD'))
+    empleado_block.text(empleado['nombre'], align='center', y=0.5, format_=F14)
+
+
 if __name__ == '__main__':
-    # En estas pruebas escupir los logs en la consola
+    """
+    Esto es para hacer pruebas rapido con los arhcivos de ejemplo.
+    Dejar para hacer correcciones rápidas.
+    En estas pruebas escupir los logs en la consola
+    """
+    import json
     import sys
+    log.setLevel(logging.DEBUG)
     handler = logging.StreamHandler(sys.stdout)
     handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
     log.addHandler(handler)
 
     # Descargar el libro
-    json_data = {}
+    json_data_test_file = 'py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json'
+    json_data = json.load(open(json_data_test_file))
     output_path = 'download/'
     filename = 'libro-sueldo'
     descargar_libro(json_data, output_path, filename)
-    print(f'Libro sueldo descargado en {output_path}{filename}.pdf')

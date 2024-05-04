@@ -1,0 +1,246 @@
+{
+    "periodo": "2023-12",
+    "company_name": "Empresa de Prueba",
+    "cuit": "20333333333",
+    "domicilio": "Calle de Prueba 123, 10, Formosa",
+    "tipo_liquidacion": "Mensual",
+    "nombres_completos": {
+        "6410": "POBLETE, ADRIANA ANAH\u00cd",
+        "7720": "MONTEVERDE, EDUARDO VIVIANA",
+        "6411": "POBLETE 2, ADRIANA ANAH\u00cd",
+        "7721": "MONTEVERDE 2, EDUARDO VIVIANA",
+        "6412": "POBLETE 3, ADRIANA ANAH\u00cd",
+        "7722": "MONTEVERDE 3, EDUARDO VIVIANA"
+    },
+    "cuiles": {
+        "6410": "20-18871264-8",
+        "7720": "20-67464843-8",
+        "6411": "20-18871264-8",
+        "7721": "20-67464843-8",
+        "6412": "20-18871264-8",
+        "7722": "20-67464843-8"
+    },
+    "legajos": ["6410", "7720", "6411", "7721", "6412", "7722"],
+    "categorias": {
+        "6410": "Vendedor C",
+        "7720": "Cajero C",
+        "6411": "Vendedor C1",
+        "7721": "Cajero C1",
+        "6412": "Vendedor C2",
+        "7722": "Cajero C2"
+    },
+    "fechas_ingreso": {
+        "6410": "01/10/1990",
+        "7720": "01/10/1990",
+        "6411": "01/10/1991",
+        "7721": "01/10/1991",
+        "6412": "01/10/1992",
+        "7722": "01/10/1992"
+    },
+    "fechas_ingreso_2": {},
+    "contratos": {
+        "6410": "A tiempo parcial: Indeterminado /permanente",
+        "7720": "A tiempo parcial: Indeterminado /permanente",
+        "6411": "A tiempo parcial: Indeterminado /permanente1",
+        "7721": "A tiempo parcial: Indeterminado /permanente1",
+        "6412": "A tiempo parcial: Indeterminado /permanente2",
+        "7722": "A tiempo parcial: Indeterminado /permanente2"
+    },
+    "obras_sociales": {
+        "6410": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES",
+        "7720": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES",
+        "6411": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES1",
+        "7721": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES1",
+        "6412": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES2",
+        "7722": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES2"
+    },
+    "areas": {
+        "6410": "Area 1",
+        "7720": "Area 1",
+        "6411": "Area 11",
+        "7721": "Area 11",
+        "6412": "Area 12",
+        "7722": "Area 12"
+    },
+    "posiciones": {
+        "6410": "Posicion 1",
+        "7720": "Posicion 1",
+        "6411": "Posicion 11",
+        "7721": "Posicion 11",
+        "6412": "Posicion 12",
+        "7722": "Posicion 12"
+    },
+    "basicos": {
+        "6410": "$  112.520,15",
+        "7720": "$  110.645,24",
+        "6411": "$  112.520,11",
+        "7721": "$  110.645,21",
+        "6412": "$  112.520,12",
+        "7722": "$  110.645,22"
+    },
+    "lugares_trabajo": {
+        "6410": "Mendiolaza",
+        "7720": "25 de Mayo",
+        "6411": "Mendiolaza1",
+        "7721": "25 de Mayo1",
+        "6412": "Mendiolaza2",
+        "7722": "25 de Mayo2"
+    },
+    "conceptos_liquidados": {
+        "6410": [
+            {
+                "code": "SUELDO",
+                "name": "Sueldo B\u00e1sico",
+                "tipo_concepto": 1,
+                "cantidad": 30.0,
+                "importe": 112520.15
+            },
+            {
+                "code": "ANTIGU",
+                "name": "Antiguedad",
+                "tipo_concepto": 1,
+                "cantidad": 33.0,
+                "importe": 37131.6495
+            }
+        ],
+        "7720": [
+            {
+                "code": "SUELDO",
+                "name": "Sueldo B\u00e1sico",
+                "tipo_concepto": 1,
+                "cantidad": 30.0,
+                "importe": 110645.24
+            },
+            {
+                "code": "ANTIGU",
+                "name": "Antiguedad",
+                "tipo_concepto": 1,
+                "cantidad": 33.0,
+                "importe": 36512.929200000006
+            }
+        ],
+        "6411": [
+            {
+                "code": "SUELDO",
+                "name": "Sueldo B\u00e1sico",
+                "tipo_concepto": 1,
+                "cantidad": 30.0,
+                "importe": 112520.11
+            },
+            {
+                "code": "ANTIGU",
+                "name": "Antiguedad",
+                "tipo_concepto": 1,
+                "cantidad": 33.0,
+                "importe": 37131.6493
+            }
+        ],
+        "7721": [
+            {
+                "code": "SUELDO",
+                "name": "Sueldo B\u00e1sico",
+                "tipo_concepto": 1,
+                "cantidad": 30.0,
+                "importe": 110645.21
+            },
+            {
+                "code": "ANTIGU",
+                "name": "Antiguedad",
+                "tipo_concepto": 1,
+                "cantidad": 33.0,
+                "importe": 36512.9293
+            }
+        ],
+        "6412": [
+            {
+                "code": "SUELDO",
+                "name": "Sueldo B\u00e1sico",
+                "tipo_concepto": 1,
+                "cantidad": 30.0,
+                "importe": 112520.12
+            },
+            {
+                "code": "ANTIGU",
+                "name": "Antiguedad",
+                "tipo_concepto": 1,
+                "cantidad": 33.0,
+                "importe": 37131.6496
+            }
+        ],
+        "7722": [
+            {
+                "code": "SUELDO",
+                "name": "Sueldo B\u00e1sico",
+                "tipo_concepto": 1,
+                "cantidad": 30.0,
+                "importe": 110645.22
+            },
+            {
+                "code": "ANTIGU",
+                "name": "Antiguedad",
+                "tipo_concepto": 1,
+                "cantidad": 33.0,
+                "importe": 36512.9294
+            }
+        ]
+    },
+    "totales_liquidacion": {
+        "6410": {
+            "total_remunerativo": 162122.78279166666,
+            "total_no_remunerativo": 36477.626128125004,
+            "total_retenciones": 32625.883297578122,
+            "neto_liquidacion": 165974.52562221355
+        },
+        "7720": {
+            "total_remunerativo": 159421.34996666666,
+            "total_no_remunerativo": 35869.8037425,
+            "total_retenciones": 32083.9083370625,
+            "neto_liquidacion": 163207.24537210417
+        },
+        "6411": {
+            "total_remunerativo": 162122.75979166666,
+            "total_no_remunerativo": 36477.621128125004,
+            "total_retenciones": 32625.879297578122,
+            "neto_liquidacion": 165974.50162221355
+        },
+        "7721": {
+            "total_remunerativo": 159421.32996666666,
+            "total_no_remunerativo": 35869.7987425,
+            "total_retenciones": 32083.9033370625,
+            "neto_liquidacion": 163207.22537210417
+        },
+        "6412": {
+            "total_remunerativo": 162122.76979166666,
+            "total_no_remunerativo": 36477.623128125004,
+            "total_retenciones": 32625.881297578122,
+            "neto_liquidacion": 165974.51162221355
+        },
+        "7722": {
+            "total_remunerativo": 159421.33996666666,
+            "total_no_remunerativo": 35869.8017425,
+            "total_retenciones": 32083.9053370625,
+            "neto_liquidacion": 163207.23537210417
+        }
+    },
+    "fecha_pago": "04/01/2024",
+    "ultimo_pago_ss": {
+        "id": 31,
+        "banco": "Banco De La Ciudad De Buenos Aires",
+        "mes": 12,
+        "anio": 2023,
+        "fecha_pago": "2024-01-09",
+        "empresa": 1
+    },
+    "relaciones_bancarias": {
+        "6410": {
+            "forma_pago": "EFVO",
+            "numero_cuenta": null,
+            "cbu": null
+        },
+        "7720": {
+            "forma_pago": "EFVO",
+            "numero_cuenta": null,
+            "cbu": null
+        }
+    }
+}
