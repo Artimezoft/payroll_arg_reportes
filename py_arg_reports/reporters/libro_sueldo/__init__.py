@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 F14 = Format(font_size=14)
 F10 = Format(font_size=10)
 F9 = Format(font_size=9)
+t10_line_sep = 0.5
 
 
 def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
@@ -35,25 +36,15 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     log.info(f'Generando libro sueldo en {my_file_path}')
 
     # Mi PDF general donde voy a agregar los bloques
-    PDF = CanvasPDF(file_path=my_file_path, title='Libro Sueldo', units=cm)
+    PDF = CanvasPDF(
+        file_path=my_file_path,
+        title='Libro Sueldo', units=cm,
+        data=info_recibo,
+    )
     log.info(f'Creando PDF en {my_file_path}')
 
-    # Agregar el bloque de headers izquiero
-    header = CanvaPDFBlock(PDF, Rect(0, 0, 0, 4), Format(font_size=10, fill_color='#D0D0D0'))
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14)
-    col = [info_recibo['company_name'], info_recibo['domicilio'], "CUIT: " + info_recibo['cuit']]
-    header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
-    # actividades
-    actividades = ['No tenemos actividades 7777', 'Esta deberia ser la secundaria 1', 'Esta deberia ser la secundaria 2']
-    apri = f'Actividad principal: {actividades[0]}'
-    asec = [f'Actividad secundaria: {act}' for act in actividades[1:]]
-    col = [apri] + asec
-    header.text_column(col, start_x=0.4, start_y=2.7, format_=F9)
-
-    # Agregar el bloque de headers derecho
-    per = f'Periodo {info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
-    col = [per, 'Folio 1/1']
-    header.text_column(col, start_x=13, start_y=1.3, format_=F10)
+    draw_header(PDF)
+    draw_footer(PDF)
 
     pos_y = PDF.last_y + 0.1
     empleado_h = 6
@@ -85,9 +76,44 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     PDF.export('py_arg_reports/reporters/libro_sueldo/samples/libro-sueldo-test.json')
 
 
+def draw_header(PDF: CanvasPDF):
+    info_recibo = PDF.data
+    log.info(f'Creando header en pagina {PDF.page}')
+    # Agregar el bloque de headers izquiero
+    header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 4), format_=Format(font_size=10, fill_color='#D0D0D0'))
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14)
+    col = [info_recibo['company_name'], info_recibo['domicilio'], "CUIT: " + info_recibo['cuit']]
+    header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
+    # actividades
+    actividades = ['No tenemos actividades 7777', 'Esta deberia ser la secundaria 1', 'Esta deberia ser la secundaria 2']
+    apri = f'Actividad principal: {actividades[0]}'
+    asec = [f'Actividad secundaria: {act}' for act in actividades[1:]]
+    col = [apri] + asec
+    header.text_column(col, start_x=0.4, start_y=2.7, line_sep=t10_line_sep, format_=F9)
+
+    # Agregar el bloque de headers derecho
+    per = f'Periodo {info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
+    col = [per, f'Folio {PDF.page}']
+    header.text_column(col, start_x=13, start_y=1.3, format_=F10)
+    return header
+
+
+def draw_footer(PDF: CanvasPDF):
+    log.info(f'Creando footer en pagina {PDF.page}')
+    footer = CanvaPDFBlock(
+        PDF, is_footer=True,
+        rect=Rect(0, PDF.height-1, 0, 0.5), format_=Format(font_size=8, fill_color='#D0D0D0')
+    )
+    footer.text(f'Hojas Móviles Libro Art. 52 Ley 20744 -pagina {PDF.page}', align='center', y=0.3)
+    return footer
+
+
 def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block = CanvaPDFBlock(PDF, Rect(0, start_y, 0, height), Format(font_size=10, fill_color='#FDFDFD'))
-    empleado_block.text(empleado['nombre'], align='center', y=0.5, format_=F14)
+    name = f'{empleado["legajo"]} - {empleado["nombre"]}'
+    y = 0.5
+    empleado_block.text(name, bold=True, x=1, y=y, format_=F10)
+    empleado_block.text('Lalo', x=1.5, y=y+t10_line_sep, format_=F10)
 
 
 if __name__ == '__main__':

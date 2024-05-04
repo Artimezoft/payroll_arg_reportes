@@ -39,8 +39,14 @@ class Rect:
 
 class Format:
     """ A format for a block """
-    def __init__(self, font='Helvetica', font_size=10, color='#000000', fill_color='#F0F0F0'):
+    def __init__(
+            self,
+            font='Helvetica', font_bold='Helvetica-Bold',
+            font_size=10,
+            color='#000000', fill_color='#F0F0F0'
+    ):
         self.font = font
+        self.font_bold = font_bold
         self.font_size = font_size
         # Los colores son como los de HTML #RRGGBBAA, despues los transformamos al pintar
         self.color = color
@@ -60,10 +66,16 @@ class Format:
 
 class CanvasPDF:
     """ A PDF file from scratch """
-    def __init__(self, file_path, title=None, pagesize=A4, units=cm, margin_x=1, margin_y=1):
+    def __init__(
+            self, file_path, title=None,
+            pagesize=A4, units=cm,
+            margin_x=1, margin_y=1,
+            data={},  # datos generales con los que se construye el PDF
+    ):
         self.canvas = Canvas(file_path, pagesize=pagesize, bottomup=False)
         self.pagesize = pagesize
         self.units = units
+        self.data = data
         self.width_raw, self.height_raw = pagesize
         self.width = self.width_raw / units
         self.height = self.height_raw / units
@@ -99,6 +111,9 @@ class CanvasPDF:
                 'units': round(units, 2),
             }
         )
+        # los bloques de header y de footer se guardan para crear en cada pagina
+        self.header_block = None
+        self.footer_block = None
 
     def __str__(self):
         w = round(self.width, 2)
@@ -131,14 +146,23 @@ class CanvasPDF:
 class CanvaPDFBlock:
     """ A Canvas PDF block with something, even pages"""
 
-    def __init__(self, canvas: CanvasPDF, rect: Rect, format_: Format = None, with_rectangles=True):
+    def __init__(
+            self, canvas: CanvasPDF,
+            rect: Rect, format_: Format = None,
+            is_header=False,  # Si es un header lo guardo
+            is_footer=False,  # Si es un footer lo guardo
+            with_rectangles=True
+    ):
         """ Inicializamos con coordenadas iniciales y ancho y alto si los hay"""
         # connect to the parent canvas
         # Our PDF canvas
         self.base_pdf = canvas
+        if is_header:
+            self.base_pdf.header_block = self
+        if is_footer:
+            self.base_pdf.footer_block = self
         # and the "real" canvas
         self.canvas = self.base_pdf.canvas
-
         self.base_pdf.content.append(
             {
                 'type': 'PDFBlock_before_init',
@@ -147,12 +171,18 @@ class CanvaPDFBlock:
             }
         )
         # Si este bloque pasa la pagina actual, terminar la pagina
-        if rect.y + rect.h > self.base_pdf.height:
-            log.info(f'Block {rect} is going to pass the page, finishing page')
+        if rect.y + rect.h > self.base_pdf.height - self.base_pdf.margin_y:
+            log.info(f'Block is going to pass the page {self.base_pdf.page}, finishing page')
             self.base_pdf.finish_page()
             # Recomenzar Y
             rect.y = self.base_pdf.margin_y
             self.base_pdf.page += 1
+            # re draw header and footer
+            if self.base_pdf.header_block:
+                pass
+            if self.base_pdf.footer_block:
+                pass
+
         # La coordenada Y empieza abajo de todo de la pagina si no ponemos bottomup=False
         # start_x, start_y: coordenadas iniciales para que los numeros internos sean siempre relativos
         # Un cero aqui significa que el bloque está en la esquina superior izquierda de este objeto, no de la página.
@@ -195,7 +225,9 @@ class CanvaPDFBlock:
                 move_start=False
             )
         # Como no se si pase pagina y se creo otra guardo registro del Y maximo donde termine
-        self.base_pdf.last_y = self.start_y + self.height
+        # No tener en cuenta si estoy dibujando el footer!
+        if not is_footer:
+            self.base_pdf.last_y = self.start_y + self.height
 
     def _rect_to_units(self, rect, move_start=True):
         """ Convierte un rectángulo relativo a uno absoluto """
@@ -263,7 +295,7 @@ class CanvaPDFBlock:
         self.canvas.setStrokeColor(HexColor(color))
         self.canvas.line(*rect2)
 
-    def text(self, text, x=0, y=0, align='left', format_: Format = None):
+    def text(self, text, x=0, y=0, align='left', bold=False, format_: Format = None):
         """ Dibuja un texto en el canvas c """
         # Si es centrado y no me da x propongo la mitad del ancho de este bloque
         if align == 'center' and x == 0:
@@ -289,7 +321,9 @@ class CanvaPDFBlock:
             }
         )
 
-        font = format_.font if format_ else self.format.font
+        format_ = format_ or self.format
+        font = format_.font_bold if bold else self.format.font
+
         font_size = format_.font_size if format_ else self.format.font_size
         color = format_.color if format_ else self.format.color
         self.canvas.setFont(font, font_size)

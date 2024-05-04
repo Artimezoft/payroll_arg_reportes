@@ -114,8 +114,8 @@
         "align": "left",
         "x": 0.4,
         "x2": 1.4,
-        "y": 3.1,
-        "y2": 4.1
+        "y": 3.2,
+        "y2": 4.2
     },
     {
         "type": "text",
@@ -123,8 +123,8 @@
         "align": "left",
         "x": 0.4,
         "x2": 1.4,
-        "y": 3.5,
-        "y2": 4.5
+        "y": 3.7,
+        "y2": 4.7
     },
     {
         "type": "text",
@@ -137,7 +137,7 @@
     },
     {
         "type": "text",
-        "text": "Folio 1/1",
+        "text": "Folio 1",
         "align": "left",
         "x": 13,
         "x2": 14.0,
@@ -148,6 +148,67 @@
         "type": "PDFBlock_before_init",
         "rect": {
             "x": 0,
+            "y": 28.7,
+            "w": 0,
+            "h": 0.5,
+            "units": 28.35
+        },
+        "format": {
+            "font": "Helvetica",
+            "font_size": 8,
+            "color": "#000000",
+            "fill_color": "#D0D0D0"
+        }
+    },
+    {
+        "type": "PDFBlock_after_init",
+        "rect": {
+            "x": 1,
+            "y": 1,
+            "w": 19.0,
+            "h": 0.5,
+            "units": 28.35
+        },
+        "format": {
+            "font": "Helvetica",
+            "font_size": 8,
+            "color": "#000000",
+            "fill_color": "#D0D0D0"
+        }
+    },
+    {
+        "type": "rectangle",
+        "rect1": {
+            "x": 1,
+            "y": 1,
+            "w": 19.0,
+            "h": 0.5,
+            "units": 28.35
+        },
+        "rect2": {
+            "x": 1.0,
+            "y": 1.0,
+            "w": 19.0,
+            "h": 0.5,
+            "units": 28.35
+        },
+        "color": "#000000",
+        "fill_color": "#D0D0D0",
+        "rounded": true
+    },
+    {
+        "type": "text",
+        "text": "Hojas M\u00f3viles Libro Art. 52 Ley 20744 -pagina 2",
+        "align": "center",
+        "x": 9.5,
+        "x2": 10.5,
+        "y": 0.3,
+        "y2": 1.3
+    },
+    {
+        "type": "PDFBlock_before_init",
+        "rect": {
+            "x": 0,
             "y": 5.1,
             "w": 0,
             "h": 6,
@@ -198,14 +259,23 @@
     },
     {
         "type": "text",
-        "text": "POBLETE, ADRIANA ANAH\u00cd",
-        "align": "center",
-        "x": 9.5,
-        "x2": 10.5,
+        "text": "6410 - POBLETE, ADRIANA ANAH\u00cd",
+        "align": "left",
+        "x": 1,
+        "x2": 2.0,
         "y": 0.5,
         "y2": 5.6
     },
     {
+        "type": "text",
+        "text": "Lalo",
+        "align": "left",
+        "x": 1.5,
+        "x2": 2.5,
+        "y": 1.0,
+        "y2": 6.1
+    },
+    {
         "type": "PDFBlock_before_init",
         "rect": {
             "x": 0,
@@ -259,14 +329,23 @@
     },
     {
         "type": "text",
-        "text": "MONTEVERDE, EDUARDO VIVIANA",
-        "align": "center",
-        "x": 9.5,
-        "x2": 10.5,
+        "text": "7720 - MONTEVERDE, EDUARDO VIVIANA",
+        "align": "left",
+        "x": 1,
+        "x2": 2.0,
         "y": 0.5,
         "y2": 11.7
     },
     {
+        "type": "text",
+        "text": "Lalo",
+        "align": "left",
+        "x": 1.5,
+        "x2": 2.5,
+        "y": 1.0,
+        "y2": 12.2
+    },
+    {
         "type": "PDFBlock_before_init",
         "rect": {
             "x": 0,
@@ -320,79 +399,27 @@
     },
     {
         "type": "text",
-        "text": "POBLETE 2, ADRIANA ANAH\u00cd",
-        "align": "center",
-        "x": 9.5,
-        "x2": 10.5,
+        "text": "6411 - POBLETE 2, ADRIANA ANAH\u00cd",
+        "align": "left",
+        "x": 1,
+        "x2": 2.0,
         "y": 0.5,
         "y2": 17.8
     },
     {
-        "type": "PDFBlock_before_init",
-        "rect": {
-            "x": 0,
-            "y": 23.4,
-            "w": 0,
-            "h": 6,
-            "units": 28.35
-        },
-        "format": {
-            "font": "Helvetica",
-            "font_size": 10,
-            "color": "#000000",
-            "fill_color": "#FDFDFD"
-        }
-    },
-    {
-        "type": "PDFBlock_after_init",
-        "rect": {
-            "x": 1,
-            "y": 23.4,
-            "w": 19.0,
-            "h": 6,
-            "units": 28.35
-        },
-        "format": {
-            "font": "Helvetica",
-            "font_size": 10,
-            "color": "#000000",
-            "fill_color": "#FDFDFD"
-        }
-    },
-    {
-        "type": "rectangle",
-        "rect1": {
-            "x": 1,
-            "y": 23.4,
-            "w": 19.0,
-            "h": 6,
-            "units": 28.35
-        },
-        "rect2": {
-            "x": 1.0,
-            "y": 23.4,
-            "w": 19.0,
-            "h": 6.0,
-            "units": 28.35
-        },
-        "color": "#000000",
-        "fill_color": "#FDFDFD",
-        "rounded": true
-    },
-    {
         "type": "text",
-        "text": "MONTEVERDE 2, EDUARDO VIVIANA",
-        "align": "center",
-        "x": 9.5,
-        "x2": 10.5,
-        "y": 0.5,
-        "y2": 23.9
+        "text": "Lalo",
+        "align": "left",
+        "x": 1.5,
+        "x2": 2.5,
+        "y": 1.0,
+        "y2": 18.3
     },
     {
         "type": "PDFBlock_before_init",
         "rect": {
             "x": 0,
-            "y": 29.5,
+            "y": 23.4,
             "w": 0,
             "h": 6,
             "units": 28.35
@@ -442,12 +469,21 @@
     },
     {
         "type": "text",
-        "text": "POBLETE 3, ADRIANA ANAH\u00cd",
-        "align": "center",
-        "x": 9.5,
-        "x2": 10.5,
+        "text": "7721 - MONTEVERDE 2, EDUARDO VIVIANA",
+        "align": "left",
+        "x": 1,
+        "x2": 2.0,
         "y": 0.5,
         "y2": 1.5
+    },
+    {
+        "type": "text",
+        "text": "Lalo",
+        "align": "left",
+        "x": 1.5,
+        "x2": 2.5,
+        "y": 1.0,
+        "y2": 2.0
     },
     {
         "type": "PDFBlock_before_init",
@@ -503,11 +539,90 @@
     },
     {
         "type": "text",
-        "text": "MONTEVERDE 3, EDUARDO VIVIANA",
-        "align": "center",
-        "x": 9.5,
-        "x2": 10.5,
+        "text": "6412 - POBLETE 3, ADRIANA ANAH\u00cd",
+        "align": "left",
+        "x": 1,
+        "x2": 2.0,
         "y": 0.5,
         "y2": 7.6
+    },
+    {
+        "type": "text",
+        "text": "Lalo",
+        "align": "left",
+        "x": 1.5,
+        "x2": 2.5,
+        "y": 1.0,
+        "y2": 8.1
+    },
+    {
+        "type": "PDFBlock_before_init",
+        "rect": {
+            "x": 0,
+            "y": 13.2,
+            "w": 0,
+            "h": 6,
+            "units": 28.35
+        },
+        "format": {
+            "font": "Helvetica",
+            "font_size": 10,
+            "color": "#000000",
+            "fill_color": "#FDFDFD"
+        }
+    },
+    {
+        "type": "PDFBlock_after_init",
+        "rect": {
+            "x": 1,
+            "y": 13.2,
+            "w": 19.0,
+            "h": 6,
+            "units": 28.35
+        },
+        "format": {
+            "font": "Helvetica",
+            "font_size": 10,
+            "color": "#000000",
+            "fill_color": "#FDFDFD"
+        }
+    },
+    {
+        "type": "rectangle",
+        "rect1": {
+            "x": 1,
+            "y": 13.2,
+            "w": 19.0,
+            "h": 6,
+            "units": 28.35
+        },
+        "rect2": {
+            "x": 1.0,
+            "y": 13.2,
+            "w": 19.0,
+            "h": 6.0,
+            "units": 28.35
+        },
+        "color": "#000000",
+        "fill_color": "#FDFDFD",
+        "rounded": true
+    },
+    {
+        "type": "text",
+        "text": "7722 - MONTEVERDE 3, EDUARDO VIVIANA",
+        "align": "left",
+        "x": 1,
+        "x2": 2.0,
+        "y": 0.5,
+        "y2": 13.7
+    },
+    {
+        "type": "text",
+        "text": "Lalo",
+        "align": "left",
+        "x": 1.5,
+        "x2": 2.5,
+        "y": 1.0,
+        "y2": 14.2
     }
 ]
