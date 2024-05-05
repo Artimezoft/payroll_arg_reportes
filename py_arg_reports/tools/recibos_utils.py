@@ -26,7 +26,7 @@ def float_to_format_currency(float_value: float, include_currency: bool = True) 
     resp = resp.replace(",", "X").replace(".", ",").replace("X", ".")
     currency = "$ " if include_currency else ""
 
-    return f'{currency} {resp}'
+    return f'{currency}{resp}'
 
 
 def draw_text_with_max_width(canvas, text, max_width, x, y):
@@ -88,8 +88,3 @@ def nombre_mes(mes: int) -> str:
         return "Noviembre"
     elif mes == 12:
         return "Diciembre"
-
-
-def ts(num, decimal_digits=2, thousand_separator='.', decimal_separator=','):
-    """ Ensure thousand separator """
-    return f'{num:,.{decimal_digits}f}'.replace(",", "X").replace(".", decimal_separator).replace("X", thousand_separator)
