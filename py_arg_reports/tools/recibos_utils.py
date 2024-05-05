@@ -88,3 +88,8 @@ def nombre_mes(mes: int) -> str:
         return "Noviembre"
     elif mes == 12:
         return "Diciembre"
+
+
+def ts(num, decimal_digits=2, thousand_separator='.', decimal_separator=','):
+    """ Ensure thousand separator """
+    return f'{num:,.{decimal_digits}f}'.replace(",", "X").replace(".", decimal_separator).replace("X", thousand_separator)
