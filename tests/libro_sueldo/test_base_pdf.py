@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 import unittest
-# from PyPDF2 import PdfReader
+from PyPDF2 import PdfReader
 from py_arg_reports.reporters.libro_sueldo import descargar_libro
 
 
@@ -30,10 +30,22 @@ class TestLibroSueldo(unittest.TestCase):
         # Check if the file exists
         self.assertTrue(expected_path.exists())
 
-        # # Check the number of pages in the PDF file
-        # with open(full_path, 'rb') as file:
-        #     # pdf_reader = PyPDF2.PdfFileReader(f)
-        #     pdf = PdfReader(file)
-        #     num_sheets = len(pdf.pages)
+        # Check content
+        f = open(str(expected_path), 'rb')
+        # Check the number of pages in the PDF file
+        pdf = PdfReader(f)
+        pages = len(pdf.pages)
+        self.assertEqual(pages, 1)
 
-        # self.assertEqual(num_sheets, 3)
+        # Probar que el contenido del archivo sea el esperado
+        page = pdf.pages[0]
+        page_1_text = page.extract_text()
+        expected = [
+            'Empresa de Prueba',
+            'Calle de Prueba 123, 10, Formosa',
+            'Actividad principal: No tenemos actividades 7777',
+            'No Remunerativos',
+            'Neto a cobrar $ 329.181,77'
+        ]
+        for text in expected:
+            self.assertIn(text, page_1_text)
