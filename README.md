@@ -109,13 +109,13 @@ Ver modelo de JSON usados en [samples-recibo-info.json](py_arg_reports/reporters
 ```python
 import json
 
-from py_arg_reports.reporters.recibo_sueldo import descargar_recibo
+from py_arg_reports.reporters.libro_sueldo import descargar_libro
 
 my_json = 'py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json
 liquidacion = json.load(open(my_json, 'r'))
 
-# Llamo a la función descargar_recibo
-resultado_descarga = descargar_recibo(
+# Llamo a la función descargar_libro
+resultado_descarga = descargar_libro(
     json_data=liquidacion,
     output_path='./downloads/',
     filename='libro-sueldo',
