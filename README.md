@@ -103,8 +103,7 @@ info_dict = {
 
 #### Libro Sueldos
 
-Ver modelo de JSON usados en [samples-recibo-info.json](py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json)
-
+Ver modelo de JSON usado en [samples-recibo-info.json](py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json) (es el mismo modelo que el recibo de sueldos).  
 
 ```python
 import json
@@ -125,4 +124,3 @@ resultado_descarga = descargar_libro(
 El archivo final estará disponible en `downloads/libro-sueldo.pdf`.  
 
 ![Libro Sueldos](docs/images/libro-sueldo.png)
-
