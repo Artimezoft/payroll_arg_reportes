@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 import unittest
-from PyPDF2 import PdfReader
+# from PyPDF2 import PdfReader
 from py_arg_reports.reporters.libro_sueldo import descargar_libro
 
 
