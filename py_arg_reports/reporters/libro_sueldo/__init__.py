@@ -1,4 +1,4 @@
-import os
+from pathlib import Path
 from py_arg_reports.logs import get_logger
 from py_arg_reports.reporters.libro_sueldo.info import get_recibo_info, get_info_final_for_libro_sueldo
 from py_arg_reports.tools.base import CanvasPDF, CanvaPDFBlock, Format, Rect
@@ -16,30 +16,30 @@ t9_line_sep = 0.3
 
 def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     """ Descarga el libro sueldo en formato PDF,
-        Retorna error si lo hay
+        Retorna una tupla:
+         - False, error: si falla
+         - True, None: si todo salió bien
     """
 
     recibo_info = get_recibo_info(json_data)
     if recibo_info.get("error"):
         error_detail = recibo_info["error"]
         log.error(f'Error al obtener la info del recibo: {error_detail}')
-        return error_detail
+        return False, error_detail
 
     # Get info from recibo_info
     info_recibo = get_info_final_for_libro_sueldo(recibo_info)
-    test_info_tecibo = 'py_arg_reports/reporters/libro_sueldo/samples/imfo-recibo.json'
-    info_recibo = json.load(open(test_info_tecibo))
 
     # Cada liquidación va a tener su propia carpeta en download
-    my_path = output_path
-    if not os.path.exists(my_path):
-        os.makedirs(my_path)
-    my_file_path = f'{my_path}{filename}.pdf'
+    if not Path(output_path).exists():
+        # create the folder
+        Path(output_path).mkdir(parents=True, exist_ok=True)
+    my_file_path = Path(output_path) / f'{filename}.pdf'
     log.info(f'Generando libro sueldo en {my_file_path}')
 
     # Mi PDF general donde voy a agregar los bloques
     PDF = CanvasPDF(
-        file_path=my_file_path,
+        file_path=str(my_file_path),
         title='Libro Sueldo', units=cm,
         data=info_recibo,
     )
@@ -97,6 +97,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
 
     PDF.finish_page()
     PDF.save()
+    return True, None
 
 
 def draw_header(PDF: CanvasPDF):
