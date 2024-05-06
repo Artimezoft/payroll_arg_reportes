@@ -26,7 +26,7 @@ def float_to_format_currency(float_value: float, include_currency: bool = True) 
     resp = resp.replace(",", "X").replace(".", ",").replace("X", ".")
     currency = "$ " if include_currency else ""
 
-    return f'{currency} {resp}'
+    return f'{currency}{resp}'
 
 
 def draw_text_with_max_width(canvas, text, max_width, x, y):
