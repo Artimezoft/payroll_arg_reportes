@@ -5,6 +5,11 @@ Para generar el PDF del libro de sueldos es necesario tener un JSON con la infor
 Ver modelo de JSON usado en [samples-recibo-info.json](/py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json)
 (es el mismo modelo que el recibo de sueldos).  
 
+El campo `tipo_concepto` usado se debe interpretar como:
+  - 1: Remunerativo
+  - 2: No Remunerativo
+  - 3: Descuento
+
 ```python
 import json
 

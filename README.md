@@ -3,6 +3,17 @@
 Este repositorio tiene como objetivo generar todos los reportes necesarios para Payroll en Argentina.
 recibiendo un json para cada caso y retornando los distintos reportes en los formatos según el caso pdf, txt, csv, etc.
 
+Para generar cada reporte esperamos que tengas tus datos estructurados en los formatos esperados en esta librería. Es posible
+que necesites adaptarlos. Una vez estructurados en el formato esperado por cada reporte, todo lo demás estará resuelto.  
+
+Notas generales:
+ - El campo `tipo_concepto` usado se debe interpretar como:
+   - 1: Remunerativo
+   - 2: No Remunerativo
+   - 3: Descuento
+ - Los campos `pk` se refieren a _primary key_ y no son necesarios para la generación de los reportes.
+ - Puede haber más campos en tus datos, esta librería solo necesita los campos que se mencionan en cada reporte.
+
 ### Reportes Legales
 
 - [Recibo de Sueldos](/docs/recibo-de-sueldos.md)
