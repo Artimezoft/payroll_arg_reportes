@@ -2,7 +2,8 @@
 
 Para generar el PDF del libro de sueldos es necesario tener un JSON con la información de los recibos de sueldos.  
 
-Ver modelo de JSON usado en [samples-recibo-info.json](py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json) (es el mismo modelo que el recibo de sueldos).  
+Ver modelo de JSON usado en [samples-recibo-info.json](/py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json)
+(es el mismo modelo que el recibo de sueldos).  
 
 ```python
 import json
