@@ -1,7 +1,7 @@
 # Recibo de Sueldos
 
-Ver modelo de JSON usados en [samples-recibo-info.json](py_arg_reports/reporters/samples/samples-recibo-info.json) o [liquidacion_corta.json](py_arg_reports/test_cases/liquidacion_corta.json)
-
+Ver modelo de JSON usados en [samples-recibo-info.json](/py_arg_reports/reporters/libro_sueldo/samples/samples-recibo-info.json)
+o [liquidacion_corta.json](/py_arg_reports/test_cases/liquidacion_corta.json)
 
 ```python
 import json
