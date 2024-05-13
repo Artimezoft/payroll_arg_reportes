@@ -1,6 +1,6 @@
 from pathlib import Path
 from py_arg_reports.logs import get_logger
-from py_arg_reports.reporters.libro_sueldo.info import get_recibo_info, get_info_final_for_libro_sueldo
+from py_arg_reports.reporters.libro_sueldo.data import translate_data
 from py_arg_reports.tools.base import CanvasPDF, CanvaPDFBlock, Format, Rect
 from py_arg_reports.tools.recibos_utils import float_to_format_currency
 from reportlab.lib.units import cm
@@ -21,14 +21,12 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
          - True, None: si todo salió bien
     """
 
-    recibo_info = get_recibo_info(json_data)
-    if recibo_info.get("error"):
-        error_detail = recibo_info["error"]
-        log.error(f'Error al obtener la info del recibo: {error_detail}')
+    try:
+        info_recibo = translate_data(json_data)
+    except Exception as e:
+        error_detail = f'Error al traducir los datos para libro sueldo: {str(e)}'
+        log.error(error_detail)
         return False, error_detail
-
-    # Get info from recibo_info
-    info_recibo = get_info_final_for_libro_sueldo(recibo_info)
 
     # Cada liquidación va a tener su propia carpeta en download
     if not Path(output_path).exists():
@@ -53,25 +51,8 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
     total_rem = 0
     total_no_rem = 0
     total_desc = 0
-    for legajo in info_recibo['legajos']:
-        log.info(f'Generando empleado {legajo}')
-        empleado = {
-            'nombre': info_recibo['nombres_completos'].get(legajo),
-            'cuil': info_recibo['cuiles'].get(legajo),
-            'legajo': legajo,
-            'categoria': info_recibo['categorias'].get(legajo),
-            'fecha_ingreso': info_recibo['fechas_ingreso'].get(legajo),
-            'fecha_ingreso_2': info_recibo['fechas_ingreso_2'].get(legajo),
-            'contrato': info_recibo['contratos'].get(legajo),
-            'obra_social': info_recibo['obras_sociales'].get(legajo),
-            'area': info_recibo['areas'].get(legajo),
-            'posicion': info_recibo['posiciones'].get(legajo),
-            'basico': info_recibo['basicos'].get(legajo),
-            'lugar_trabajo': info_recibo['lugares_trabajo'].get(legajo),
-            'conceptos_liquidados': info_recibo['conceptos_liquidados'].get(legajo),
-            'totales_liquidacion': info_recibo['totales_liquidacion'].get(legajo),
-            'relacion_bancaria': info_recibo['relaciones_bancarias'].get(legajo),
-        }
+    for empleado in info_recibo['empleados']:
+        log.info(f'Generando empleado {empleado["legajo"]}')
         draw_empleado(PDF, empleado, start_y=pos_y, height=empleado_h)
         pos_y = PDF.last_y + 0.3
         total_rem += empleado['totales_liquidacion']['total_remunerativo']
@@ -145,7 +126,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text_column(lista, start_x=4, start_y=y, line_sep=t9_line_sep, format_=F9)
     lista = ['Estado civil', 'Puesto']
     empleado_block.text_column(lista, start_x=7, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
-    lista = ['FALTA', empleado["posicion"]]
+    lista = [empleado['estado_civil'], empleado["posicion"]]
     empleado_block.text_column(lista, start_x=10, start_y=y, line_sep=t9_line_sep, format_=F9)
     lista = ['CUIL', 'Categoría', 'Seccion']
     y = 0.5 + t9_line_sep + 0.1
