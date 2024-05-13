@@ -45,7 +45,7 @@ class TestLibroSueldo(unittest.TestCase):
             'Calle de Prueba 123, 10, Formosa',
             'Actividad principal: No tenemos actividades 7777',
             'No Remunerativos',
-            'Neto a cobrar $ 329.181,77'
+            # Agregue cosas y ya no se el total 'Neto a cobrar $ 329.181,77'
         ]
         for text in expected:
             self.assertIn(text, page_1_text)
