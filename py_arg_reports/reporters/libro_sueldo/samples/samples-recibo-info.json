@@ -186,5 +186,135 @@
             "total_retenciones": 32083.9083370625,
             "neto_liquidacion": 163207.24537210417
         }
+    },
+    {
+        "empresa": {
+            "pk": 1,
+            "name": "Empresa de Prueba",
+            "cuit": "20333333333",
+            "domicilio": {
+                "pk": 1,
+                "calle": "Calle de Prueba",
+                "numero": "123",
+                "piso": null,
+                "oficina": null,
+                "barrio": null,
+                "localidad": {
+                    "pk": 1252,
+                    "provincia": {
+                        "pk": 10,
+                        "name": "Formosa",
+                        "pais": {
+                            "pk": 11,
+                            "code": "AR",
+                            "name": "Argentina"
+                        }
+                    },
+                    "name": "10",
+                    "text": "10 (Formosa)"
+                },
+                "cod_postal": null
+            },
+            "ultimo_pago_seguridad_social": {
+                "id": 31,
+                "banco": "Banco De La Ciudad De Buenos Aires",
+                "mes": 12,
+                "anio": 2023,
+                "fecha_pago": "2024-01-09",
+                "empresa": 1
+            }
+        },
+        "liquidacion": {
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "periodo": {
+                "periodo": "2023-12"
+            },
+            "fecha_pago": "2024-01-04"
+        },
+        "empleado": {
+            "legajo": 7087,
+            "first_name": "Victor",
+            "last_name": "Voyd",
+            "cuil": "20674148438",
+            "fecha_ingreso": "1996-10-01",
+            "fecha_ingreso_2": null,
+            "categoria": "Cajero C4",
+            "contrato": "A tiempo parcial: Indeterminado /permanente",
+            "obra_social": "O.S.de los ajustadores de tornillos de luyan de cuyo",
+            "area": "Area 1v",
+            "posicion": "Posicion 1v",
+            "basico": 110645.24,
+            "lugar_trabajo": "26 de Mayo",
+            "relacion_bancaria": {
+                "forma_pago": "EFVO",
+                "numero_cuenta": null,
+                "cbu": null
+            }
+        },
+        "conceptos_liquidados": [
+            {
+                "concepto": {
+                    "code": "SUELDO",
+                    "tipo_concepto": 1,
+                    "name": "Sueldo Básico"
+                },
+                "orden": 12,
+                "cantidad": 30.0,
+                "importe": 310645.24
+            },
+            {
+                "concepto": {
+                    "code": "ANTIGU",
+                    "tipo_concepto": 1,
+                    "name": "Antiguedad"
+                },
+                "orden": 49,
+                "cantidad": 13.0,
+                "importe": 39512.929200000006
+            },
+            {
+                "concepto": {
+                    "code": "Algo01",
+                    "tipo_concepto": 2,
+                    "name": "Alguo 001"
+                },
+                "orden": 19,
+                "cantidad": 11.0,
+                "importe": 19512.929200000006
+            },
+            {
+                "concepto": {
+                    "code": "Algo02",
+                    "tipo_concepto": 2,
+                    "name": "Alguo 002"
+                },
+                "orden": 11,
+                "cantidad": 7.0,
+                "importe": 11512.929200000006
+            },
+            {
+                "concepto": {"code": "Desc01", "tipo_concepto": 3, "name": "Descu 001"},
+                "orden": 19, "cantidad": 11.0, "importe": 19512.929200000006
+            },
+            {
+                "concepto": {"code": "Desc02", "tipo_concepto": 3, "name": "Descu 002"},
+                "orden": 19, "cantidad": 11.0, "importe": 9512.92
+            },
+            {
+                "concepto": {"code": "Desc03", "tipo_concepto": 3, "name": "Descu 003"},
+                "orden": 19, "cantidad": 11.0, "importe": 512.92
+            },
+            {
+                "concepto": {"code": "Desc04", "tipo_concepto": 3, "name": "Descu 004"},
+                "orden": 19, "cantidad": 0, "importe": 12.92
+            }
+        ],
+        "totales_liquidacion": {
+            "total_remunerativo": 159421.34996666666,
+            "total_no_remunerativo": 35869.8037425,
+            "total_retenciones": 32083.9083370625,
+            "neto_liquidacion": 163207.24537210417
+        }
     }
 ]
