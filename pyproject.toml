@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll_arg_reportes"
-version = "0.0.18"
+version = "0.0.19"
 dependencies = [
   "numero-a-letras>=0.0.4",
   "reportlab==4.0.8",
@@ -12,10 +12,12 @@ dependencies = [
 ]
 requires-python = ">=3.10"
 authors = [
-  { name="Eugenio", email="coding_with@eugeniovazquez.com.ar" },
+  {name="Eugenio", email="coding_with@eugeniovazquez.com.ar"},
+  {name="Andres", email="andres@data99.com.ar"},
 ]
 maintainers = [
-  { name="Eugenio", email="coding_with@eugeniovazquez.com.ar" },
+  {name="Eugenio", email="coding_with@eugeniovazquez.com.ar"},
+  {name="Andres", email="andres@data99.com.ar"},
 ]
 description = "Reportes para Payroll en Argentina"
 readme = "README.md"

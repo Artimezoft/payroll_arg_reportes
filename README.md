@@ -16,10 +16,10 @@ Notas generales:
 
 ### Reportes Legales
 
-- [Recibo de Sueldos](/docs/recibo-de-sueldos.md)
+- [Recibo de Sueldos](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/recibo-de-sueldos.md)
 - F.931
 - Libro de Sueldos Digital
-- [Libro de Sueldos](/docs/libro-de-sueldos.md)
+- [Libro de Sueldos](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/libro-de-sueldos.md)
 - Sicore
 - F.1357
 
@@ -63,4 +63,4 @@ pip install payroll-arg-reportes
 
 Libro sueldos
 
-![Libro Sueldos](/docs/images/libro-sueldo.png)
+![Libro Sueldos](https://raw.githubusercontent.com/Artimezoft/payroll_arg_reportes/develop/docs/images/libro-sueldo.png)
