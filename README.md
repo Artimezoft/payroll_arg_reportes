@@ -17,7 +17,7 @@ Notas generales:
 ### Reportes Legales
 
 - [Recibo de Sueldos](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/recibo-de-sueldos.md)
-- F.931
+- [F.931](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/f931.md)
 - Libro de Sueldos Digital
 - [Libro de Sueldos](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/libro-de-sueldos.md)
 - Sicore
