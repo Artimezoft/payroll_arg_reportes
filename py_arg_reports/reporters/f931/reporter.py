@@ -207,7 +207,7 @@ Remuneración Imponible 11	488	12
 def genera_txt_f931(
     json_data: dict,
     output_path: str,
-    filename: str
+    filename: str = None,
 ) -> tuple:
     """ Genera el archivo de texto para la F931,
         Args:
@@ -224,6 +224,11 @@ def genera_txt_f931(
     if not json_data.get('txt_empleados'):
         return False, 'No se puede generar el txt para el F931, no hay datos'
 
+    # Configurar filename si usuario no lo especifica
+    if not filename:
+        filename = f'txt_f931_{json_data["cuit"]}_{json_data["periodo"]}'
+
+    # Crear archivo vacio
     full_path = f'{output_path}{filename}.txt'
     with open(full_path, 'w') as f:
         f.write('')
