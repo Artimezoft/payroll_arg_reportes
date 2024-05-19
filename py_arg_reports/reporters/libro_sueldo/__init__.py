@@ -14,7 +14,7 @@ t10_line_sep = 0.5
 t9_line_sep = 0.3
 
 
-def descargar_libro(json_data: dict, output_path: str, filename: str) -> str:
+def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
     """ Descarga el libro sueldo en formato PDF,
         Retorna una tupla:
          - False, error: si falla
@@ -199,7 +199,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
 
 if __name__ == '__main__':
     """
-    Esto es para hacer pruebas rapido con los arhcivos de ejemplo.
+    Esto es para hacer pruebas rapido con los archivos de ejemplo.
     Dejar para hacer correcciones rápidas.
     En estas pruebas escupir los logs en la consola
     """

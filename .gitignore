@@ -17,3 +17,6 @@ downloads/
 dist/
 build/
 *.egg-info/
+
+# Temp files
+temp/
