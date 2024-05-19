@@ -1,3 +1,4 @@
+from py_arg_reports.reporters.f931.tools import FORMATO_TXT_F931, sync_format
 
 """
 Ejemplo de json
@@ -202,6 +203,8 @@ Incremento Salarial	476	12
 Remuneración Imponible 11	488	12
 """
 
+BOOLEAN_FIELDS = ['seguro_vida_obligatorio']
+
 
 def genera_txt_f931(
     json_data: dict,
@@ -219,5 +222,28 @@ def genera_txt_f931(
          - True, None: si todo salió bien
     """
     resp = None
+    full_path = f'{output_path}{filename}.txt'
+    with open(full_path, 'w') as f:
+        f.write('')
+
+    # Comienzo dato por dato de json_data a generar en el txt linea por linea
+    for empleado in json_data['txt_empleados']:
+        # Generar linea por empleado
+        line = ''
+        for field_name in FORMATO_TXT_F931:
+            multiplicador = FORMATO_TXT_F931[field_name].get('multiplicador', 1)
+            tipo_dato = FORMATO_TXT_F931[field_name]['type']
+            largo = FORMATO_TXT_F931[field_name]['long']
+            info = empleado[field_name]
+            if field_name in BOOLEAN_FIELDS:
+                info_formatted = "1" if info else "0"
+            else:
+                info_formatted = sync_format(str(info), largo, tipo_dato, multiplicador)
+            line += info_formatted
+        # Agregar salto de linea
+        line += '\n'
+        # Escribir linea en el archivo
+        with open(full_path, 'a') as f:
+            f.write(line)
 
     return True, resp
