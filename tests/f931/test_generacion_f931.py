@@ -62,8 +62,9 @@ class TestGeneracionF931(unittest.TestCase):
 
         # Check the number of lines in the txt file
         with open(self.temp_folder + 'txt_f931_prueba_1.txt', 'r') as file:
-            largo_linea = len(file.readline())
-            num_lines = len(file.readlines())
+            lines = file.readlines()
+            num_lines = len(lines)
+            largo_linea = len(lines[0]) if lines else 0
 
         # La línea debe tener 500 caracteres (incluyendo el salto de línea)
         # y el archivo 2 líneas por 2 empleados
