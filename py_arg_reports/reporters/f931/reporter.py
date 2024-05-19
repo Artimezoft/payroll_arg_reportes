@@ -203,8 +203,6 @@ Incremento Salarial	476	12
 Remuneración Imponible 11	488	12
 """
 
-BOOLEAN_FIELDS = ['seguro_vida_obligatorio']
-
 
 def genera_txt_f931(
     json_data: dict,
@@ -222,6 +220,10 @@ def genera_txt_f931(
          - True, None: si todo salió bien
     """
     resp = None
+
+    if not json_data.get('txt_empleados'):
+        return False, 'No se puede generar el txt para el F931, no hay datos'
+
     full_path = f'{output_path}{filename}.txt'
     with open(full_path, 'w') as f:
         f.write('')
@@ -231,14 +233,16 @@ def genera_txt_f931(
         # Generar linea por empleado
         line = ''
         for field_name in FORMATO_TXT_F931:
-            multiplicador = FORMATO_TXT_F931[field_name].get('multiplicador', 1)
+            if field_name not in empleado.keys():
+                return False, f'El campo {field_name} no fue encontrado en los datos'
             tipo_dato = FORMATO_TXT_F931[field_name]['type']
+            if tipo_dato == 'DE':
+                multiplicador = FORMATO_TXT_F931[field_name].get('multiplicador', 100)
+            else:
+                multiplicador = FORMATO_TXT_F931[field_name].get('multiplicador', 1)
             largo = FORMATO_TXT_F931[field_name]['long']
             info = empleado[field_name]
-            if field_name in BOOLEAN_FIELDS:
-                info_formatted = "1" if info else "0"
-            else:
-                info_formatted = sync_format(str(info), largo, tipo_dato, multiplicador)
+            info_formatted = sync_format(str(info), largo, tipo_dato, multiplicador)
             line += info_formatted
         # Agregar salto de linea
         line += '\n'
