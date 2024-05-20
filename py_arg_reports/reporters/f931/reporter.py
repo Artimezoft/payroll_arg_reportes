@@ -229,7 +229,7 @@ def genera_txt_f931(
         filename = f'txt_f931_{json_data["cuit"]}_{json_data["periodo"]}'
 
     # Crear archivo vacio
-    full_path = f'{output_path}{filename}.txt'
+    full_path = f'{output_path}/{filename}.txt'
     with open(full_path, 'w') as f:
         f.write('')
 
