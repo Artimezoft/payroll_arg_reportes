@@ -43,7 +43,7 @@ class TestLibroSueldo(unittest.TestCase):
         expected = [
             'Empresa de Prueba',
             'Calle de Prueba 123, 10, Formosa',
-            'Error: Actividades no especificadas "falta dato"', # por elmomento queda asi hasta que se implemente
+            'Error: Actividades no especificadas "falta dato"',
             'No Remunerativos',
             # Agregue cosas y ya no se el total 'Neto a cobrar $ 329.181,77'
         ]
