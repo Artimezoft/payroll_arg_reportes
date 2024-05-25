@@ -25,13 +25,16 @@ from py_arg_reports.reporters.acreditaciones.santander import AcreditacionSantan
 data = json.load(open('sample.json'))
 acreditacion = AcreditacionSantander(data)
 destination = 'santa.txt'
-process, _ = acreditacion.generate_file(destination)
-assert process
-# test results file
-f = open(destination)
-text = f.read()
-f.close()
-print(text)
+process, error = acreditacion.generate_file(destination)
+if not process:
+    print(error)
+else:
+    print('OK')
+    # show results file
+    f = open(destination)
+    text = f.read()
+    f.close()
+    print(text)
 
 H301234567800011000070000100000       S                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
 D 0          71626RC         2025010000Juan Perez                    Domicilio completo, Mendiolaza, Córdoba, Arg       00000    00000000000000000000000000000000000000000000000000000000000000000000000000000000000           20345678901                                                                                                                                                                  N005499999999999999999999999999000000002025020100000012361190050   00000000000   00000000000   00000000000   0000000000000000000000000 00000000000000000                                                                                                      
