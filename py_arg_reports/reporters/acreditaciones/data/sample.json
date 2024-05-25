@@ -9,7 +9,7 @@
         "fecha_pago_anio": 2025,
         "fecha_pago_mes": 2,
         "fecha_pago_dia": 1,
-        "total_pago": "1236119.00"
+        "total_pago": "0"
     },
     "empleados": [
         {
@@ -19,6 +19,13 @@
             "legajo": 71626,
             "direccion": "Domicilio completo, Mendiolaza, Córdoba, Arg",
             "importe_pago": "1236119.00"
+        },{
+            "nombre": "Victoria",
+            "apellido": "Velez",
+            "cuil": "20244478711",
+            "legajo": 60420,
+            "direccion": "San Fe 511, Unquillo, Córdoba, Arg",
+            "importe_pago": "936107.33"
         }
     ]
 }

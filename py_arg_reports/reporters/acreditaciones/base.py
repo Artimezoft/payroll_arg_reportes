@@ -41,13 +41,17 @@ class AcreditacionFile:
                 for empleado in empleados
             ]
         )
-        total_pago = float(liquidacion.get('total_pago'))
-        if abs(total_from_empleados - total_pago) > 1:
-            error = (
-                'El total de pagos no coincide con la suma de los pagos de los empleados'
-                f'{total_from_empleados} != {total_pago}'
-            )
-            raise ValueError(error)
+        # Si total_pago es "0" entonces lo calculo solo sin validar
+        if liquidacion.get('total_pago') == "0":
+            liquidacion['total_pago'] = str(total_from_empleados)
+        else:
+            total_pago = float(liquidacion.get('total_pago'))
+            if abs(total_from_empleados - total_pago) > 1:
+                error = (
+                    'El total de pagos no coincide con la suma de los pagos de los empleados'
+                    f'{total_from_empleados} != {total_pago}'
+                )
+                raise ValueError(error)
         self.liquidacion = liquidacion
 
     def validate_empleado(self, empleado):
@@ -87,9 +91,11 @@ class AcreditacionesHeadDetailTrailerFile(AcreditacionFile):
         f = open(path, 'w')
         header = self.generate_header()
         f.write(header)
+        f.write('\n')
         for empleado in self.empleados:
             detalle_empleado = self.generate_detalle_empleado(empleado)
             f.write(detalle_empleado)
+            f.write('\n')
         trailer = self.generate_trailer()
         f.write(trailer)
         f.close()
