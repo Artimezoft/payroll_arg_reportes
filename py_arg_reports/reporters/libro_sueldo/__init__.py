@@ -1,7 +1,7 @@
 from pathlib import Path
 from py_arg_reports.logs import get_logger
 from py_arg_reports.reporters.libro_sueldo.data import translate_data
-from py_arg_reports.tools.base import CanvasPDF, CanvaPDFBlock, Format, Rect
+from py_arg_reports.tools.pdf import CanvasPDF, CanvaPDFBlock, Format, Rect
 from py_arg_reports.tools.recibos_utils import float_to_format_currency
 from reportlab.lib.units import cm
 
