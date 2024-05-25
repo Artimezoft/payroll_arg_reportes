@@ -7,7 +7,9 @@ Santander Argentina permite archivo TXT o una nueva version en excel
 Santander requiere un archivo TXT de campos de ancho fijo y sin separadores
 Incluye un header, luego todas las filas con los registros de acreditación y un trailer
 El documento con las especificaciones tècnicas està aquí
-[Guía txt Santander Argentina - Pago de Haberes y Honorarios.pdf](/py_arg_reports/reporters/acreditaciones/santander/docs/Guía txt - Pago de Haberes y Honorarios.pdf)
+[Guía txt Santander Argentina - Pago de Haberes y Honorarios.pdf](</py_arg_reports/reporters/acreditaciones/santander/docs/Guía txt - Pago de Haberes y Honorarios.pdf>)
+
+
 
 ### Header
 
