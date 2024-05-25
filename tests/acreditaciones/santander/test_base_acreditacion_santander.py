@@ -44,7 +44,7 @@ class TestAcreditacionSantander(unittest.TestCase):
         header = result_lines[0]
         self._test_header(header)
         trailer = result_lines[-1]
-        self._test_trailer(trailer)
+        self._test_trailer(trailer, acreditacion)
         detalles = result_lines[1:-2]
         for det in detalles:
             self._test_detalle(det)
@@ -76,10 +76,22 @@ class TestAcreditacionSantander(unittest.TestCase):
         reservado = header[39:650]
         self.assertEqual(reservado, ' ' * 611)
 
-    def _test_trailer(self, trailer):
+    def _test_trailer(self, trailer, acreditacion):
         # El trailer empieza con T
         self.assertEqual(trailer[0], 'T')
         self.assertEqual(len(trailer), 650)
+        # 15 ceros (reservado)
+        self.assertEqual(trailer[1:16], '0' * 15)
+        # 15 digitos, pago total
+        total_pago = trailer[16:31]
+        self.assertTrue(total_pago.isdigit())
+        # 7 digitos para la cantidad de registros
+        cant_registros = trailer[31:38]
+        self.assertTrue(cant_registros.isdigit())
+        can_registros_num = int(cant_registros)
+        self.assertEqual(can_registros_num, len(acreditacion.empleados))
+        # 612 ceros
+        self.assertEqual(trailer[38:650], '0' * 612)
 
     def _test_detalle(self, det):
         """ Cada detalle es un empleado """
