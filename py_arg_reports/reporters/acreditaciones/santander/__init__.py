@@ -11,7 +11,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += self.empresa.get('cuit')
         ret += "0"
         ret += "011"  # Codigo de producto 011 es haberes y 013 es honorarios
-        ret += "00"  # Nro de acueroo (asignado por el banco) TODO de donde saco esto?
+        ret += "00"  # Nro de acuero (asignado por el banco) TODO de donde saco esto?
         ret += "007"  # Codigo de canal 007 Online Banking Cash Management 005 Diskette
         ret += "00001"  # Numero de envio: suponemos que se manda un solo envio por dia
         ret += "00000"  # Reservado para usos futuros
@@ -62,8 +62,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += 'N'
         # 17 Pais, fijo 0054
         ret += '0054'
-        # TODO esto no esta listo
-        # 18 CBU beneficiario. 26 caracteres, Diferente para Santender u otros
+        # 18 CBU beneficiario. 26 caracteres. Es casi el CBU
         ret += self.get_codigo_cbu(empleado)
         # 19 Reservado para usos futuros, Num, 8
         ret += '0' * 8
