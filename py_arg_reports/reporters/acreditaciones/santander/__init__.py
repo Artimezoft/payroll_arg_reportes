@@ -31,13 +31,14 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         # 4 Numero del beneficiario (interno empresa) Alf
         # 15 caracters fijos
         legajo_str = str(empleado.get('legajo'))
-        ret += fixed_width_str(legajo_str, 15)
+        ret += fixed_width_str(legajo_str, 15, align='right')
         # 5 Tipo de comprobante, fijo en RC
         ret += 'RC'
         # 6 Numero de comprobante Num, 15, AAAAMM rellenado con ceros a la izquierda
         anio = str(self.liquidacion.get('periodo_anio'))
         mes = str(self.liquidacion.get('periodo_mes'))
-        ret += anio + fixed_width_str(mes, 2, align='right', fill_with='0')
+        periodo = anio + fixed_width_str(mes, 2, align='right', fill_with='0')
+        ret += fixed_width_str(periodo, 15, align='right')
         # 7 Reservado para usos futuros, num, 4
         ret += '0000'
         # 8 Nombre del beneficiario, Alf, 30

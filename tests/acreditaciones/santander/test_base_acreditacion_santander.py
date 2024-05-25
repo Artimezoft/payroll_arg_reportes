@@ -34,3 +34,33 @@ class TestAcreditacionSantander(unittest.TestCase):
         destination = self.temp_folder / 'santa.txt'
         process, _ = acreditacion.generate_file(destination)
         assert process
+        # test results file
+        f = open(destination)
+        result_text = f.read()
+        f.close()
+        result_lines = result_text.split('\n')
+        # Header + Detalles + Trailer
+        self.assertEqual(len(result_lines), 1 + len(acreditacion.empleados) + 1)
+        header = result_lines[0]
+        self._test_header(header)
+        trailer = result_lines[-1]
+        self._test_trailer(trailer)
+        detalles = result_lines[1:-2]
+        for det in detalles:
+            self._test_detalle(det)
+
+    def _test_header(self, header):
+        # El header empieza con H
+        self.assertEqual(header[0], 'H')
+        self.assertEqual(len(header), 650)
+
+    def _test_trailer(self, trailer):
+        # El trailer empieza con T
+        self.assertEqual(trailer[0], 'T')
+        self.assertEqual(len(trailer), 650)
+
+    def _test_detalle(self, det):
+        """ Cada detalle es un empleado """
+        # El detalle empieza con D
+        self.assertEqual(det[0], 'D')
+        self.assertEqual(len(det), 650)

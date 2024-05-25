@@ -83,6 +83,9 @@ class AcreditacionesHeadDetailTrailerFile(AcreditacionFile):
         Detalle -> generate_detalle_empleado
         Trailer -> generate_trailer
     """
+    def __init__(self, data):
+        super().__init__(data)
+        self.largo_lineas = 0
 
     def generate_file(self, path):
         """ Generar el archivo
