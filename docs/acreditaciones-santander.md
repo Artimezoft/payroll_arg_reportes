@@ -15,6 +15,46 @@ El documento con las especificaciones tècnicas està aquí
 Se requiere que transformes tus datos de origen a un JSON con la estructura definida en
 [este archivo](/py_arg_reports/reporters/acreditaciones/data/sample.json)
 
+Ejemplo:
+
+```json
+{
+    "empresa": {
+        "cuit": "30123456780",
+        "razon_social": "Empresa S.A."
+    },
+    "liquidacion": {
+        "periodo_anio": 2025,
+        "periodo_mes": 1,
+        "fecha_pago_anio": 2025,
+        "fecha_pago_mes": 2,
+        "fecha_pago_dia": 1,
+        "total_pago": "0"
+    },
+    "empleados": [
+        {
+            "nombre": "Juan",
+            "apellido": "Perez",
+            "cuil": "20345678901",
+            "legajo": 71626,
+            "direccion": "Domicilio completo, Mendiolaza, Córdoba, Arg",
+            "importe_pago": "1236119.00",
+            "cbu": "4720001000012345678901"
+        },{
+            "nombre": "Victoria",
+            "apellido": "Velez",
+            "cuil": "20244478711",
+            "legajo": 60420,
+            "direccion": "San Fe 511, Unquillo, Córdoba, Arg",
+            "importe_pago": "936107.33",
+            "cbu": "2854001000012345678902"
+        }
+    ]
+}
+```
+Si `liquidacion.total_pago` es "0" entonces se sumara el total de los empleados.  
+Si se usa un valor, se validará que sea ~igual al total de los empleados.  
+
 ## Ejemplo de uso
 
 ```python
