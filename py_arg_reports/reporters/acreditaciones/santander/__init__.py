@@ -36,9 +36,9 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += 'RC'
         # 6 Numero de comprobante Num, 15, AAAAMM rellenado con ceros a la izquierda
         anio = str(self.liquidacion.get('periodo_anio'))
-        mes = str(self.liquidacion.get('periodo_mes'))
-        periodo = anio + fixed_width_str(mes, 2, align='right', fill_with='0')
-        ret += fixed_width_str(periodo, 15, align='right')
+        mes = self.liquidacion.get('periodo_mes')
+        periodo = f'{anio}{mes:02}'
+        ret += f'{periodo:015}'
         # 7 Reservado para usos futuros, num, 4
         ret += '0000'
         # 8 Nombre del beneficiario, Alf, 30
@@ -71,11 +71,12 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         anio = str(self.liquidacion.get('fecha_pago_anio'))
         mes = str(self.liquidacion.get('fecha_pago_mes'))
         dia = str(self.liquidacion.get('fecha_pago_dia'))
-        ret += anio + fixed_width_str(
+        full_dia = anio + fixed_width_str(
             mes, 2, align='right', fill_with='0'
         ) + fixed_width_str(
             dia, 2, align='right', fill_with='0'
         )
+        ret += full_dia
         # 21 Import del pago, Num, 15, (13 enteros y 2 decimales sin separador)
         # Nuestro importe viene en string aun siedo un numero para que no se pierda precision
         parte_entera, parte_decimal = str_dec_num_to_no_dec_sep(empleado.get('importe_pago'))

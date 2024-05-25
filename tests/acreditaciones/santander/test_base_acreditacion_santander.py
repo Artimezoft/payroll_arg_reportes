@@ -86,3 +86,70 @@ class TestAcreditacionSantander(unittest.TestCase):
         # El detalle empieza con D
         self.assertEqual(det[0], 'D')
         self.assertEqual(len(det), 650)
+        self.assertEqual(det[1], ' ')
+        monedas = ['0', '2', '8']
+        moneda = det[2]
+        self.assertIn(moneda, monedas)
+        # legajo = det[3:18]  # No hay validacion
+        self.assertEqual(det[18:20], 'RC')
+        anio = det[20:24]
+        self.assertEqual(det[20:22], '20')
+        self.assertTrue(anio.isdigit(), anio + det[18:30])
+        mes = det[24:26]
+        self.assertTrue(mes.isdigit())
+        mes_num = int(mes)
+        self.assertTrue(1 <= mes_num <= 12)
+        # ceros hasta llegar a los 15 caracteres
+        self.assertEqual(det[26:35], '0' * 9)
+        self.assertEqual(det[35:39], '0000')
+        nombre = det[39:69]
+        self.assertTrue(nombre.strip())
+        direccion = det[69:120]
+        self.assertTrue(direccion.strip())
+        self.assertEqual(det[120:125], '00000')
+        self.assertEqual(det[125:129], ' ' * 4)
+        self.assertEqual(det[129:212], '0' * 83)
+        self.assertEqual(det[212:223], ' ' * 11)
+        cuil = det[223:234]
+        self.assertTrue(cuil.isdigit())
+        self.assertEqual(det[234:396], ' ' * 162)
+        self.assertEqual(det[396], 'N')
+        self.assertEqual(det[397:401], '0054')
+        codigo_cbu = det[401:427]
+        self.assertTrue(codigo_cbu.isdigit())
+        self.assertEqual(det[427:435], '0' * 8)
+        # fecha pago AAAAMMDD
+        fecha_pago = det[435:443]
+        self.assertTrue(fecha_pago.isdigit())
+        self.assertEqual(fecha_pago[0:2], '20')
+        mes = int(fecha_pago[4:6])
+        self.assertTrue(1 <= mes <= 12)
+        dia = int(fecha_pago[6:8])
+        self.assertTrue(1 <= dia <= 31)
+        # importe de pago, 15 digitos
+        importe = det[443:458]
+        self.assertTrue(importe.isdigit())
+        cod_pagos_validos = ['50', '52', '57']
+        cod_pago = det[458:460]
+        self.assertIn(cod_pago, cod_pagos_validos)
+        self.assertEqual(det[460:463], ' ' * 3)
+        # 11 ceros (reservado)
+        self.assertEqual(det[463:474], '0' * 11)
+        # 3 espacios (reservado)
+        self.assertEqual(det[474:477], ' ' * 3)
+        # 11 ceros (reservado)
+        self.assertEqual(det[477:488], '0' * 11)
+        # 3 espacios (reservado)
+        self.assertEqual(det[488:491], ' ' * 3)
+        # 11 ceros (reservado)
+        self.assertEqual(det[491:502], '0' * 11)
+        # 3 espacios (reservado)
+        self.assertEqual(det[502:505], ' ' * 3)
+        # 25 ceros (reservado)
+        self.assertEqual(det[505:530], '0' * 25)
+        # Un espacio (reservado)
+        self.assertEqual(det[530], ' ')
+        # 17 ceros (reservado)
+        self.assertEqual(det[531:548], '0' * 17)
+        # 102 espacios
+        self.assertEqual(det[548:650], ' ' * 102)
