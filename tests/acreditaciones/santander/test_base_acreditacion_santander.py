@@ -53,6 +53,28 @@ class TestAcreditacionSantander(unittest.TestCase):
         # El header empieza con H
         self.assertEqual(header[0], 'H')
         self.assertEqual(len(header), 650)
+        cuit = header[1:12]
+        # assert all numbers
+        self.assertTrue(cuit.isdigit())
+        self.assertEqual(header[12], '0')
+        cod_productos = ['011', '013']
+        cod_prod = header[13:16]
+        self.assertIn(cod_prod, cod_productos)
+        nro_acuerdo = header[16:18]
+        nro_acuerdos_validos = ['00']  # TODO de donde saco esto?
+        self.assertIn(nro_acuerdo, nro_acuerdos_validos)
+        cod_canal = header[18:21]
+        self.assertEqual(cod_canal, '007')
+        nro_envio = header[21:26]
+        self.assertEqual(nro_envio, '00001')
+        reservado = header[26:31]
+        self.assertEqual(reservado, '00000')
+        reservado = header[31:38]
+        self.assertEqual(reservado, ' ' * 7)
+        validacion_cuil = header[38]
+        self.assertEqual(validacion_cuil, 'S')
+        reservado = header[39:650]
+        self.assertEqual(reservado, ' ' * 611)
 
     def _test_trailer(self, trailer):
         # El trailer empieza con T

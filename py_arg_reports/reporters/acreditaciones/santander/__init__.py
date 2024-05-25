@@ -10,9 +10,9 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret = "H"
         ret += self.empresa.get('cuit')
         ret += "0"
-        ret += "011"  # 011 es haberes y 013 es honorarios
+        ret += "011"  # Codigo de producto 011 es haberes y 013 es honorarios
         ret += "00"  # TODO de donde saco esto?
-        ret += "007"  # 007 Online Banking Cash Management 005 Diskette
+        ret += "007"  # Codigo de canal 007 Online Banking Cash Management 005 Diskette
         ret += "00001"  # suponemos que se manda un solo envio por dia
         ret += "00000"  # Reservado para usos futuros
         ret += " " * 7  # Reservado para usos futuros
