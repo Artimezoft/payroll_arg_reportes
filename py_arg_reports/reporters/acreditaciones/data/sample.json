@@ -18,14 +18,16 @@
             "cuil": "20345678901",
             "legajo": 71626,
             "direccion": "Domicilio completo, Mendiolaza, Córdoba, Arg",
-            "importe_pago": "1236119.00"
+            "importe_pago": "1236119.00",
+            "cbu": "4720001000012345678901"
         },{
             "nombre": "Victoria",
             "apellido": "Velez",
             "cuil": "20244478711",
             "legajo": 60420,
             "direccion": "San Fe 511, Unquillo, Córdoba, Arg",
-            "importe_pago": "936107.33"
+            "importe_pago": "936107.33",
+            "cbu": "2850001000012345678902"
         }
     ]
 }

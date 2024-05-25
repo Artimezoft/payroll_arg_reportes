@@ -129,6 +129,10 @@ class TestAcreditacionSantander(unittest.TestCase):
         self.assertEqual(det[397:401], '0054')
         codigo_cbu = det[401:427]
         self.assertTrue(codigo_cbu.isdigit())
+        # el cbu empieza con cero
+        self.assertEqual(codigo_cbu[0], '0')
+        # Luego tiene 3 ceros fijos en la posicion 9, 10 y 11
+        self.assertEqual(codigo_cbu[8:11], '000')
         self.assertEqual(det[427:435], '0' * 8)
         # fecha pago AAAAMMDD
         fecha_pago = det[435:443]

@@ -11,9 +11,9 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += self.empresa.get('cuit')
         ret += "0"
         ret += "011"  # Codigo de producto 011 es haberes y 013 es honorarios
-        ret += "00"  # TODO de donde saco esto?
+        ret += "00"  # Nro de acueroo (asignado por el banco) TODO de donde saco esto?
         ret += "007"  # Codigo de canal 007 Online Banking Cash Management 005 Diskette
-        ret += "00001"  # suponemos que se manda un solo envio por dia
+        ret += "00001"  # Numero de envio: suponemos que se manda un solo envio por dia
         ret += "00000"  # Reservado para usos futuros
         ret += " " * 7  # Reservado para usos futuros
         ret += "S"  # Validacion CUIL
@@ -64,7 +64,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += '0054'
         # TODO esto no esta listo
         # 18 CBU beneficiario. 26 caracteres, Diferente para Santender u otros
-        ret += self.get_codigo_cbu()
+        ret += self.get_codigo_cbu(empleado)
         # 19 Reservado para usos futuros, Num, 8
         ret += '0' * 8
         # 20 Fecha de pago, Num, 8, AAAAMMDD
@@ -109,7 +109,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += ' ' * 102
         return ret
 
-    def get_codigo_cbu(self):
+    def get_codigo_cbu(self, empleado):
         """ Devuelve el CBU en formato especifico
             18 CBU beneficiario. 26 caracteres, Diferente para Santender u otros
             Santander:
@@ -127,8 +127,28 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
              - Num(8) Bloque 1
              - Num(3) fijo 000
              - Num(14) Bloque 2
+            EN RESUMEN. ES UN CBU COMUN QUE EMPIEZA CON UN 0 Y METE ADEMAS 3 CEROS FIJOS ANTES DEL SEGUNDO BLOQUE
+            Al parecer tenian miedo de que se les acaben los numeros de cuenta.
+            Ejemplo real Santander
+            072 0469 6 8 8 00003516919 0
+
+             Wikipedia: https://es.wikipedia.org/wiki/Clave_Bancaria_Uniforme
+                La CBU está compuesta por 22 dígitos, separados en dos bloques. El primer bloque tiene un número de entidad
+                de 3 dígitos, un número de sucursal de 4 dígitos y un dígito verificador. El segundo bloque tiene un número
+                de 13 dígitos que identifica la cuenta dentro de la entidad y la sucursal, más un dígito verificador.
+                [
+                    XXX BANCO (ver tabla)
+                    YYYY SUCURSAL
+                    D DÍGITO VERIFICADOR
+                    +
+                    CTA[13] 13 digitos para la cuenta dentro del banco y sucursal
+                    D DÍGITO VERIFICADOR
+                ]
+                Para el número de entidad de 3 dígitos que compone el primer bloque, debe verificarse el código de banco con
+                la siguiente tabla de bancos
         """
-        return '9' * 26
+        cbu = empleado.get('cbu')
+        return '0' + cbu[0:9] + '000' + cbu[9:23]
 
     def generate_trailer(self):
         """ Generar el trailer """
