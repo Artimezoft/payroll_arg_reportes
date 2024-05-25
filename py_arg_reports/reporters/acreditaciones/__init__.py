@@ -1,4 +1,4 @@
 # flake8: noqa: F401
 
 
-from reporters.acreditaciones.base import AcreditacionFile
+from py_arg_reports.reporters.acreditaciones.base import AcreditacionFile, AcreditacionesHeadDetailTrailerFile

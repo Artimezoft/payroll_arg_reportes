@@ -3,9 +3,13 @@ class AcreditacionFile:
 
     def __init__(self, data):
         self.data = data
-        self.load_data()
+
         self.empresa = None
-        self.empleados = None
+        self.empleados = []
+        # Datos de esta liquidacion
+        self.liquidacion = None
+        # Cargar los datos
+        self.load_data()
         # Incluye los headers el archivo final?
         self.include_headers = True
 
@@ -25,6 +29,26 @@ class AcreditacionFile:
         if not isinstance(empresa, dict):
             raise ValueError('No hay un diccionario con los datos de la empresa')
         self.empresa = self.validate_empresa(empresa)
+        liquidacion = self.data.get('liquidacion')
+        if not isinstance(liquidacion, dict):
+            raise ValueError('No hay un diccionario con los datos de la liquidacion')
+        # validar el total de pagos
+        if not liquidacion.get('total_pago'):
+            raise ValueError('No hay un total de pagos en la liquidacion')
+        total_from_empleados = sum(
+            [
+                float(empleado.get('importe_pago'))
+                for empleado in empleados
+            ]
+        )
+        total_pago = float(liquidacion.get('total_pago'))
+        if abs(total_from_empleados - total_pago) > 1:
+            error = (
+                'El total de pagos no coincide con la suma de los pagos de los empleados'
+                f'{total_from_empleados} != {total_pago}'
+            )
+            raise ValueError(error)
+        self.liquidacion = liquidacion
 
     def validate_empleado(self, empleado):
         """ Validar los datos de un empleado """
@@ -38,7 +62,7 @@ class AcreditacionFile:
 
     def validate_empresa(self, empresa):
         """ Validar los datos de la empresa """
-        if not empresa.get('nombre'):
+        if not empresa.get('razon_social'):
             raise ValueError('No hay un nombre de empresa')
         if not empresa.get('cuit'):
             raise ValueError('No hay un cuit de empresa')
@@ -47,3 +71,26 @@ class AcreditacionFile:
     def generate_file(self, path):
         """ Generar el archivo """
         raise NotImplementedError
+
+
+class AcreditacionesHeadDetailTrailerFile(AcreditacionFile):
+    """Este es un archivo de texto con
+        Header  -> generate_header
+        Detalle -> generate_detalle_empleado
+        Trailer -> generate_trailer
+    """
+
+    def generate_file(self, path):
+        """ Generar el archivo
+            Devuelve un booleano y un mensaje de error (si hay)
+        """
+        f = open(path, 'w')
+        header = self.generate_header()
+        f.write(header)
+        for empleado in self.empleados:
+            detalle_empleado = self.generate_detalle_empleado(empleado)
+            f.write(detalle_empleado)
+        trailer = self.generate_trailer()
+        f.write(trailer)
+        f.close()
+        return True, None

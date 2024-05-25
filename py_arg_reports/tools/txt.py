@@ -12,6 +12,14 @@ def fixed_width_str(text, width, align='left', fill_with=' '):
         raise ValueError(f'Invalid align value: {align}')
 
 
+def str_dec_num_to_no_dec_sep(str_num):
+    """ Tengo un numero como string en un JSON y necesito sus partes entera y decimal """
+    importe = float(str_num)
+    parte_entera = int(importe)
+    parte_decimal = int((importe - parte_entera) * 100)
+    return parte_entera, parte_decimal
+
+
 if __name__ == '__main__':
     assert fixed_width_str('Hello', 10) == 'Hello     '
     assert fixed_width_str('Hello', 10, align='right') == '     Hello'
