@@ -100,14 +100,10 @@ def draw_header(PDF: CanvasPDF):
         # Crear la lista de actividades secundarias solo si existen
         asec = [f'Actividad secundaria: {act}' for act in actividades[1:]]
 
-        # Agregar solo la actividad principal si no hay actividades secundarias
-        if asec:
-            col = [apri] + asec
-        else:
-            col = [apri]
+        col = [apri] + asec
         header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9)
     else:
-        header.text(' Error: Actividades no especificadas "falta dato"', x=0.4, y=2.2, format_=F14)
+        header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F9)
 
     # Agregar el bloque de headers derecho
     per = f'Periodo {info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
