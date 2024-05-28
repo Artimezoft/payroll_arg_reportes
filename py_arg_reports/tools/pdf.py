@@ -296,7 +296,6 @@ class CanvaPDFBlock:
         """ Dibuja un texto en el canvas c """
         if not text:
             text = ''
-        # log.debug(f'Drawing text [{text[:10]}] at ({x}, {y}) - page {self.base_pdf.page}')
         if not text:
             return
 
