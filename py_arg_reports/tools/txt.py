@@ -2,6 +2,8 @@ def fixed_width_str(text, width, align='left', fill_with=' '):
     """
     Returns a string with fixed width. If the text is longer than the width, it will be truncated.
     """
+    if not isinstance(text, str):
+        text = str(text)
     if len(text) > width:
         return text[:width]
     if align == 'left':
