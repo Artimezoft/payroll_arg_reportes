@@ -145,12 +145,5 @@ def get_nice_fecha(fecha_str):
 
 
 def get_estado_civil(empleado):
-    # Try to extract the 'estado_civil' dictionary from the 'empleado' dictionary
-    print("*****Empleado data:", empleado)
-
-    estado_civil = empleado.get('marital_status')
-    print("***Estado Civil data:", estado_civil)
-
-    if estado_civil:
-        return estado_civil.get('name', 'Dato no disponible')
-    return 'Dato no disponible'
+    estado_civil = empleado.get('marital_status', 'Dato no disponible')
+    return estado_civil

@@ -296,7 +296,7 @@ class CanvaPDFBlock:
         """ Dibuja un texto en el canvas c """
         if not text:
             text = ''
-        log.debug(f'Drawing text [{text[:10]}] at ({x}, {y}) - page {self.base_pdf.page}')
+        # log.debug(f'Drawing text [{text[:10]}] at ({x}, {y}) - page {self.base_pdf.page}')
         if not text:
             return
 
@@ -314,7 +314,7 @@ class CanvaPDFBlock:
 
         # Puede haber valores dinamicos. Por ahora la página
         # Esto podria ser mejor si hay mas valores
-        text = text.replace('{page}', str(self.base_pdf.page))
+        text = str(text).replace('{page}', str(self.base_pdf.page))
 
         # Si es centrado y no me da x propongo la mitad del ancho de este bloque
         if align == 'center' and x == 0:
