@@ -167,9 +167,9 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text('Remunerativos', bold=True, x=0.3, y=y_titles, format_=F10)
     total_remu = sum([cpt['importe'] for cpt in remunerativos])
     empleado_block.text(float_to_format_currency(total_remu), x=5.5, y=y_titles, align='right', bold=True,  format_=F10)
-    F9_size = Format(font_size=7)
+    F7 = Format(font_size=7)
     lista = [name_cant(cpt) for cpt in remunerativos]
-    empleado_block.text_column(lista, start_x=0.3, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F9_size)
+    empleado_block.text_column(lista, start_x=0.3, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in remunerativos]
     empleado_block.text_column(lista, start_x=5.5, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
 
@@ -182,7 +182,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text(float_to_format_currency(total_no_remu), x=12, y=y_titles, align='right', bold=True, format_=F10)
 
     lista = [name_cant(cpt) for cpt in no_remunerativos]
-    empleado_block.text_column(lista, start_x=6, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F9_size)
+    empleado_block.text_column(lista, start_x=6, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in no_remunerativos]
     empleado_block.text_column(lista, start_x=12, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
 
@@ -195,7 +195,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text(float_to_format_currency(total_desc), x=18.7, y=y_titles, align='right', bold=True, format_=F10)
 
     lista = [name_cant(cpt) for cpt in descuentos]
-    empleado_block.text_column(lista, start_x=12.4, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F9_size)
+    empleado_block.text_column(lista, start_x=12.4, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in descuentos]
     empleado_block.text_column(lista, start_x=18.7, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
 
