@@ -37,11 +37,16 @@ Ejemplo:
             "cbu": "4720001000012345678901"
         },
         ...
-    ]
+    ],
+    "extras": {
+        "nro_de_acuerdo": "88", 
+    }
 }
 ```
 Si `liquidacion.total_pago` es "0" entonces se sumara el total de los empleados.  
 Si se usa un valor, se validará que sea ~igual al total de los empleados.  
+
+El _Nro de acuerdo_ es un requisito de Santander. Cada empresa debe solicitarlo a su ejecutivo de cuenta.  
 
 ## Ejemplo de uso
 

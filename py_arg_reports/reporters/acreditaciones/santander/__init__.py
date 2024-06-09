@@ -11,7 +11,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         ret += self.empresa.get('cuit')
         ret += "0"
         ret += "011"  # Codigo de producto 011 es haberes y 013 es honorarios
-        ret += "00"  # Nro de acueroo (asignado por el banco) TODO de donde saco esto?
+        ret += self.get_nro_de_acuerdo()  # Nro de acuerdo (asignado por el banco)
         ret += "007"  # Codigo de canal 007 Online Banking Cash Management 005 Diskette
         ret += "00001"  # Numero de envio: suponemos que se manda un solo envio por dia
         ret += "00000"  # Reservado para usos futuros
@@ -166,3 +166,11 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         # 5 Reservado para usos futuros, Num, 612
         ret += '0' * 612
         return ret
+
+    def get_nro_de_acuerdo(self):
+        """ Devuelve un numero de acuerdo.
+            Este es un codigo de dos digitos que se asigna por el banco.
+            Se lo tenes que pedir a tu ejecutivo de cuenta.
+        """
+
+        return self.extras.get('nro_de_acuerdo', '00')
