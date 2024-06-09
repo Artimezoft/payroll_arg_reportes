@@ -8,6 +8,8 @@ class AcreditacionFile:
         self.empleados = []
         # Datos de esta liquidacion
         self.liquidacion = None
+        # Extras que cada banco puede requerir
+        self.extras = {}
         # Cargar los datos
         self.load_data()
         # Incluye los headers el archivo final?
@@ -53,6 +55,7 @@ class AcreditacionFile:
                 )
                 raise ValueError(error)
         self.liquidacion = liquidacion
+        self.extras = self.data.get('extras', {})
 
     def validate_empleado(self, empleado):
         """ Validar los datos de un empleado """
