@@ -30,8 +30,9 @@ class TestAcreditacionSantander(unittest.TestCase):
     def test_bad_codigo_de_pago(self):
         file_data = self.samples_folder / 'sample_santander_bad_codigo_de_pago.json'
         data = json.load(open(file_data))
+        acreditacion = AcreditacionSantander(data)
         with self.assertRaises(ValueError) as e:
-            AcreditacionSantander(data)
+            acreditacion.generate_file('some.txt')
         self.assertEqual(str(e.exception), 'Código de forma de pago inválido')
 
     def test_acreditacion_santander_ok(self):
