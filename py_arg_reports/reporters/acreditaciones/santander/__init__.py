@@ -84,7 +84,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         numero_sin_separa = f'{parte_entera:013}{parte_decimal:02}'
         ret += numero_sin_separa
         # 22 Codigo de forma de pago, Num, 2, 50=Acredit Santander, 52=SNP (otros bancos), 57=CCI (Otros bancos)
-        ret += '50'  # TODO averiguar esto
+        ret += self.get_codigo_forma_pago()
         # 23 Reservado para usos futuros, Alf, 3
         ret += ' ' * 3
         # 24 Reservado para usos futuros, Num, 11
@@ -174,3 +174,10 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         """
 
         return self.extras.get('nro_de_acuerdo', '00')
+
+    def get_codigo_forma_pago(self):
+        """ Devuelve el codigo de forma de pago """
+        cfp = self.extras.get('codigo_forma_pago', '50')
+        if cfp not in ['50', '52', '57']:
+            raise ValueError('Código de forma de pago inválido')
+        return cfp

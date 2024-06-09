@@ -39,14 +39,20 @@ Ejemplo:
         ...
     ],
     "extras": {
-        "nro_de_acuerdo": "88", 
+        "nro_de_acuerdo": "88",
+        "codigo_forma_pago": "50",
     }
 }
 ```
 Si `liquidacion.total_pago` es "0" entonces se sumara el total de los empleados.  
 Si se usa un valor, se validará que sea ~igual al total de los empleados.  
 
-El _Nro de acuerdo_ es un requisito de Santander. Cada empresa debe solicitarlo a su ejecutivo de cuenta.  
+El `nro_de_acuerdo` se refiere al _Nro de acuerdo_ que es un requisito de Santander. Cada empresa debe solicitarlo a su ejecutivo de cuenta.  
+
+El `codigo_forma_pago` Es requerido por santander para definir a quienes pagamos:
+ - 50: Cuenta sueldo
+ - 52: SNP (Sistema Nacional de Pagos)
+ - 57: CCI (Cámara Compensadora Interbancaria)
 
 ## Ejemplo de uso
 
