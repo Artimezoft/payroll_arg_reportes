@@ -35,7 +35,7 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         # 5 Tipo de comprobante, fijo en RC
         ret += 'RC'
         # 6 Numero de comprobante Num, 15, AAAAMM rellenado con ceros a la izquierda
-        anio = str(self.liquidacion.get('periodo_anio'))
+        anio = self.liquidacion.get('periodo_anio')
         mes = self.liquidacion.get('periodo_mes')
         periodo = f'{anio}{mes:02}'
         ret += f'{periodo:015}'
@@ -68,14 +68,10 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         # 19 Reservado para usos futuros, Num, 8
         ret += '0' * 8
         # 20 Fecha de pago, Num, 8, AAAAMMDD
-        anio = str(self.liquidacion.get('fecha_pago_anio'))
-        mes = str(self.liquidacion.get('fecha_pago_mes'))
-        dia = str(self.liquidacion.get('fecha_pago_dia'))
-        full_dia = anio + fixed_width_str(
-            mes, 2, align='right', fill_with='0'
-        ) + fixed_width_str(
-            dia, 2, align='right', fill_with='0'
-        )
+        anio = int(self.liquidacion.get('fecha_pago_anio'))
+        mes = int(self.liquidacion.get('fecha_pago_mes'))
+        dia = int(self.liquidacion.get('fecha_pago_dia'))
+        full_dia = f'{anio}{mes:02}{dia:02}'
         ret += full_dia
         # 21 Import del pago, Num, 15, (13 enteros y 2 decimales sin separador)
         # Nuestro importe viene en string aun siedo un numero para que no se pierda precision
