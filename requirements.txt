@@ -1,8 +1,8 @@
 build==1.0.3
-numero-a-letras==0.0.4
-flake8==5.0.4
-openpyxl==3.1.4  # Read XLS
-PyPDF2==3.0.1
-reportlab==4.0.8
-twine==4.0.2
-XlsxWriter==3.2.0  # Write XLS
+numero-a-letras>=0.0.4
+flake8>=5.0.4,<6
+openpyxl>=3.1.4,<4  # Read XLS
+PyPDF2>=3.0.1,<4  # Read PDF
+reportlab>=4.0.8,<5  # Write PDF
+twine>=4.0.2,<5
+XlsxWriter>=3.2.0,<4  # Write XLS
