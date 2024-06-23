@@ -31,6 +31,7 @@
         }
     ],
     "extras": {
-        "nro_de_acuerdo": "88"
+        "nro_de_acuerdo": "88",
+        "codigo_forma_pago": "50"
     }
 }

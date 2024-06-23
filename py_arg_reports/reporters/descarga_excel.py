@@ -77,10 +77,14 @@ def descarga_excel(info_dict: dict, sheet_name: str = 'Reporte'):
     # Formato de datos
     for row, data in enumerate(info_dict['data'], 1):
         for col, header in enumerate(info_dict['headers']):
+            cell_value = data.get(header, '')
             if 'is_number' in info_dict['headers'][header]:
-                worksheet.write_number(row, col, data.get(header, ''), cell_formats[col])
+                try:
+                    worksheet.write_number(row, col, cell_value, cell_formats[col])
+                except TypeError as e:
+                    raise ValueError(f'Error del valor "{cell_value}" la celda [{row+1}, {col+1}]: {e}')
             else:
-                worksheet.write(row, col, data.get(header, ''), cell_formats[col])
+                worksheet.write(row, col, cell_value, cell_formats[col])
 
     workbook.close()
     # Retrieve the binary data from BytesIO object

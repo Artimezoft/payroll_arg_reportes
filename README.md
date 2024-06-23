@@ -35,7 +35,7 @@ Notas generales:
 
 ### Reportes Bancarios
 
-- Banco Galicia
+- [Banco Galicia](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/acreditaciones-galicia.md)
 - [Banco Santander](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/acreditaciones-santander.md)
 - Banco Nación
 - Etc.
