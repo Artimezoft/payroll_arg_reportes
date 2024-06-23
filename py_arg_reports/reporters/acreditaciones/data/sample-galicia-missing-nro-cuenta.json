@@ -1,0 +1,12 @@
+{
+    "empleados": [
+        {
+            "nombre": "Juan", "apellido": "Perez",
+            "importe_pago": "1236119.04"
+        },{
+            "nombre": "Pedro", "apellido": "Argento",
+            "importe_pago": "5216108.17",
+            "nro_cuenta": "00209023941003"
+        }
+    ]
+}

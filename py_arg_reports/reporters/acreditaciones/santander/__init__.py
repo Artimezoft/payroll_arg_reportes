@@ -5,6 +5,17 @@ from py_arg_reports.tools.txt import fixed_width_str, str_dec_num_to_no_dec_sep
 class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
     """ Un archivo para el banco Santander """
 
+    def __init__(self, data):
+        super().__init__(
+            data,
+            empresa_required=True,
+            liquidacion_required=True,
+            empleados_require=['nombre', 'apellido', 'cuil', 'legajo', 'direccion', 'importe_pago', 'cbu'],
+            empresa_require=['razon_social', 'cuit'],
+            liquidacion_require=['periodo_anio', 'periodo_mes', 'fecha_pago_anio', 'fecha_pago_mes', 'fecha_pago_dia'],
+            extras_require=['nro_de_acuerdo', 'codigo_forma_pago'],
+        )
+
     def generate_header(self):
         """ Generar el header """
         ret = "H"

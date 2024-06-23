@@ -30,13 +30,14 @@ class TestAcreditacionSantander(unittest.TestCase):
     def test_bad_codigo_de_pago(self):
         file_data = self.samples_folder / 'sample_santander_bad_codigo_de_pago.json'
         data = json.load(open(file_data))
-        acreditacion = AcreditacionSantander(data)
         with self.assertRaises(ValueError) as e:
-            acreditacion.generate_file('some.txt')
-        self.assertEqual(str(e.exception), 'Código de forma de pago inválido')
+            AcreditacionSantander(data)
+        expected = 'No hay un codigo_forma_pago'
+        error = str(e.exception)
+        self.assertIn(expected, error)
 
     def test_acreditacion_santander_ok(self):
-        file_data = self.samples_folder / 'sample.json'
+        file_data = self.samples_folder / 'sample-santander.json'
         data = json.load(open(file_data))
         acreditacion = AcreditacionSantander(data)
         destination = self.temp_folder / 'santa.txt'
@@ -69,7 +70,7 @@ class TestAcreditacionSantander(unittest.TestCase):
         cod_prod = header[13:16]
         self.assertIn(cod_prod, cod_productos)
         nro_acuerdo = header[16:18]
-        nro_acuerdos_validos = ['00']  # TODO de donde saco esto?
+        nro_acuerdos_validos = ['88']
         self.assertIn(nro_acuerdo, nro_acuerdos_validos)
         cod_canal = header[18:21]
         self.assertEqual(cod_canal, '007')
