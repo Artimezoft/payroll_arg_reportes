@@ -67,7 +67,7 @@ pip install payroll-arg-reportes
 
 ### Acreditaciones Galicia
 
-![Resultado Excel](https://raw.githubusercontent.com/Artimezoft/payroll_arg_reportes/develop/docs/acreditacion-galicia-xlsx.png)
+![Resultado Excel](https://raw.githubusercontent.com/Artimezoft/payroll_arg_reportes/develop/py_arg_reports/reporters/acreditaciones/galicia/docs/acreditacion-galicia-xlsx.png)
 
 ### Acreditaciones Santander
 
