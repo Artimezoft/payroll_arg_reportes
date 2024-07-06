@@ -40,7 +40,7 @@ def translate_data(origin_data):
                 'nombre': get_nombre_empleado(empleado),
                 'cuil': get_cuil_empleado(empleado),
                 'legajo': empleado['legajo'],
-                'estado_civil': empleado.get('estado_civil', 'FIX!'),
+                'estado_civil': get_estado_civil(empleado),
                 'categoria': empleado.get('categoria', ''),
                 'fecha_ingreso': get_nice_fecha(empleado.get('fecha_ingreso')),
                 'fecha_ingreso_2': get_nice_fecha(empleado.get('fecha_ingreso_2')),
@@ -142,3 +142,8 @@ def get_nice_fecha(fecha_str):
     if fecha_str:
         return formatted_date_str(fecha_str)
     return ''
+
+
+def get_estado_civil(empleado):
+    estado_civil = empleado.get('marital_status', 'Dato no disponible')
+    return estado_civil
