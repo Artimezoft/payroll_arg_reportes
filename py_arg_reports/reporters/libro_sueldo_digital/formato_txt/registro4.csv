@@ -1,0 +1,41 @@
+Campo,Long,Desde,Hasta,Tipo,Observación
+Código de tipo de empleador asociado al trabajador,1,20,20,Alfanumérico,
+Código de tipo de operación,1,21,21,Alfanumérico,Valor fijo: ‘0’
+Código de situación de revista,2,22,23,Alfanumérico,Valores permitidos: los existentes en la tabla “Situación de Revista” de Declaración en Línea.
+Código de condición,2,24,25,Alfanumérico,Valores permitidos: los existentes en la tabla “Código de Condición” de Declaración en Línea.
+Código de actividad,3,26,28,Alfanumérico,Valores permitidos: los existentes en la tabla “Actividades” de Declaración en Línea.
+Código de modalidad de contratación,3,29,31,Alfanumérico,Valores permitidos: los existentes en la tabla “Modalidades de Contratación” de Declaración en Línea.
+Código de siniestrado,2,32,33,Alfanumérico,Valores permitidos: los existentes en la tabla “Siniestrados” de Declaración en Línea.
+Código de localidad,2,34,35,Alfanumérico,Valores permitidos: los existentes en la tabla “Localidades Geográficas” de Declaración en Línea.
+Situación de revista 1,2,36,37,Alfanumérico,Valores permitidos: los existentes en la tabla “Situación de Revista” de Declaración en Línea.
+Día de inicio situación de revista 1,2,38,39,Numérico,2 enteros. Día inicial para la situación de revista 1.
+Situación de revista 2,2,40,41,Alfanumérico,Valores permitidos: los existentes en la tabla “Situación de Revista” de Declaración en Línea.
+Día de inicio situación de revista 2,2,42,43,Numérico,2 enteros. Día inicial para la situación de revista 2.
+Situación de revista 3,2,44,45,Alfanumérico,Valores permitidos: los existentes en la tabla “Situación de Revista” de Declaración en Línea.
+Día de inicio situación de revista 3,2,46,47,Numérico,2 enteros. Día inicial para la situación de revista 3.
+Cantidad de días trabajados,2,48,49,Numérico,2 enteros.
+Cantidad de horas trabajadas,3,50,52,Numérico,"3 enteros. Si se informa un valor, el campo Cantidad días trabajados debe ser 0."
+Porcentaje de aporte adicional de seguridad social,5,53,57,Numérico,3 enteros y 2 decimales. Formato 99999. Las últimas dos posiciones corresponden a los centavos del importe.
+Porcentaje de contribución por tarea diferencial,5,58,62,Numérico,3 enteros y 2 decimales. Formato 99999. Las últimas dos posiciones corresponden a los centavos del importe.
+Código de obra social del trabajador,6,63,68,Alfanumérico,Según tabla de codificación RNOS
+Cantidad de adherentes de obra social,2,69,70,Numérico,2 enteros.
+Aporte adicional de obra social,15,71,85,Numérico,
+Contribución adicional de obra social,15,86,100,Numérico,
+Base para el cálculo diferencial de aporte de obra social y FSR (1),15,101,115,Numérico,
+Base para el cálculo diferencial de contribuciones de obra social y FSR (1),15,116,130,Numérico,
+Base para el cálculo diferencial Ley de Riesgos del Trabajo (1),15,131,145,Numérico,
+Remuneración maternidad para ANSeS,15,146,160,Numérico,
+Remuneración bruta,15,161,175,Numérico,
+Base imponible 1,15,176,190,Numérico,
+Base imponible 2,15,191,205,Numérico,
+Base imponible 3,15,206,220,Numérico,
+Base imponible 4,15,221,235,Numérico,
+Base imponible 5,15,236,250,Numérico,
+Base imponible 6,15,251,265,Numérico,
+Base imponible 7,15,266,280,Numérico,
+Base imponible 8,15,281,295,Numérico,
+Base imponible 9,15,296,310,Numérico,
+Base para el cálculo diferencial de aporte de Seg. Social,15,311,325,Numérico,
+Base para el cálculo diferencial de contribuciones de Seg. Social,15,326,340,Numérico,
+Base imponible 10,15,341,355,Numérico,
+Importe a detraer (Ley 26.473),15,356,370,Numérico,

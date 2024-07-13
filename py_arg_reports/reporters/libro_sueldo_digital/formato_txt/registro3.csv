@@ -1,0 +1,15 @@
+Campo,Long,Desde,Hasta,Tipo,Observación
+Identificación del tipo de registro,2,1,2,Alfabético,Fijo '03'
+CUIL del trabajador,11,3,13,Numérico,11 enteros. CUIL del empleado sin guiones.
+Código de concepto liquidado por el empleador,10,14,23,Alfanumérico,Corresponde al código del concepto del empleador.
+Cantidad,5,24,28,Numérico,"3 enteros y 2 decimales.
+Este valor es obligatorio cuando se informa un código de concepto asociado a los siguientes conceptos AFIP:
+123000-SAC PROPORCIONAL
+150000-ADELANTO VACACIONAL
+130000 a 139999-HORAS EXTRAS"
+Unidades,1,29,29,Alfanumérico,"Tipo de moneda=$; porcentuales=%; A=año; M=mes; Q=quincena; S=semanal; D=días; H=horas. Valor optativo, puede informarse en blanco."
+Importe,15,30,44,Numérico,13 enteros y 2 decimales
+Indicador Débito / Crédito,1,45,45,Alfanumérico,D=Débito; C=Crédito
+Período de ajuste retroactivo,6,46,51,Alfanumérico,"Formato: AAAAMM.
+Para los conceptos liquidados del período este valor se informa con blancos. 
+Si hace referencia a una liquidación retroactiva del concepto, se debe informar el período. Este dato es solo informativo."
