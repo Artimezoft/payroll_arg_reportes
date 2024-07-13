@@ -4,12 +4,12 @@ from py_arg_reports.tools.tools import convert_to_float_if_possible
 
 def process_reg3(cuil: str, concepto_liq: dict) -> tuple:
     """ Generacion txt de Libro Sueldos Digital
-        Registro 2 Datos referenciales de la Liquidación de SyJ del trabajador
+        Registro 3 Conceptos de sueldo liquidados al trabajador
         Args:
-            empleados_liquidados: dict, datos de los empleados liquidados
-            fecha_pago: datetime.date, fecha de la liquidacion
+            cuil: str, CUIL del trabajador
+            concepto_liq: dict, conceptos liquidados al trabajador
             Retorna:
-            (Resultado, Error, Registro2)
+            (Resultado, Error, Registro3)
             - True, None, str: si todo salió bien
             - False, str, None: si falla
     """

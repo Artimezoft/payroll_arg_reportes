@@ -1,4 +1,5 @@
 import datetime
+import os
 
 from py_arg_reports.reporters.libro_sueldo_digital.generador_registros import (
     process_reg1,
@@ -7,7 +8,7 @@ from py_arg_reports.reporters.libro_sueldo_digital.generador_registros import (
     process_reg4,
     process_reg5,
 )
-from py_arg_reports.tools.tools import sync_format
+from py_arg_reports.tools.tools import file_compress, delete_list_of_liles
 
 
 def genera_txt_lsd_liquidacion(
@@ -58,32 +59,39 @@ def genera_txt_lsd_liquidacion(
     res_final += registro2_txt[2]
     # Fin Registro 2 -------------------------------------------------------------------------------------
 
-    # Registro 3 -----------------------------------------------------------------------------------------
+    # Registro 3 y 4 -------------------------------------------------------------------------------------
     registro_3_por_empleado = []
+    registro_4_por_empleado = []
     for empleado in empleados_liquidados:
-        cuil = empleado['info_f931']['fijos']['cuil']
-        conceptos_liquidados = empleado['info_f931']['variables']['conceptos_liquidados']
+        # Agrupo toda la informacion de info_931
+        info_931 = {}
+        info_931.update(empleado["info_f931"]["fijos"])
+        info_931.update(empleado["info_f931"]["variables"])
+        info_931.update(empleado["info_f931"]["importes"])
+
+        cuil = info_931['cuil']
+        conceptos_liquidados = empleado['conceptos_liquidados']
         this_registro3 = process_reg3(
             cuil=cuil,
             concepto_liq=conceptos_liquidados,
+        )
+        this_registro4 = process_reg4(
+            cuil=cuil,
+            info_931=info_931,
         )
         if not this_registro3[0]:
             return False, this_registro3[1], None
         registro_3_por_empleado.append(this_registro3[2])
 
-    registro3_txt = '\r\n'.join(registro_3_por_empleado)
-    res_final += registro3_txt[2]
-    # Fin Registro 3 -------------------------------------------------------------------------------------
+        if not this_registro4[0]:
+            return False, this_registro4[1], None
+        registro_4_por_empleado.append(this_registro4[2])
 
-    # Registro 4 -----------------------------------------------------------------------------------------
-    registro4_txt = process_reg4(
-        empleados_liquidados=empleados_liquidados,
-        fecha_pago=fecha_pago_date,
-    )
-    if not registro4_txt[0]:
-        return False, registro4_txt[1], None
+    registro3_txt = '\r\n'.join(registro_3_por_empleado)
+    registro4_txt = '\r\n'.join(registro_4_por_empleado)
+    res_final += registro3_txt[2]
     res_final += registro4_txt[2]
-    # Fin Registro 4 -------------------------------------------------------------------------------------
+    # Fin Registro 3 y 4 ---------------------------------------------------------------------------------
 
     # Registro 5 -----------------------------------------------------------------------------------------
     registro5_txt = process_reg5(
@@ -96,6 +104,42 @@ def genera_txt_lsd_liquidacion(
     # Fin Registro 5 -------------------------------------------------------------------------------------
 
     return True, None, res_final
+
+
+def genera_archivo_final_lsd(txt_liquidaciones: list, output_path: str, filename: str) -> tuple:
+    """ Genera el archivo de texto para la generación del Libro Sueldo Digital
+        Args:
+            txt_liquidaciones: list, lista de txt de liquidaciones
+            output_path: str, ruta donde se guardará el archivo
+            filename: str, nombre del archivo
+
+        Retorna una tupla:
+         - False, error, None: si falla
+         - True, None, file_path: si todo salió bien
+    """
+    resp = None
+    txt_liquidaciones_files = []
+
+    # Voy escribiendo cada una de las liquidaciones
+    for txt_liquidacion, i in enumerate(txt_liquidaciones):
+        fpath = os.path.join(output_path, f'{filename}_{i}.txt')
+
+        with open(fpath, 'w') as f:
+            f.write(txt_liquidacion)
+
+        txt_liquidaciones_files.append(fpath)
+
+    if len(txt_liquidaciones) == 1:
+        final_fpath = fpath
+    else:
+        zip_output_file_name = fpath = os.path.join(output_path, f'{filename}.zip')
+        file_compress(txt_liquidaciones_files, zip_output_file_name)
+        final_fpath = zip_output_file_name
+
+        # Borro txts
+        delete_list_of_liles(txt_liquidaciones_files)
+
+    return True, resp, final_fpath
 
 
 def genera_txt_lsd(
@@ -137,6 +181,7 @@ def genera_txt_lsd(
 
     # Inicio nro_liquidacion
     nro_liquidacion = 0
+    txt_liquidaciones = []
     for liquidacion in liquidaciones:
         if not isinstance(liquidacion, dict):
             return False, 'No se puede generar el txt, liquidaciones no es una lista de diccionarios'
@@ -152,36 +197,9 @@ def genera_txt_lsd(
             liquidacion_data=liquidacion,
             nro_liq=nro_liquidacion,
         )
+        if not txt_liquidacion[0]:
+            return False, txt_liquidacion[1]
 
-    # Configurar filename si usuario no lo especifica
-    if not filename:
-        filename = f'txt_lsd_{cuit}_{periodo}'
-
-    # Comienzo dato por dato de json_data a generar en el txt linea por linea
-    for empleado in json_data['txt_empleados']:
-        # Generar linea por empleado
-        line = ''
-        for field_name in FORMATO_TXT_F931:
-            if field_name not in empleado.keys():
-                return False, f'El campo {field_name} no fue encontrado en los datos'
-            tipo_dato = FORMATO_TXT_F931[field_name]['type']
-            if tipo_dato == 'DE':
-                multiplicador = FORMATO_TXT_F931[field_name].get('multiplicador', 100)
-            else:
-                multiplicador = FORMATO_TXT_F931[field_name].get('multiplicador', 1)
-            largo = FORMATO_TXT_F931[field_name]['long']
-            info = empleado[field_name]
-            info_formatted = sync_format(str(info), largo, tipo_dato, multiplicador)
-            line += info_formatted
-        # Agregar salto de linea
-        line += '\n'
-        # Escribir linea en el archivo
-        with open(full_path, 'a') as f:
-            f.write(line)
-
-    # Crear archivo vacio
-    full_path = f'{output_path}/{filename}.txt'
-    with open(full_path, 'w') as f:
-        f.write('')
+        txt_liquidaciones.append(txt_liquidacion[2])
 
     return True, resp
