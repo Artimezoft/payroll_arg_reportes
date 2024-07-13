@@ -1,6 +1,6 @@
 
 
-def process_reg4_line(txt_info_line: str, no_rem_os: float = 0.0, id_liquidaciones_anteriores: list = []) -> str:
+def process_reg4(txt_info_line: str, no_rem_os: float = 0.0, id_liquidaciones_anteriores: list = []) -> str:
     resp = ''
     cuil = get_value_from_txt(txt_info_line, 'CUIL')
     reg4_qs = OrdenRegistro.objects.filter(tiporegistro__order=4)

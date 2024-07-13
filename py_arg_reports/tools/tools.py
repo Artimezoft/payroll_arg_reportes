@@ -67,3 +67,21 @@ def sync_format(info: str, expected_len: int, type_info: str, multiplicador: int
         resp = str(resp).ljust(expected_len)
 
     return resp
+
+
+def convert_to_float_if_possible(value_str: str):
+    """Convert the value_str to float if possible, else return the value_str
+    """
+    try:
+        return float(value_str)
+    except ValueError:
+        return value_str
+
+
+def convert_to_int_if_possible(value_str: str):
+    """Convert the value_str to int if possible, else return the value_str
+    """
+    try:
+        return int(value_str)
+    except ValueError:
+        return value_str

@@ -92,6 +92,21 @@ FORMATO_TXT_LSD = {
 }
 
 
+INDICE_TIPO_LIQUIDACIONES = {
+    'Mensual': 'M',
+    'Vacaciones': 'M',
+    'Quincenal': 'Q',
+    '1° Quincena': 'Q',
+    '2° Quincena': 'Q',
+    'Semanal': 'S',
+    'SAC': 'M',
+    'Liquidación Final': 'M',
+    'Gratificaciones': 'M',
+    'Adelantos': 'M',
+    'Otros': 'M',
+}
+
+
 def get_value_from_txt(txt_line: str, nro_reg: int, field_name: str) -> str:
     """ Retorna el valor de un campo en un txt de Libro Sueldo Digital de acuerdo a las
         especificaciones de AFIP.

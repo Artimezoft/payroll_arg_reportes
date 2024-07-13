@@ -1,39 +1,64 @@
 import datetime
 
-from django.db.models.query import QuerySet
 
-
-def process_reg2(leg_liqs: QuerySet, payday: datetime.date, forma_pago: str) -> str:
-    """
-    Identificacion del tipo de registro	2	1	2
-    CUIL del trabajador	11	3	13
-    Legajo del trabajador	10	14	23
-    Dependencia de revista del trabajador	50	24	73
-    CBU de acreditación del pago	22	74	95
-    Cantidad de días para proporcionar tope	3	96	98
-    Fecha de pago	8	99	106
-    Fecha de rúbrica	8	107	114
-    Forma de pago	1	115	115
+def process_reg2(empleados_liquidados: dict, fecha_pago: datetime.date) -> tuple:
+    """ Generacion txt de Libro Sueldos Digital
+        Registro 2 Datos referenciales de la Liquidación de SyJ del trabajador
+        Args:
+            empleados_liquidados: dict, datos de los empleados liquidados
+            fecha_pago: datetime.date, fecha de la liquidacion
+            Retorna:
+            (Resultado, Error, Registro2)
+            - True, None, str: si todo salió bien
+            - False, str, None: si falla
     """
     resp = []
-    for id_legajo in leg_liqs:
-        empleado = Empleado.objects.get(id=id_legajo['empleado'])
-        cuil = empleado.cuil
-        leg = str(empleado.leg).zfill(10)
+    keys_esenciales_empleado = ['empleado_legajo', 'info_f931']
+    keys_esenciales_f931 = ['fijos', 'variables', 'importes']
+    keys_esenciales_f931_fijos = ['cuil', 'forma_pago', 'cbu', 'area']
+    # Formas de pago aceptadas
+    # '1'=Efectivo; '2'=Cheque; '3'=Acreditación en cuenta
 
-        area = " " * 50 if not empleado.area else empleado.area.ljust(50)
-        fecha_pago = payday.strftime('%Y%m%d')
-        # Si acredita informo el CBU, el CBU está o no está, pero no puede ser más corto
-        if forma_pago == '3' and empleado.cbu:
-            cbu = empleado.cbu
-        else:
-            cbu = " " * 22
+    for info_empleado in empleados_liquidados:
+        # Validaciones
+        for key in keys_esenciales_empleado:
+            if key not in info_empleado:
+                return False, f'Falta la clave {key} en el diccionario de empleados', None
+
+        for key in keys_esenciales_f931:
+            if key not in info_empleado['info_f931']:
+                return False, f'Falta la clave {key} en el diccionario de F931', None
+
+        for key in keys_esenciales_f931_fijos:
+            if key not in info_empleado['info_f931']['fijos']:
+                return False, f'Falta la clave {key} en el diccionario de F931 Fijos', None
+
+        legajo = info_empleado['empleado_legajo']
+        cuil = info_empleado['info_f931']['fijos']['cuil']
+        cbu = info_empleado['info_f931']['fijos']['cbu']
+        area = info_empleado['info_f931']['fijos']['area']
+        forma_pago = info_empleado['info_f931']['fijos']['forma_pago']
         fecha_rubrica = " " * 8
 
-        item = f'02{cuil}{leg}{area}{cbu}030{fecha_pago}{fecha_rubrica}{forma_pago}'
+        if forma_pago not in ['1', '2', '3']:
+            return False, f'Forma de pago no válida para el empleado {legajo}', None
+
+        if forma_pago == '3' and (not cbu or len(cbu) != 22):
+            return False, f'Forma de pago Acreditación en cuenta CBU inválido {legajo}', None
+
+        if forma_pago != '3':
+            cbu = " " * 22
+
+        # Normalizacion
+        legajo_norm = str(legajo).zfill(10)
+        area_norm = " " * 50 if not area else area.ljust(50)
+        fecha_pago_str = fecha_pago('%Y%m%d')
+
+        item = f'02{cuil}{legajo_norm}{area_norm}{cbu}030{fecha_pago_str}{fecha_rubrica}{forma_pago}'
 
         resp.append(item)
 
+    # Listo los registros, los uno con \r\n
     resp_final = '\r\n'.join(resp)
 
-    return resp_final
+    return True, None, resp_final

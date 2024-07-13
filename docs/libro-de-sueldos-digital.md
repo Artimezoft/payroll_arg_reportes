@@ -8,11 +8,11 @@ A continuación se muestra el modelo de JSON utilizado:
 
 El resultado obtenido es un/os txt correspondiente al requerido por AFIP
 
-[Registro 1](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro1.csv)
-[Registro 2](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro2.csv)
-[Registro 3](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro3.csv)
-[Registro 4](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro4.csv)
-[Registro 5](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro5.csv)
+* [Registro 1](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro1.csv)
+* [Registro 2](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro2.csv)
+* [Registro 3](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro3.csv)
+* [Registro 4](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro4.csv)
+* [Registro 5](/py_arg_reports/reporters/libro_sueldo_digital/formato_txt/registro5.csv)
 
 ```python
 import json

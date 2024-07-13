@@ -1,7 +1,7 @@
 {
     "periodo": "2024-04-01",
     "empresa": "GLADYS LUCAS HERNAN",
-    "cuit": "20123443210",
+    "cuit": "20123456780",
     "cantidad_liquidaciones": 2,
     "liquidaciones": [
         {
@@ -15,8 +15,8 @@
                     "empleado_legajo": 1,
                     "info_f931": {
                         "fijos": {
-                            "cuil": "27213967466",
-                            "nombre_completo": "GODOY, MARCELA ALEJANDRA",
+                            "cuil": "20432112340",
+                            "nombre_completo": "PEREZ, JUAN MANUEL",
                             "conyuge": 0,
                             "hijos": 0,
                             "condicion": "01",
@@ -33,10 +33,13 @@
                             "porcentaje_aporte_adicional_ss": 0,
                             "corresponde_reduccion": 0,
                             "regimen": 1,
-                            "tipo_operacion": 0
+                            "tipo_operacion": 0,
+                            "forma_pago": "3",
+                            "cbu": "1910100455110004255699",
+                            "area": "Area 1"
                         },
                         "variables": {
-                            "cuil": "27213967466",
+                            "cuil": "20432112340",
                             "situacion": 1,
                             "situacion_1": 1,
                             "dia_sr1": 1,
@@ -47,7 +50,7 @@
                             "codigo_siniestrado": 0
                         },
                         "importes": {
-                            "cuil": "27213967466",
+                            "cuil": "20432112340",
                             "aporte_vol": 0,
                             "asign_fam": 0,
                             "capital_lrt": 0,
@@ -93,32 +96,32 @@
                         {
                             "concepto": "JUBILA",
                             "cantidad": 11.0,
-                            "importe": 8083.3
+                            "importe": -8083.3
                         },
                         {
                             "concepto": "INSSJP",
                             "cantidad": 3.0,
-                            "importe": 2204.54
+                            "importe": -2204.54
                         },
                         {
                             "concepto": "OBRSOC",
                             "cantidad": 0.0,
-                            "importe": 3747.71
+                            "importe": -3747.71
                         },
                         {
                             "concepto": "FDOSOL",
                             "cantidad": 0.0,
-                            "importe": 661.36
+                            "importe": -661.36
                         },
                         {
                             "concepto": "AGECFD",
                             "cantidad": 2.0,
-                            "importe": 1469.69
+                            "importe": -1469.69
                         },
                         {
                             "concepto": "FAECYS",
                             "cantidad": 0.5,
-                            "importe": 367.42
+                            "importe": -367.42
                         }
                     ]
                 }
@@ -135,7 +138,7 @@
                     "empleado_legajo": 1,
                     "info_f931": {
                         "fijos": {
-                            "cuil": "27213967466",
+                            "cuil": "20432112340",
                             "nombre_completo": "GODOY, MARCELA ALEJANDRA",
                             "conyuge": 0,
                             "hijos": 0,
@@ -153,10 +156,13 @@
                             "porcentaje_aporte_adicional_ss": 0,
                             "corresponde_reduccion": 0,
                             "regimen": 1,
-                            "tipo_operacion": 0
+                            "tipo_operacion": 0,
+                            "forma_pago": "3",
+                            "cbu": "1910100455110004255699",
+                            "area": "Area 1"
                         },
                         "variables": {
-                            "cuil": "27213967466",
+                            "cuil": "20432112340",
                             "situacion": 1,
                             "situacion_1": 1,
                             "dia_sr1": 1,
@@ -167,7 +173,7 @@
                             "codigo_siniestrado": 0
                         },
                         "importes": {
-                            "cuil": "27213967466",
+                            "cuil": "20432112340",
                             "aporte_vol": 0,
                             "asign_fam": 0,
                             "capital_lrt": 0,
@@ -243,37 +249,37 @@
                         {
                             "concepto": "JUBILA",
                             "cantidad": 11.0,
-                            "importe": 22517.75
+                            "importe": -22517.75
                         },
                         {
                             "concepto": "INSSJP",
                             "cantidad": 3.0,
-                            "importe": 6141.21
+                            "importe": -6141.21
                         },
                         {
                             "concepto": "OBRSOC",
                             "cantidad": 0.0,
-                            "importe": 17966.07
+                            "importe": -17966.07
                         },
                         {
                             "concepto": "FDOSOL",
                             "cantidad": 0.0,
-                            "importe": 3170.48
+                            "importe": -3170.48
                         },
                         {
                             "concepto": "AGECFD",
                             "cantidad": 2.0,
-                            "importe": 7045.52
+                            "importe": -7045.52
                         },
                         {
                             "concepto": "FAECYS",
                             "cantidad": 0.5,
-                            "importe": 1761.38
+                            "importe": -1761.38
                         },
                         {
                             "concepto": "APOSEC",
                             "cantidad": 0.0,
-                            "importe": 100.0
+                            "importe": -100.0
                         }
                     ]
                 }
