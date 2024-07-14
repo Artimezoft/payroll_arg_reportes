@@ -12,7 +12,7 @@ jobs:
     strategy:
       max-parallel: 4
       matrix:
-        python-version: ["3.10", "3.11"]
+        python-version: ["3.11", "3.12"]
 
     steps:
     - uses: actions/checkout@v4
@@ -29,12 +29,14 @@ jobs:
 
     - name: Lint with Flake8
       run: |
+        # Ignore E231 missing whitespace after (in Python 3.12)
         flake8 \
         --count \
         --show-source \
         --max-complexity=14 \
         --max-line-length=130 \
-        --statistics
+        --statistics \
+        --extend-ignore=E231
 
     - name: Run Tests
       run: |

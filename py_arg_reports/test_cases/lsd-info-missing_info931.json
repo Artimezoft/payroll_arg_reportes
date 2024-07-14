@@ -1,0 +1,87 @@
+{
+    "periodo": "2024-03-01",
+    "empresa": "GLADYS LUCAS HERNAN",
+    "cuit": "20123456780",
+    "cantidad_liquidaciones": 1,
+    "liquidaciones": [
+        {
+            "id": 5,
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "fecha_pago": "2024-04-04",
+            "empleados_liquidados": [
+                {
+                    "empleado_id": 203,
+                    "empleado_legajo": 1,
+                    "conceptos_liquidados": [
+                        {
+                            "concepto": "PLUFER",
+                            "cantidad": 2.0,
+                            "importe": 3047.26
+                        },
+                        {
+                            "concepto": "ANTIGU",
+                            "cantidad": 6.0,
+                            "importe": 13895.49
+                        },
+                        {
+                            "concepto": "PRESEN",
+                            "cantidad": 8.33,
+                            "importe": 20457.24
+                        },
+                        {
+                            "concepto": "COMA01",
+                            "cantidad": 0.0,
+                            "importe": 85932.61
+                        },
+                        {
+                            "concepto": "COMA02",
+                            "cantidad": 0.0,
+                            "importe": 5155.96
+                        },
+                        {
+                            "concepto": "COMA03",
+                            "cantidad": 0.0,
+                            "importe": 7590.71
+                        },
+                        {
+                            "concepto": "JUBILA",
+                            "cantidad": 11.0,
+                            "importe": -29253.86
+                        },
+                        {
+                            "concepto": "INSSJP",
+                            "cantidad": 3.0,
+                            "importe": -7978.32
+                        },
+                        {
+                            "concepto": "OBRSOC",
+                            "cantidad": 0.0,
+                            "importe": -18595.8
+                        },
+                        {
+                            "concepto": "FDOSOL",
+                            "cantidad": 0.0,
+                            "importe": -3281.61
+                        },
+                        {
+                            "concepto": "AGECFD",
+                            "cantidad": 2.0,
+                            "importe": -7292.47
+                        },
+                        {
+                            "concepto": "FAECYS",
+                            "cantidad": 0.5,
+                            "importe": -1823.12
+                        },
+                        {
+                            "concepto": "APOSEC",
+                            "cantidad": 0.0,
+                            "importe": -100.0
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}

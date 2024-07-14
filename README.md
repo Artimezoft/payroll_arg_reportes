@@ -18,7 +18,7 @@ Notas generales:
 
 - [Recibo de Sueldos](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/recibo-de-sueldos.md)
 - [F.931](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/f931.md)
-- Libro de Sueldos Digital
+- [Libro de Sueldos Digital](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/libro-de-sueldos-digital.md)
 - [Libro de Sueldos](https://github.com/Artimezoft/payroll_arg_reportes/blob/develop/docs/libro-de-sueldos.md)
 - Sicore
 - F.1357

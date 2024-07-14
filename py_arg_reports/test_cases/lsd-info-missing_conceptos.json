@@ -1,0 +1,94 @@
+{
+    "periodo": "2024-03-01",
+    "empresa": "GLADYS LUCAS HERNAN",
+    "cuit": "20123456780",
+    "cantidad_liquidaciones": 1,
+    "liquidaciones": [
+        {
+            "id": 5,
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "fecha_pago": "2024-04-04",
+            "empleados_liquidados": [
+                {
+                    "empleado_id": 203,
+                    "empleado_legajo": 1,
+                    "info_f931": {
+                        "fijos": {
+                            "cuil": "20432112340",
+                            "nombre_completo": "PEREZ, JUAN MANUEL",
+                            "conyuge": 0,
+                            "hijos": 0,
+                            "condicion": "01",
+                            "actividad": "049",
+                            "obra_social": "126205",
+                            "adherentes": 0,
+                            "zona": "18",
+                            "localidad": "CORDOBA - Gran Córdoba",
+                            "modalidad_contrato": "001",
+                            "porc_contr_dif_ss": 0.0,
+                            "seguro_vida_obligatorio": 1,
+                            "tipo_empresa": "1",
+                            "convencionado": 1,
+                            "porcentaje_aporte_adicional_ss": 0,
+                            "corresponde_reduccion": 0,
+                            "regimen": 1,
+                            "tipo_operacion": 0,
+                            "forma_pago": "3",
+                            "cbu": "1910100455110004255699",
+                            "area": "Area 1"
+                        },
+                        "variables": {
+                            "cuil": "20432112340",
+                            "situacion": 1,
+                            "situacion_1": 1,
+                            "dia_sr1": 1,
+                            "situacion_2": 0,
+                            "dia_sr2": 0,
+                            "situacion_3": 0,
+                            "dia_sr3": 0,
+                            "codigo_siniestrado": 0
+                        },
+                        "importes": {
+                            "cuil": "20432112340",
+                            "aporte_vol": 0,
+                            "asign_fam": 0,
+                            "capital_lrt": 0,
+                            "rectificacion": 0,
+                            "incremento": 0,
+                            "imp_exc_ap_os": 0,
+                            "imp_exc_ap_ss": 0,
+                            "remuneracion_total": 364623.45,
+                            "no_remunerativo": 98679.28,
+                            "remuneracion_01": 265944.17,
+                            "remuneracion_02": 265944.17,
+                            "remuneracion_03": 265944.17,
+                            "remuneracion_04": 729246.9,
+                            "remuneracion_05": 265944.17,
+                            "remuneracion_06": 0,
+                            "remuneracion_07": 0,
+                            "remuneracion_08": 729246.9,
+                            "remuneracion_09": 364623.45,
+                            "remuneracion_10": 262442.33,
+                            "remuneracion_11": 0,
+                            "sueldo": 231591.44,
+                            "adicionales": 13895.49,
+                            "premios": 20457.24,
+                            "hs_extras": 0,
+                            "sac": 0,
+                            "zona_desfavorable": 0,
+                            "vacaciones": 0,
+                            "maternidad": 0,
+                            "k_dias": 31.0,
+                            "k_horas": 0,
+                            "k_hs_extras": 0,
+                            "aporte_adicional_os": 100.0,
+                            "importe_adicional_os": 0,
+                            "detraccion": 3501.84
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,10 @@
+Campo,Long,Desde,Hasta,Tipo,Observación
+Identificacion del tipo de registro,2,1,2,Alfabético,Fijo '02'
+CUIL del trabajador,11,3,13,Numérico,11 enteros. CUIL del empleado sin guiones.
+Legajo del trabajador,10,14,23,Alfanumérico,"Este valor es optativo. De no incluir detalle, completar con espacios."
+Dependencia de revista del trabajador,50,24,73,Alfanumérico,"Es el área donde el trabajador desempeña sus funciones( Ej. departamento de ventas). Este valor es optativo. De no incluir detalle, completar con espacios."
+CBU de acreditación del pago,22,74,95,Alfanumérico,"Se valida de acuerdo a las reglas definidas por el BCRA. Sólo se informa si ""forma de pago"" es igual a '3' (acreditación en cuenta)"
+Cantidad de días para proporcionar tope,3,96,98,Numérico,"3 enteros. Este valor se utiliza para proporcionar en más o en menos la base imponible máxima o “tope” para el cálculo de los descuentos de aportes al trabajador (SIPA, INSSJyP y obra social/Fondo Solidario de Redistribución).Si la liquidación no corresponde a período de inicio o fin de la relación laboral o relacionada con vacaciones, este valor debe informarse en 0."
+Fecha de pago,8,99,106,Numérico,Formato: AAAAMMDD
+Fecha de rúbrica,8,107,114,Alfanumérico,Completar con espacios en blanco.
+Forma de pago,1,115,115,Alfanumérico,Valores permitidos. '1'=Efectivo; '2'=Cheque; '3'=Acreditación en cuenta

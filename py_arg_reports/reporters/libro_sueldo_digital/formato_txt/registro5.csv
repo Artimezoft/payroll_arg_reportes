@@ -1,0 +1,13 @@
+Campo,Long,Desde,Hasta,Tipo,Observación
+Identificacion del tipo de registro,2,1,2,Alfanumérico,Fijo '05'
+CUIL del trabajador,11,3,13,Numérico,11 enteros. CUIL del empleado sin guiones.
+Categoría profesional,6,14,19,Numérico,Según tabla de codificación específica de Simplificación registral.
+Puesto desempeñado,4,20,23,Alfanumérico,Según tabla de codificación específica de Simplificación registral.
+Fecha de ingreso,8,24,31,Numérico,"Formato: AAAAMMDD.
+Es la fecha dentro del período declarado en la que inicia la prestación de servicios en la Empresa Usuaria.
+Puede haber iniciado su relación laboral en meses anteriores."
+Fecha de egreso,8,32,39,Numérico,"Formato: AAAAMMDD.
+Es la fecha en la que finaliza dentro del período declarado la prestación de servicios en la Empresa Usuaria.
+Puede continuar la relación el mes siguiente."
+Remuneración,15,40,54,Numérico,Debe coincidir con la base imponible 9
+CUIT del empleador,11,55,65,Numérico,Las empresas usuarias deben informar el CUIT de la empresa de servicios eventuales.
