@@ -94,10 +94,7 @@ def genera_txt_lsd_liquidacion(
     # Fin Registro 3 y 4 ---------------------------------------------------------------------------------
 
     # Registro 5 -----------------------------------------------------------------------------------------
-    registro5_txt = process_reg5(
-        empleados_liquidados=empleados_liquidados,
-        fecha_pago=fecha_pago_date,
-    )
+    registro5_txt = process_reg5()
     if not registro5_txt[0]:
         return False, registro5_txt[1], None
     res_final += registro5_txt[2]
@@ -121,7 +118,7 @@ def genera_archivo_final_lsd(txt_liquidaciones: list, output_path: str, filename
     txt_liquidaciones_files = []
 
     # Voy escribiendo cada una de las liquidaciones
-    for txt_liquidacion, i in enumerate(txt_liquidaciones):
+    for i, txt_liquidacion in enumerate(txt_liquidaciones):
         fpath = os.path.join(output_path, f'{filename}_{i}.txt')
 
         with open(fpath, 'w') as f:
@@ -201,5 +198,14 @@ def genera_txt_lsd(
             return False, txt_liquidacion[1]
 
         txt_liquidaciones.append(txt_liquidacion[2])
+
+    # Genero el archivo final
+    resultado_final = genera_archivo_final_lsd(
+        txt_liquidaciones=txt_liquidaciones,
+        output_path=output_path,
+        filename=filename,
+    )
+    if not resultado_final[0]:
+        return False, resultado_final[1]
 
     return True, resp

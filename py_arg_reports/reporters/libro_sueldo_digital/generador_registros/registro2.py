@@ -52,7 +52,7 @@ def process_reg2(empleados_liquidados: dict, fecha_pago: datetime.date) -> tuple
         # Normalizacion
         legajo_norm = str(legajo).zfill(10)
         area_norm = " " * 50 if not area else area.ljust(50)
-        fecha_pago_str = fecha_pago('%Y%m%d')
+        fecha_pago_str = fecha_pago.strftime('%Y%m%d')
 
         item = f'02{cuil}{legajo_norm}{area_norm}{cbu}030{fecha_pago_str}{fecha_rubrica}{forma_pago}'
 
