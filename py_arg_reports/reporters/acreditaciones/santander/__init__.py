@@ -48,8 +48,8 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         # 6 Numero de comprobante Num, 15, AAAAMM rellenado con ceros a la izquierda
         anio = self.liquidacion.get('periodo_anio')
         mes = self.liquidacion.get('periodo_mes')
-        periodo = f'{anio}{mes: 02}'
-        ret += f'{periodo: 015}'
+        periodo = f'{anio}{mes:02}'
+        ret += f'{periodo:015}'
         # 7 Reservado para usos futuros, num, 4
         ret += '0000'
         # 8 Nombre del beneficiario, Alf, 30
@@ -82,13 +82,13 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         anio = int(self.liquidacion.get('fecha_pago_anio'))
         mes = int(self.liquidacion.get('fecha_pago_mes'))
         dia = int(self.liquidacion.get('fecha_pago_dia'))
-        full_dia = f'{anio}{mes: 02}{dia: 02}'
+        full_dia = f'{anio}{mes:02}{dia:02}'
         ret += full_dia
         # 21 Import del pago, Num, 15, (13 enteros y 2 decimales sin separador)
         # Nuestro importe viene en string aun siedo un numero para que no se pierda precision
         parte_entera, parte_decimal = str_dec_num_to_no_dec_sep(empleado.get('importe_pago'))
         # asegurarse que la parte entera tiene 13 digitos y la parte decimal tiene 2 digitos con format string
-        numero_sin_separa = f'{parte_entera: 013}{parte_decimal: 02}'
+        numero_sin_separa = f'{parte_entera:013}{parte_decimal:02}'
         ret += numero_sin_separa
         # 22 Codigo de forma de pago, Num, 2, 50=Acredit Santander, 52=SNP (otros bancos), 57=CCI (Otros bancos)
         ret += self.get_codigo_forma_pago()
@@ -165,11 +165,11 @@ class AcreditacionSantander(AcreditacionesHeadDetailTrailerFile):
         # 3 Importe total del pago Num, 15, (13 enteros y 2 decimales sin separador)
         parte_entera, parte_decimal = str_dec_num_to_no_dec_sep(self.liquidacion.get('total_pago'))
         # asegurarse que la parte entera tiene 13 digitos y la parte decimal tiene 2 digitos con format string
-        numero_sin_separa = f'{parte_entera: 013}{parte_decimal: 02}'
+        numero_sin_separa = f'{parte_entera:013}{parte_decimal:02}'
         ret += numero_sin_separa
         # 4 Cantidad de registros Num, 7
         total_empleados = len(self.empleados)
-        ret += f'{total_empleados: 07}'
+        ret += f'{total_empleados:07}'
         # 5 Reservado para usos futuros, Num, 612
         ret += '0' * 612
         return ret
