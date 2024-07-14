@@ -10,11 +10,17 @@ def integer_to_amount_txt(amount: int, long: int, multiplicador: int = 1) -> str
     return resp
 
 
-def float_to_amount_txt(amount: float, long: int, multiplicador: int = 100) -> str:
+def float_to_amount_txt(amount: float, long: int, multiplicador: int = 100, no_coma: bool = False) -> str:
     """ Convierte un monto float a formato de texto
     """
-    resp = "{:.2f}".format(amount)
-    resp = resp.zfill(long).replace('.', ',')
+    resp = amount * multiplicador
+    if not no_coma:
+        resp = "{:.2f}".format(amount)
+        resp = resp.zfill(long).replace('.', ',')
+    else:
+        resp = int(resp)
+        resp = str(resp)
+        resp = resp.zfill(long)
     return resp
 
 
@@ -37,7 +43,7 @@ def amount_txt_to_float(amount_txt: str, multip: int = 100, rount_to: int = 2) -
     return resp
 
 
-def sync_format(info: str, expected_len: int, type_info: str, multiplicador: int = 1) -> str:
+def sync_format(info: str, expected_len: int, type_info: str, multiplicador: int = 1, no_coma: bool = False) -> str:
     """ Sincroniza el formato de un campo de un txt de F931
         Args:
             info: str, valor del campo
@@ -62,7 +68,7 @@ def sync_format(info: str, expected_len: int, type_info: str, multiplicador: int
             resp = str(resp * multiplicador).zfill(expected_len)
         else:
             if type_info == 'DE':
-                resp = float_to_amount_txt(float(info), expected_len, multiplicador)
+                resp = float_to_amount_txt(float(info), expected_len, multiplicador, no_coma)
             elif type_info == 'EN':
                 resp = integer_to_amount_txt(int(info), expected_len, multiplicador)
 

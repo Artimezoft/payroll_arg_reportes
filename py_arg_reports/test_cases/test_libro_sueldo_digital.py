@@ -3,7 +3,7 @@ import json
 from py_arg_reports.reporters.libro_sueldo_digital.reporter import genera_txt_lsd
 
 
-with open('./test_cases/lsd-info.json', 'r') as f:
+with open('./test_cases/lsd-info-1l.json', 'r') as f:
     lsd_data = json.load(f)
 
 cuit_empresa = lsd_data['cuit']

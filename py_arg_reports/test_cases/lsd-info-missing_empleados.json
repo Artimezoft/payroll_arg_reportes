@@ -1,0 +1,14 @@
+{
+    "periodo": "2024-03-01",
+    "empresa": "GLADYS LUCAS HERNAN",
+    "cuit": "20123456780",
+    "cantidad_liquidaciones": 1,
+    "liquidaciones": [
+        {
+            "id": 5,
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "fecha_pago": "2024-04-04"
+        }
+    ]
+}

@@ -56,6 +56,8 @@ def genera_txt_lsd_liquidacion(
     )
     if not registro2_txt[0]:
         return False, registro2_txt[1], None
+    # Agrego salto de linea
+    res_final += '\r\n'
     res_final += registro2_txt[2]
     # Fin Registro 2 -------------------------------------------------------------------------------------
 
@@ -89,14 +91,21 @@ def genera_txt_lsd_liquidacion(
 
     registro3_txt = '\r\n'.join(registro_3_por_empleado)
     registro4_txt = '\r\n'.join(registro_4_por_empleado)
-    res_final += registro3_txt[2]
-    res_final += registro4_txt[2]
+    # Agrego salto de linea
+    res_final += '\r\n'
+    res_final += registro3_txt
+    # Agrego salto de linea
+    res_final += '\r\n'
+    res_final += registro4_txt
     # Fin Registro 3 y 4 ---------------------------------------------------------------------------------
 
     # Registro 5 -----------------------------------------------------------------------------------------
     registro5_txt = process_reg5()
     if not registro5_txt[0]:
         return False, registro5_txt[1], None
+    if registro5_txt[2] != '':
+        # Agrego salto de linea
+        res_final += '\r\n'
     res_final += registro5_txt[2]
     # Fin Registro 5 -------------------------------------------------------------------------------------
 
@@ -119,7 +128,7 @@ def genera_archivo_final_lsd(txt_liquidaciones: list, output_path: str, filename
 
     # Voy escribiendo cada una de las liquidaciones
     for i, txt_liquidacion in enumerate(txt_liquidaciones):
-        fpath = os.path.join(output_path, f'{filename}_{i}.txt')
+        fpath = os.path.join(output_path, f'{filename}_{i+1}.txt')
 
         with open(fpath, 'w') as f:
             f.write(txt_liquidacion)
@@ -155,6 +164,9 @@ def genera_txt_lsd(
          - False, error: si falla
          - True, None: si todo salió bien
     """
+    if not json_data:
+        return False, 'No se puede generar el txt para Libro Sueldo Digital, no hay datos'
+
     resp = None
     indices_esenciales = ['periodo', 'cuit', 'cantidad_liquidaciones', 'liquidaciones']
     indices_esenciales_liquidaciones = ['tipo_liquidacion', 'fecha_pago', 'empleados_liquidados']

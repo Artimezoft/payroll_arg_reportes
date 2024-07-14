@@ -52,10 +52,12 @@ def process_reg4(cuil: str, info_931: dict) -> tuple:
         return False, 'CUIL inválido', None
 
     for dato, formato in formato_txt_r4.items():
+        long = formato['long']
+        dato_type = formato['type']
         if dato == 'tipo_registro':
-            resp += '04'
+            dato_to_add = '04'
         elif dato == 'cuil':
-            resp += cuil
+            dato_to_add = cuil
         else:
             # Procesa las claves específicas
             if dato in KEYS_CALCULOS_ESPECIFICOS:
@@ -64,10 +66,14 @@ def process_reg4(cuil: str, info_931: dict) -> tuple:
                 # Todos los demás items deben estar en info_931
                 if dato not in info_931:
                     return False, f'Falta el campo {dato} en el diccionario de info_931', None
-                long = formato['long']
-                dato_type = formato['type']
                 dato_value = str(info_931[dato])
-            dato_to_add = sync_format(dato_value, long, dato_type)
-            resp += dato_to_add
+                # En el caso de decimal, se multiplica por 100 porque va sin coma
+                multiplicador = 100 if dato_type == 'DE' else 1
+                no_coma = True if dato_type == 'DE' else False
+            dato_to_add = sync_format(dato_value, long, dato_type, multiplicador, no_coma)
+        resp += dato_to_add
+
+        if len(dato_to_add) != long:
+            return False, f'Error en el largo del dato {dato}', None
 
     return True, None, resp

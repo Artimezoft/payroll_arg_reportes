@@ -13,7 +13,7 @@ def process_reg2(empleados_liquidados: dict, fecha_pago: datetime.date) -> tuple
             - False, str, None: si falla
     """
     resp = []
-    keys_esenciales_empleado = ['empleado_legajo', 'info_f931']
+    keys_esenciales_empleado = ['empleado_legajo', 'info_f931', 'conceptos_liquidados']
     keys_esenciales_f931 = ['fijos', 'variables', 'importes']
     keys_esenciales_f931_fijos = ['cuil', 'forma_pago', 'cbu', 'area']
     # Formas de pago aceptadas

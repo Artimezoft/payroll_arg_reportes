@@ -45,7 +45,7 @@ class TestGeneracionF931(unittest.TestCase):
                     os.rmdir(os.path.join(root, dir))
             os.rmdir(cls.temp_folder)
 
-    def test_descarga_recibo_1(self):
+    def test_descarga_f931_1(self):
         """ Prueba de la generacion de txt de f931
         """
         resp_descarga = genera_txt_f931(
