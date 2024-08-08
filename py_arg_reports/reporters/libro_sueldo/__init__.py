@@ -135,7 +135,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     contrato_text = empleado["contrato"]
     if ':' in contrato_text:
         partes_contrato = contrato_text.split(':', 1)
-        contrato_text = partes_contrato[0].strip() + ':\n' + partes_contrato[1].strip()
+        contrato_text = partes_contrato[0].strip() + ':''\n' + partes_contrato[1].strip()
 
     lista = ['Estado civil', 'Puesto', 'Mod.Contrato']
     empleado_block.text_column(lista, start_x=7, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
@@ -148,7 +148,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     lista = [empleado["cuil"], empleado["categoria"], empleado["area"]]
     empleado_block.text_column(lista, start_x=16, start_y=y, line_sep=t9_line_sep, format_=F9)
 
-    empleado_block.line(Rect(2, 1.8, 16, 1.8), line_with=2)
+    empleado_block.line(Rect(2, 2, 16, 1.9), line_with=2)
 
     y_titles = 2.3
     # Los tipos de conceptos son:

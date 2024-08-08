@@ -345,8 +345,12 @@ class CanvaPDFBlock:
 
     def text_column(self, text_list, line_sep=0.4, start_x=0, start_y=0, align='left', bold=False, format_: Format = None):
         """ Escribir una columna de textos """
-        for i, text in enumerate(text_list):
-            self.text(text, x=start_x, y=start_y + (line_sep * i), align=align, format_=format_, bold=bold)
+        current_y = start_y
+        for text in text_list:
+            parts = text.split('\n')  # Divide el texto en partes según los saltos de línea
+            for part in parts:
+                self.text(part, x=start_x, y=current_y, align=align, format_=format_, bold=bold)
+                current_y += line_sep  # Mueve 'y' abajo para la siguiente línea
 
     def re_draw(self):
         """ Redibujar el bloque """
