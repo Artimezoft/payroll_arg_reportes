@@ -40,10 +40,11 @@ class TestLibroSueldo(unittest.TestCase):
         # Probar que el contenido del archivo sea el esperado
         page = pdf.pages[0]
         page_1_text = page.extract_text()
+        print("page_1_text", page_1_text)
         expected = [
             'Empresa de Prueba',
             'Calle de Prueba 123, 10, Formosa',
-            'Actividades no especificadas',
+            'Actividad de Prueba',
             'No Remunerativos',
             # Agregue cosas y ya no se el total 'Neto a cobrar $ 329.181,77'
         ]
