@@ -78,9 +78,11 @@ def get_domicilio_empresa(empresa):
 def get_cuit(empresa):
     return empresa['cuit']
 
+
 def get_actividad_principal(empresa):
     # tomar el dato de actividad principal de la empresa
     return empresa['actividad_principal']
+
 
 def get_liquidacion(liquidacion):
     """ Obtener UNA liquidacion de un empleado """
