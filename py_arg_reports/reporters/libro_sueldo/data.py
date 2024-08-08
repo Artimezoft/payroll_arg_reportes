@@ -23,8 +23,7 @@ def translate_data(origin_data):
         'company_name': get_company_name(empresa),
         'domicilio': get_domicilio_empresa(empresa),
         'cuit': get_cuit(empresa),
-        'actividad_principal': 'FALTA ACT PRI',  # TODO
-        'actividades_secundarias': ['FALTA ACT SEC'],  # TODO
+        'actividad_principal': get_actividad_principal(empresa),  # TODO
         'tipo_liquidacion': get_tipo_liquidacion(liquidacion),
         'periodo': get_periodo_liquidacon(liquidacion),
         'legajos': legajos,
@@ -79,6 +78,9 @@ def get_domicilio_empresa(empresa):
 def get_cuit(empresa):
     return empresa['cuit']
 
+def get_actividad_principal(empresa):
+    # tomar el dato de actividad principal de la empresa
+    return empresa['actividad_principal']
 
 def get_liquidacion(liquidacion):
     """ Obtener UNA liquidacion de un empleado """

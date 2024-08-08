@@ -7,8 +7,8 @@ from reportlab.lib.units import cm
 
 
 log = get_logger(__name__)
-F14 = Format(font_size=14)
-F10 = Format(font_size=10)
+F14 = Format(font_size=10)
+F10 = Format(font_size=9)
 F9 = Format(font_size=8)
 t10_line_sep = 0.5
 t9_line_sep = 0.3
@@ -86,21 +86,18 @@ def draw_header(PDF: CanvasPDF):
     log.info(f'Creando header en pagina {PDF.page}')
     # Agregar el bloque de headers izquiero
     header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 3.3), format_=Format(font_size=10, fill_color='#D0D0D0CC'))
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14)
-    header.text('Folio {page}', x=17.5, y=0.7, format_=F10)
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14, bold=True)
     col = [info_recibo['company_name'], info_recibo['domicilio']]
     header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
 
     # actividades
-    actividades = info_recibo.get('actividades', [])
+    actividades = info_recibo.get('actividad_principal', {})
 
     # Verificar que haya al menos una actividad principal
     if actividades:
-        apri = f'Actividad principal: {actividades[0]}'
-        # Crear la lista de actividades secundarias solo si existen
-        asec = [f'Actividad secundaria: {act}' for act in actividades[1:]]
+        apri = f"Actividad principal: {actividades['name']}"
 
-        col = [apri] + asec
+        col = [apri]
         header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9)
     else:
         header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F9)
@@ -128,15 +125,23 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     name = f'{empleado["legajo"]} - {empleado["nombre"]}'
     y = 0.5
     empleado_block.text(name, bold=True, x=1, y=y)
+    # Información básica del empleado
     lista = ['F. Ingreso', '', 'Remun. asignada']
     y = y + t9_line_sep + 0.1
     empleado_block.text_column(lista, start_x=1, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
     lista = [empleado["fecha_ingreso"], empleado["fecha_ingreso_2"], empleado["basico"]]
     empleado_block.text_column(lista, start_x=4, start_y=y, line_sep=t9_line_sep, format_=F9)
-    lista = ['Estado civil', 'Puesto']
+    # División automática del contrato
+    contrato_text = empleado["contrato"]
+    if ':' in contrato_text:
+        partes_contrato = contrato_text.split(':', 1)
+        contrato_text = partes_contrato[0].strip() + ':\n' + partes_contrato[1].strip()
+
+    lista = ['Estado civil', 'Puesto', 'Mod.Contrato']
     empleado_block.text_column(lista, start_x=7, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
-    lista = [empleado['estado_civil'], empleado["posicion"]]
+    lista = [empleado['estado_civil'], empleado["posicion"], contrato_text]
     empleado_block.text_column(lista, start_x=10, start_y=y, line_sep=t9_line_sep, format_=F9)
+    # Información adicional del empleado
     lista = ['CUIL', 'Categoría', 'Seccion']
     y = 0.5 + t9_line_sep + 0.1
     empleado_block.text_column(lista, start_x=13, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
