@@ -130,23 +130,20 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     y = y + t9_line_sep + 0.1
     empleado_block.text_column(lista, start_x=1, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
     lista = [empleado["fecha_ingreso"], empleado["fecha_ingreso_2"], empleado["basico"]]
-    empleado_block.text_column(lista, start_x=4, start_y=y, line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=3.5, start_y=y, line_sep=t9_line_sep, format_=F9)
     # División automática del contrato
     contrato_text = empleado["contrato"]
-    if ':' in contrato_text:
-        partes_contrato = contrato_text.split(':', 1)
-        contrato_text = partes_contrato[0].strip() + ':''\n' + partes_contrato[1].strip()
 
     lista = ['Estado civil', 'Puesto', 'Mod.Contrato']
-    empleado_block.text_column(lista, start_x=7, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
+    empleado_block.text_column(lista, start_x=6, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
     lista = [empleado['estado_civil'], empleado["posicion"], contrato_text]
-    empleado_block.text_column(lista, start_x=10, start_y=y, line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=8, start_y=y, line_sep=t9_line_sep, format_=F9)
     # Información adicional del empleado
     lista = ['CUIL', 'Categoría', 'Seccion']
     y = 0.5 + t9_line_sep + 0.1
-    empleado_block.text_column(lista, start_x=13, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
+    empleado_block.text_column(lista, start_x=13.5, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
     lista = [empleado["cuil"], empleado["categoria"], empleado["area"]]
-    empleado_block.text_column(lista, start_x=16, start_y=y, line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=15, start_y=y, line_sep=t9_line_sep, format_=F9)
 
     empleado_block.line(Rect(2, 2, 16, 1.9), line_with=2)
 
