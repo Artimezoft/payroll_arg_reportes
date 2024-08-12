@@ -10,6 +10,7 @@ log = get_logger(__name__)
 F10 = Format(font_size=10)
 F8 = Format(font_size=8)
 F7 = Format(font_size=7)
+F6 = Format(font_size=6)
 t10_line_sep = 0.5
 t9_line_sep = 0.3
 
@@ -171,11 +172,10 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text('Remunerativos', bold=True, x=0.3, y=y_titles, format_=F8)
     total_remu = sum([cpt['importe'] for cpt in remunerativos])
     empleado_block.text(float_to_format_currency(total_remu), x=5.5, y=y_titles, align='right', bold=True,  format_=F8)
-    F7 = Format(font_size=7-1)
     lista = [name_cant(cpt) for cpt in remunerativos]
-    empleado_block.text_column(lista, start_x=0.3, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
+    empleado_block.text_column(lista, start_x=0.3, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F6)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in remunerativos]
-    empleado_block.text_column(lista, start_x=5.5, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F7)
+    empleado_block.text_column(lista, start_x=5.5, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F6)
 
     # NO REMUNERATIVOS
 
