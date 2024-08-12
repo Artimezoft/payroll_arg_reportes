@@ -171,7 +171,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text('Remunerativos', bold=True, x=0.3, y=y_titles, format_=F10)
     total_remu = sum([cpt['importe'] for cpt in remunerativos])
     empleado_block.text(float_to_format_currency(total_remu), x=5.5, y=y_titles, align='right', bold=True,  format_=F10)
-    F7 = Format(font_size=7)
+    F7 = Format(font_size=7-1)
     lista = [name_cant(cpt) for cpt in remunerativos]
     empleado_block.text_column(lista, start_x=0.3, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in remunerativos]
