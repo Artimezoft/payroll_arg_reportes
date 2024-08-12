@@ -7,9 +7,9 @@ from reportlab.lib.units import cm
 
 
 log = get_logger(__name__)
-F14 = Format(font_size=10)
-F10 = Format(font_size=8)
-F9 = Format(font_size=7)
+F10 = Format(font_size=10)
+F8 = Format(font_size=8)
+F7 = Format(font_size=7)
 t10_line_sep = 0.5
 t9_line_sep = 0.3
 
@@ -61,9 +61,9 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
 
     # Agregar bloque de totales
     totales = CanvaPDFBlock(PDF, Rect(0, pos_y, 0, 3), Format(font_size=10, fill_color='#F0F0F099'))
-    totales.text('Totales', bold=True, x=1, y=0.5, format_=F10)
+    totales.text('Totales', bold=True, x=1, y=0.5, format_=F8)
     total_empleados = len(info_recibo['legajos'])
-    totales.text(f'Cantidad de empleados: {total_empleados}', bold=True, x=12, y=0.5, format_=F10)
+    totales.text(f'Cantidad de empleados: {total_empleados}', bold=True, x=12, y=0.5, format_=F8)
 
     total_rem2 = float_to_format_currency(total_rem)
     totales.text(f'Remunerativos {total_rem2}', bold=True, x=1, y=1.5)
@@ -74,7 +74,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
 
     neto = total_rem + total_no_rem - total_desc
     neto = float_to_format_currency(neto)
-    totales.text(f'Neto a cobrar {neto}', bold=True, x=1, y=2.5, format_=F10)
+    totales.text(f'Neto a cobrar {neto}', bold=True, x=1, y=2.5, format_=F8)
 
     PDF.finish_page()
     PDF.save()
@@ -86,7 +86,7 @@ def draw_header(PDF: CanvasPDF):
     log.info(f'Creando header en pagina {PDF.page}')
     # Agregar el bloque de headers izquiero
     header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 3.3), format_=Format(font_size=10, fill_color='#D0D0D0CC'))
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F14, bold=True)
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F10, bold=True)
     col = [info_recibo['company_name'], info_recibo['domicilio']]
     header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
 
@@ -99,15 +99,15 @@ def draw_header(PDF: CanvasPDF):
         apri_name = actividades['name']
 
         col = [apri_label]
-        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9, bold=True)
-        header.text(apri_name, x=0.4 + 2.5, y=2.2, format_=F9)
+        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F7, bold=True)
+        header.text(apri_name, x=0.4 + 2.5, y=2.2, format_=F7)
     else:
-        header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F9)
+        header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F7)
 
     # Agregar el bloque de headers derecho
     per = f'Periodo {info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
     col = ["CUIT: " + info_recibo['cuit'], per]
-    header.text_column(col, start_x=13, start_y=1.3, format_=F10)
+    header.text_column(col, start_x=13, start_y=1.3, format_=F8)
 
     return header
 
@@ -130,22 +130,22 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     # Información básica del empleado
     lista = ['F. Ingreso', '', 'Remun. asignada']
     y = y + t9_line_sep + 0.1
-    empleado_block.text_column(lista, start_x=1, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
+    empleado_block.text_column(lista, start_x=1, start_y=y, line_sep=t9_line_sep, format_=F7, bold=True)
     lista = [empleado["fecha_ingreso"], empleado["fecha_ingreso_2"], empleado["basico"]]
-    empleado_block.text_column(lista, start_x=3.5, start_y=y, line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=3.5, start_y=y, line_sep=t9_line_sep, format_=F7)
     # División automática del contrato
     contrato_text = empleado["contrato"]
 
     lista = ['Estado civil', 'Puesto', 'Mod.Contrato']
-    empleado_block.text_column(lista, start_x=6, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
+    empleado_block.text_column(lista, start_x=6, start_y=y, line_sep=t9_line_sep, format_=F7, bold=True)
     lista = [empleado['estado_civil'], empleado["posicion"], contrato_text]
-    empleado_block.text_column(lista, start_x=8, start_y=y, line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=8, start_y=y, line_sep=t9_line_sep, format_=F7)
     # Información adicional del empleado
     lista = ['CUIL', 'Categoría', 'Seccion']
     y = 0.5 + t9_line_sep + 0.1
-    empleado_block.text_column(lista, start_x=13.5, start_y=y, line_sep=t9_line_sep, format_=F9, bold=True)
+    empleado_block.text_column(lista, start_x=13.5, start_y=y, line_sep=t9_line_sep, format_=F7, bold=True)
     lista = [empleado["cuil"], empleado["categoria"], empleado["area"]]
-    empleado_block.text_column(lista, start_x=15, start_y=y, line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=15, start_y=y, line_sep=t9_line_sep, format_=F7)
 
     empleado_block.line(Rect(2, 2, 16, 1.9), line_with=2)
 
@@ -168,40 +168,40 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
 
     # Buscar todos los conceptos remunerativos (tipo_concepto=1)
     remunerativos = [c for c in conceptos if c['tipo_concepto'] == 1]
-    empleado_block.text('Remunerativos', bold=True, x=0.3, y=y_titles, format_=F10)
+    empleado_block.text('Remunerativos', bold=True, x=0.3, y=y_titles, format_=F8)
     total_remu = sum([cpt['importe'] for cpt in remunerativos])
-    empleado_block.text(float_to_format_currency(total_remu), x=5.5, y=y_titles, align='right', bold=True,  format_=F10)
+    empleado_block.text(float_to_format_currency(total_remu), x=5.5, y=y_titles, align='right', bold=True,  format_=F8)
     F7 = Format(font_size=7-1)
     lista = [name_cant(cpt) for cpt in remunerativos]
     empleado_block.text_column(lista, start_x=0.3, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in remunerativos]
-    empleado_block.text_column(lista, start_x=5.5, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=5.5, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F7)
 
     # NO REMUNERATIVOS
 
     # Buscar todos los conceptos no remunerativos (tipo_concepto=2)
     no_remunerativos = [c for c in conceptos if c['tipo_concepto'] == 2]
-    empleado_block.text('No Remunerativos', bold=True, x=6, y=y_titles, format_=F10)
+    empleado_block.text('No Remunerativos', bold=True, x=6, y=y_titles, format_=F8)
     total_no_remu = sum([cpt['importe'] for cpt in no_remunerativos])
-    empleado_block.text(float_to_format_currency(total_no_remu), x=12, y=y_titles, align='right', bold=True, format_=F10)
+    empleado_block.text(float_to_format_currency(total_no_remu), x=12, y=y_titles, align='right', bold=True, format_=F8)
 
     lista = [name_cant(cpt) for cpt in no_remunerativos]
     empleado_block.text_column(lista, start_x=6, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in no_remunerativos]
-    empleado_block.text_column(lista, start_x=12, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=12, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F7)
 
     # DESCUENTOS
 
     # Buscar todos los conceptos descuentos (tipo_concepto=3)
     descuentos = [c for c in conceptos if c['tipo_concepto'] == 3]
-    empleado_block.text('Descuentos', bold=True, x=12.4, y=y_titles, format_=F10)
+    empleado_block.text('Descuentos', bold=True, x=12.4, y=y_titles, format_=F8)
     total_desc = sum([cpt['importe'] for cpt in descuentos])
-    empleado_block.text(float_to_format_currency(total_desc), x=18.7, y=y_titles, align='right', bold=True, format_=F10)
+    empleado_block.text(float_to_format_currency(total_desc), x=18.7, y=y_titles, align='right', bold=True, format_=F8)
 
     lista = [name_cant(cpt) for cpt in descuentos]
     empleado_block.text_column(lista, start_x=12.4, start_y=y_titles + 0.5, line_sep=t9_line_sep, format_=F7)
     lista = [float_to_format_currency(cpt['importe'], include_currency=False) for cpt in descuentos]
-    empleado_block.text_column(lista, start_x=18.7, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F9)
+    empleado_block.text_column(lista, start_x=18.7, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F7)
 
     # NETO
 
@@ -209,7 +209,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
 
     empleado_block.rectangle(Rect(1, y_titles+1.6, 6, 0.6), fill_color='#D0D0D0AA')
     neto_a_cobrar = float_to_format_currency(empleado["totales_liquidacion"]["neto_liquidacion"])
-    empleado_block.text(f'Neto a cobrar   {neto_a_cobrar}', bold=True, x=1.2, y=y_titles+2, format_=F10)
+    empleado_block.text(f'Neto a cobrar   {neto_a_cobrar}', bold=True, x=1.2, y=y_titles+2, format_=F8)
 
 
 if __name__ == '__main__':
