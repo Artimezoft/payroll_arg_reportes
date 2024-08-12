@@ -8,8 +8,8 @@ from reportlab.lib.units import cm
 
 log = get_logger(__name__)
 F14 = Format(font_size=10)
-F10 = Format(font_size=9)
-F9 = Format(font_size=8)
+F10 = Format(font_size=8)
+F9 = Format(font_size=7)
 t10_line_sep = 0.5
 t9_line_sep = 0.3
 
@@ -61,7 +61,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
 
     # Agregar bloque de totales
     totales = CanvaPDFBlock(PDF, Rect(0, pos_y, 0, 3), Format(font_size=10, fill_color='#F0F0F099'))
-    totales.text('Totales', bold=True, x=1, y=0.5, format_=F14)
+    totales.text('Totales', bold=True, x=1, y=0.5, format_=F10)
     total_empleados = len(info_recibo['legajos'])
     totales.text(f'Cantidad de empleados: {total_empleados}', bold=True, x=12, y=0.5, format_=F10)
 
@@ -74,7 +74,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
 
     neto = total_rem + total_no_rem - total_desc
     neto = float_to_format_currency(neto)
-    totales.text(f'Neto a cobrar {neto}', bold=True, x=1, y=2.5, format_=F14)
+    totales.text(f'Neto a cobrar {neto}', bold=True, x=1, y=2.5, format_=F10)
 
     PDF.finish_page()
     PDF.save()
@@ -98,7 +98,7 @@ def draw_header(PDF: CanvasPDF):
         apri = f"Actividad principal: {actividades['name']}"
 
         col = [apri]
-        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9)
+        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9, bold=True)
     else:
         header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F9)
 
