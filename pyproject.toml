@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll_arg_reportes"
-version = "0.0.27"
+version = "0.0.28"
 dependencies = [
   "numero-a-letras>=0.0.4",
   "reportlab>=4.0.8,<5",
