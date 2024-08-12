@@ -95,10 +95,12 @@ def draw_header(PDF: CanvasPDF):
 
     # Verificar que haya al menos una actividad principal
     if actividades:
-        apri = f"Actividad principal: {actividades['name']}"
+        apri_label = 'Actividad principal: '
+        apri_name = actividades['name']
 
-        col = [apri]
-        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9)
+        col = [apri_label]
+        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F9, bold=True)
+        header.text(apri_name, x=0.4 + 2.5, y=2.2, format_=F9)
     else:
         header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F9)
 
