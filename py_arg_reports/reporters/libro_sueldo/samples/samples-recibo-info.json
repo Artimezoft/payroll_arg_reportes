@@ -34,6 +34,11 @@
                 "anio": 2023,
                 "fecha_pago": "2024-01-09",
                 "empresa": 1
+            },
+            "actividad_principal": {
+                "pk": 1,
+                "name": "Actividad de Prueba",
+                "code": "123456"
             }
         },
         "liquidacion": {
@@ -128,6 +133,11 @@
                 "anio": 2023,
                 "fecha_pago": "2024-01-09",
                 "empresa": 1
+            },
+            "actividad_principal": {
+                "pk": 1,
+                "name": "Actividad de Prueba",
+                "code": "123456"
             }
         },
         "liquidacion": {
@@ -222,6 +232,11 @@
                 "anio": 2023,
                 "fecha_pago": "2024-01-09",
                 "empresa": 1
+            },
+            "actividad_principal": {
+                "pk": 1,
+                "name": "Actividad de Prueba",
+                "code": "123456"
             }
         },
         "liquidacion": {
