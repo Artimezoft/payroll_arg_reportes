@@ -89,7 +89,7 @@ def draw_header(PDF: CanvasPDF):
     header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 3.3), format_=Format(font_size=10, fill_color='#D0D0D0CC'))
     header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F10, bold=True)
     col = [info_recibo['company_name'], info_recibo['domicilio']]
-    header.text_column(col, start_x=0.1, start_y=1.3, format_=Format(font_size=10))
+    header.text_column(col, start_x=0.4, start_y=1.3, format_=F7, bold=True)
 
     # actividades
     actividades = info_recibo.get('actividad_principal', {})
@@ -106,9 +106,13 @@ def draw_header(PDF: CanvasPDF):
         header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F7)
 
     # Agregar el bloque de headers derecho
-    per = f'Periodo {info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
-    col = ["CUIT: " + info_recibo['cuit'], per]
-    header.text_column(col, start_x=13, start_y=1.3, format_=F8)
+    per_label = 'Periodo: '
+    per_content = f'{info_recibo["tipo_liquidacion"]} {info_recibo["periodo"]}'
+    cuit_label = 'CUIT: '
+    cuit_content = info_recibo['cuit']
+    col = [cuit_label, per_label]
+    header.text_column(col, start_x=13, start_y=1.3, format_=F7, bold=True)
+    header.text_column([cuit_content, per_content], start_x=14.4, start_y=1.3, format_=F7)
 
     return header
 
