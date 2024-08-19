@@ -39,6 +39,16 @@
                 "pk": 1,
                 "name": "Actividad de Prueba",
                 "code": "123456"
+            },
+            "actividad_secundaria": {
+                "pk": 11911,
+                "name": "Cultivo de flores",
+                "code": "123457"
+            },
+            "actividad_secundaria_2": {
+                "pk": 11912,
+                "name": "Cultivo de plantas ornamentales",
+                "code": "123458"
             }
         },
         "liquidacion": {
@@ -138,6 +148,16 @@
                 "pk": 1,
                 "name": "Actividad de Prueba",
                 "code": "123456"
+            },
+            "actividad_secundaria": {
+                "pk": 11911,
+                "name": "Cultivo de flores",
+                "code": "123457"
+            },
+            "actividad_secundaria_2": {
+                "pk": 11912,
+                "name": "Cultivo de plantas ornamentales",
+                "code": "123458"
             }
         },
         "liquidacion": {
@@ -237,6 +257,16 @@
                 "pk": 1,
                 "name": "Actividad de Prueba",
                 "code": "123456"
+            },
+            "actividad_secundaria": {
+                "pk": 11911,
+                "name": "Cultivo de flores",
+                "code": "123457"
+            },
+            "actividad_secundaria_2": {
+                "pk": 11912,
+                "name": "Cultivo de plantas ornamentales",
+                "code": "123458"
             }
         },
         "liquidacion": {

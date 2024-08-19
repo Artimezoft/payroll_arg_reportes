@@ -84,6 +84,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
 
 def draw_header(PDF: CanvasPDF):
     info_recibo = PDF.data
+    # print('info_recibo', info_recibo, "\n \n \n")
     log.info(f'Creando header en pagina {PDF.page}')
     # Agregar el bloque de headers izquiero
     header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 3.3), format_=Format(font_size=10, fill_color='#D0D0D0CC'))
@@ -92,16 +93,27 @@ def draw_header(PDF: CanvasPDF):
     header.text_column(col, start_x=0.4, start_y=1.3, format_=F7, bold=True)
 
     # actividades
-    actividades = info_recibo.get('actividad_principal', {})
+    actividad_principal = info_recibo.get('actividad_principal', {})
+    actividades_secundarias = info_recibo.get('actividades_secundarias', [])
 
     # Verificar que haya al menos una actividad principal
-    if actividades:
+    if actividad_principal:
         apri_label = 'Actividad principal: '
-        apri_name = actividades['name']
+        apri_name = actividad_principal.get('name', 'No especificada')
 
-        col = [apri_label]
-        header.text_column(col, start_x=0.4, start_y=2.2, line_sep=t9_line_sep, format_=F7, bold=True)
+        # Mostrar la actividad principal
+        header.text(apri_label, x=0.4, y=2.2, format_=F7, bold=True)
         header.text(apri_name, x=0.4 + 2.5, y=2.2, format_=F7)
+
+        # Mostrar actividades secundarias si existen
+        if actividades_secundarias:
+            asec_label = 'Actividades secundarias:'
+            header.text(asec_label, x=0.4, y=2.7, format_=F7, bold=True)
+
+            for i, actividad in enumerate(actividades_secundarias):
+                asec_name = actividad.get('name', 'No especificada')
+                y_pos = 2.55 + (i + 0.5) * 0.3
+                header.text(asec_name, x=0.4 + 3.19, y=y_pos, format_=F7)
     else:
         header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F7)
 
@@ -211,7 +223,7 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
 
     y_titles += 0.3
 
-    empleado_block.rectangle(Rect(1, y_titles+1.6, 6, 0.6), fill_color='#D0D0D0AA')
+    empleado_block.rectangle(Rect(1, y_titles+1.6, 5, 0.6), fill_color='#D0D0D0AA')
     neto_a_cobrar = float_to_format_currency(empleado["totales_liquidacion"]["neto_liquidacion"])
     empleado_block.text(f'Neto a cobrar   {neto_a_cobrar}', bold=True, x=1.2, y=y_titles+2, format_=F8)
 
