@@ -24,6 +24,7 @@ def translate_data(origin_data):
         'domicilio': get_domicilio_empresa(empresa),
         'cuit': get_cuit(empresa),
         'actividad_principal': get_actividad_principal(empresa),  # TODO
+        'actividades_secundarias': get_actividad_secundarias(empresa),
         'tipo_liquidacion': get_tipo_liquidacion(liquidacion),
         'periodo': get_periodo_liquidacon(liquidacion),
         'legajos': legajos,
@@ -82,6 +83,11 @@ def get_cuit(empresa):
 def get_actividad_principal(empresa):
     # tomar el dato de actividad principal de la empresa
     return empresa['actividad_principal']
+
+
+def get_actividad_secundarias(empresa):
+    # tomar el dato de actividad secundaria de la empresa
+    return empresa['actividades_secundarias']
 
 
 def get_liquidacion(liquidacion):

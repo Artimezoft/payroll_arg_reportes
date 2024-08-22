@@ -45,6 +45,8 @@ class TestLibroSueldo(unittest.TestCase):
             'Empresa de Prueba',
             'Calle de Prueba 123, 10, Formosa',
             'Actividad de Prueba',
+            'Cultivo de flores',
+            'Cultivo de plantas ornamentales',
             'No Remunerativos',
             # Agregue cosas y ya no se el total 'Neto a cobrar $ 329.181,77'
         ]
