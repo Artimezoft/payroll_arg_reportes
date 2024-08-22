@@ -84,15 +84,31 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
 def draw_header(PDF: CanvasPDF):
     info_recibo = PDF.data
     log.info(f'Creando header en pagina {PDF.page}')
-    # Agregar el bloque de headers izquiero
-    header = CanvaPDFBlock(PDF, is_header=True, rect=Rect(0, 0, 0, 3.3), format_=Format(font_size=10, fill_color='#D0D0D0CC'))
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F10, bold=True)
-    col = [info_recibo['company_name'], info_recibo['domicilio']]
-    header.text_column(col, start_x=0.4, start_y=1.3, format_=F7, bold=True)
-
+    # Estimar el alto que va a tener esto, necesito las actividades que son las que me pueden hacer variar esto
     # actividades
     actividad_principal = info_recibo.get('actividad_principal', {})
     actividades_secundarias = info_recibo.get('actividades_secundarias', [])
+    total_act_secundarias = len(actividades_secundarias)
+    initial_h = (
+        1 + # el header principal con el titulo
+        0.4 + # el nombre de la empresa
+        0.6 + # el domicilio de la empresa
+        0.6 + # la actividad principal
+        (0.3 * total_act_secundarias) # por cada actividad secundaria
+    )
+    # Agregar el bloque de headers izquiero
+    header = CanvaPDFBlock(
+        PDF,
+        is_header=True,
+        rect=Rect(0, 0, 0, initial_h),
+        format_=Format(font_size=10,
+        fill_color='#D0D0D0CC')
+    )
+
+    # Agregar contenido al header
+    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F10, bold=True)
+    col = [info_recibo['company_name'], info_recibo['domicilio']]
+    header.text_column(col, start_x=0.4, start_y=1.3, format_=F7, bold=True)
 
     # Verificar que haya al menos una actividad principal
     if actividad_principal:
