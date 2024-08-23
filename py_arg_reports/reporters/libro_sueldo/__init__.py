@@ -90,19 +90,18 @@ def draw_header(PDF: CanvasPDF):
     actividades_secundarias = info_recibo.get('actividades_secundarias', [])
     total_act_secundarias = len(actividades_secundarias)
     initial_h = (
-        1 + # el header principal con el titulo
-        0.4 + # el nombre de la empresa
-        0.6 + # el domicilio de la empresa
-        0.6 + # la actividad principal
-        (0.3 * total_act_secundarias) # por cada actividad secundaria
+        1 +  # el header principal con el titulo
+        0.4 +  # el nombre de la empresa
+        0.6 +  # el domicilio de la empresa
+        0.6 +  # la actividad principal
+        (0.3 * total_act_secundarias)  # por cada actividad secundaria
     )
     # Agregar el bloque de headers izquiero
     header = CanvaPDFBlock(
         PDF,
         is_header=True,
         rect=Rect(0, 0, 0, initial_h),
-        format_=Format(font_size=10,
-        fill_color='#D0D0D0CC')
+        format_=Format(font_size=10, fill_color='#D0D0D0CC')
     )
 
     # Agregar contenido al header
@@ -154,50 +153,9 @@ def draw_footer(PDF: CanvasPDF):
 
 
 def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
-    
+
     conceptos = empleado["conceptos_liquidados"]
-    # harcodeadno para testear
-    # conceptos = [
-    #     # Tipo 1: Remunerativos
-    #     {'name': 'Salario Básico', 'tipo_concepto': 1, 'importe': 50000, 'cantidad': 1},
-    #     {'name': 'Horas Extras', 'tipo_concepto': 1, 'importe': 10000, 'cantidad': 5},
-    #     {'name': 'Aguinaldo', 'tipo_concepto': 1, 'importe': 10000, 'cantidad': 1},
-    #     {'name': 'Vacaciones', 'tipo_concepto': 1, 'importe': 10000, 'cantidad': 1},
-    #     {'name': 'Presentismo', 'tipo_concepto': 1, 'importe': 5000, 'cantidad': 1},
-    #     {'name': 'Horas Nocturnas', 'tipo_concepto': 1, 'importe': 8000, 'cantidad': 3},
-    #     {'name': 'Bono por Desempeño', 'tipo_concepto': 1, 'importe': 7000, 'cantidad': 1},
-    #     {'name': 'Antigüedad', 'tipo_concepto': 1, 'importe': 2000, 'cantidad': 1},
-    #     {'name': 'Premio por Puntualidad', 'tipo_concepto': 1, 'importe': 1500, 'cantidad': 1},
-    #     {'name': 'Productividad', 'tipo_concepto': 1, 'importe': 6000, 'cantidad': 1},
-
-    #     # Tipo 2: No Remunerativos
-    #     {'name': 'Viáticos', 'tipo_concepto': 2, 'importe': 2000, 'cantidad': 1},
-    #     {'name': 'Bonificación', 'tipo_concepto': 2, 'importe': 5000, 'cantidad': 1},
-    #     {'name': 'Asignación Familiar', 'tipo_concepto': 2, 'importe': 2500, 'cantidad': 1},
-    #     {'name': 'Ayuda Escolar', 'tipo_concepto': 2, 'importe': 1000, 'cantidad': 1},
-    #     {'name': 'Movilidad', 'tipo_concepto': 2, 'importe': 3000, 'cantidad': 1},
-    #     {'name': 'Bono Compensatorio', 'tipo_concepto': 2, 'importe': 4000, 'cantidad': 1},
-    #     {'name': 'Reintegro de Gastos', 'tipo_concepto': 2, 'importe': 1500, 'cantidad': 1},
-    #     {'name': 'Viáticos por Capacitación', 'tipo_concepto': 2, 'importe': 3500, 'cantidad': 1},
-    #     {'name': 'Seguro de Vida', 'tipo_concepto': 2, 'importe': 800, 'cantidad': 1},
-    #     {'name': 'Beca de Estudio', 'tipo_concepto': 2, 'importe': 4500, 'cantidad': 1},
-
-    #     # Tipo 3: Descuentos
-    #     {'name': 'Descuento Obra Social', 'tipo_concepto': 3, 'importe': -3000, 'cantidad': 1},
-    #     {'name': 'Descuento Jubilación', 'tipo_concepto': 3, 'importe': -2000, 'cantidad': 1},
-    #     {'name': 'Descuento Ganancias', 'tipo_concepto': 3, 'importe': -1000, 'cantidad': 1},
-    #     {'name': 'Descuento Sindicato', 'tipo_concepto': 3, 'importe': -1500, 'cantidad': 1},
-    #     {'name': 'Descuento Seguro de Vida', 'tipo_concepto': 3, 'importe': -500, 'cantidad': 1},
-    #     {'name': 'Descuento Cuota Alimentaria', 'tipo_concepto': 3, 'importe': -2500, 'cantidad': 1},
-    #     {'name': 'Descuento Préstamo', 'tipo_concepto': 3, 'importe': -3000, 'cantidad': 1},
-    #     {'name': 'Descuento Seguro de Salud', 'tipo_concepto': 3, 'importe': -1800, 'cantidad': 1},
-    #     {'name': 'Descuento Club', 'tipo_concepto': 3, 'importe': -800, 'cantidad': 1},
-    #     {'name': 'Descuento Seguro Vehicular', 'tipo_concepto': 3, 'importe': -1200, 'cantidad': 1},
-    #     {'name': 'Descuento Cuota de Auto', 'tipo_concepto': 3, 'importe': -1500, 'cantidad': 1},
-    #     {'name': 'Descuento Cuota de Casa', 'tipo_concepto': 3, 'importe': -2000, 'cantidad': 1},
-    #     {'name': 'Descuento Cuota de Tarjeta', 'tipo_concepto': 3, 'importe': -1000, 'cantidad': 1},
-    # ]
-
+    # Los conceptos se dividen por tipo
     remunerativos = [c for c in conceptos if c['tipo_concepto'] == 1]
     total_remu = len(remunerativos)
     no_remunerativos = [c for c in conceptos if c['tipo_concepto'] == 2]
@@ -207,13 +165,13 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     # el total es igual al mayor de los tres
     total_c = max(total_remu, total_no_remu, total_desc)
 
-    e_initial_h =(
-        1 + # el nombre del empleado
-        0.5 + # la información básica del empleado
-        0.5 + # la división automática del contrato
-        0.5 + # la información adicional del empleado
-        (0.3 * total_c)+ # los conceptos
-        1.2 # el neto a cobrar
+    e_initial_h = (
+        1 +  # el nombre del empleado
+        0.5 +  # la información básica del empleado
+        0.5 +  # la división automática del contrato
+        0.5 +  # la información adicional del empleado
+        (0.3 * total_c) +  # los conceptos
+        1.2  # el neto a cobrar
     )
 
     empleado_block = CanvaPDFBlock(PDF, Rect(0, start_y, 0, e_initial_h), Format(font_size=7, fill_color='#F0F0F033'))
@@ -248,10 +206,15 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     # 2 No Remunerativos
     # 3 Descuentos
 
-    def name_cant(cpt):
-        """ No bre y (cantidad) """
+    def name_cant(cpt, max_length=30):
+        """ Devuelve el nombre del concepto con la cantidad si la tiene """
         cantidad = cpt.get('cantidad')
         final = cpt['name']
+        # sie l nombre es muy largo, cortarlo
+        if len(final) > max_length:
+            half_length = (max_length - 4) // 2
+            final = f'{final[:half_length]}....{final[-half_length:]}'
+
         if cantidad:
             final = f'{final} ({cantidad})'
         return final
@@ -292,7 +255,6 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text_column(lista, start_x=18.7, start_y=y_titles + 0.5, align='right', line_sep=t9_line_sep, format_=F7)
 
     # NETO
-    # quiero que a partir del final del bloque de conceptos se agregue el neto a cobrar
 
     y_titles = e_initial_h - 2.4
 
