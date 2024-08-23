@@ -70,7 +70,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
     total_no_rem2 = float_to_format_currency(total_no_rem, 2)
     totales.text(f'No Remunerativos {total_no_rem2}', bold=True, x=7.3, y=1.5)
     total_desc2 = float_to_format_currency(total_desc)
-    totales.text(f'Descuentos $ {total_desc2}', bold=True, x=14, y=1.5)
+    totales.text(f'Descuentos {total_desc2}', bold=True, x=14, y=1.5)
 
     neto = total_rem + total_no_rem - total_desc
     neto = float_to_format_currency(neto)
