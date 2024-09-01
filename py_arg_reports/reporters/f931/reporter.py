@@ -46,6 +46,11 @@ def genera_txt_f931(
             largo = FORMATO_TXT_F931[field_name]['long']
             info = empleado[field_name]
             info_formatted = sync_format(str(info), largo, tipo_dato, multiplicador)
+
+            # Situaciones de Revista 2 y 3 no pueden ser vacías o "00", cambiar a "01" si es así
+            if field_name in ['situacion_2', 'situacion_3'] and (info_formatted == '00' or info_formatted == '  '):
+                info_formatted = '01'
+
             line += info_formatted
         # Agregar salto de linea
         line += '\n'
