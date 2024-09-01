@@ -50,7 +50,7 @@ def genera_txt_f931(
         # Agregar salto de linea
         line += '\n'
         # Escribir linea en el archivo
-        with open(full_path, 'a') as f:
+        with open(full_path, 'a', encoding='latin-1') as f:
             f.write(line)
 
     return True, resp

@@ -61,7 +61,7 @@ class TestGeneracionF931(unittest.TestCase):
         self.assertTrue(os.path.exists(full_path))
 
         # Check the number of lines in the txt file
-        with open(self.temp_folder + 'txt_f931_prueba_1.txt', 'r') as file:
+        with open(self.temp_folder + 'txt_f931_prueba_1.txt', 'r', encoding='latin-1') as file:
             lines = file.readlines()
             num_lines = len(lines)
             largo_linea = len(lines[0]) if lines else 0
