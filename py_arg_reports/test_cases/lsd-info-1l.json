@@ -84,7 +84,9 @@
                             "k_hs_extras": 0,
                             "aporte_adicional_os": 100.0,
                             "importe_adicional_os": 0,
-                            "detraccion": 3501.84
+                            "detraccion": 3501.84,
+                            "base_diferencial_aos": 463302.73,
+                            "base_diferencial_cos": 463302.73
                         }
                     },
                     "conceptos_liquidados": [

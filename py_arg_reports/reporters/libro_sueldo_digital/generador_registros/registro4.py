@@ -17,7 +17,7 @@ def process_keys_especificas(key_sp: str, info_931: dict) -> str:
     # Por el momento no cambia ninguno, se usaba para base diferencial de AOS y COS
     # Pero finalmente se reporta en el campo correspondiente
 
-    resp = 0
+    resp = "0"
 
     return resp
 
