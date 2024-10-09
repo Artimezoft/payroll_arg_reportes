@@ -60,21 +60,21 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
         total_desc += empleado['totales_liquidacion']['total_retenciones']
 
     # Agregar bloque de totales
-    totales = CanvaPDFBlock(PDF, Rect(0, pos_y, 0, 3), Format(font_size=10, fill_color='#F0F0F099'))
+    totales = CanvaPDFBlock(PDF, Rect(0, pos_y, 0, 2.5), Format(font_size=10, fill_color='#F0F0F099'))
     totales.text('Totales', bold=True, x=1, y=0.5, format_=F7)
     total_empleados = len(info_recibo['legajos'])
     totales.text(f'Cantidad de empleados: {total_empleados}', bold=True, x=12, y=0.5, format_=F7)
 
     total_rem2 = float_to_format_currency(total_rem)
-    totales.text(f'Remunerativos {total_rem2}', bold=True, x=1, y=1.5)
+    totales.text(f'Remunerativos {total_rem2}', bold=True, x=1, y=1.2, format_=F7)
     total_no_rem2 = float_to_format_currency(total_no_rem, 2)
-    totales.text(f'No Remunerativos {total_no_rem2}', bold=True, x=7.3, y=1.5)
+    totales.text(f'No Remunerativos {total_no_rem2}', bold=True, x=7.3, y=1.2, format_=F7)
     total_desc2 = float_to_format_currency(total_desc)
-    totales.text(f'Descuentos {total_desc2}', bold=True, x=14, y=1.5)
+    totales.text(f'Descuentos {total_desc2}', bold=True, x=14, y=1.2, format_=F7)
 
     neto = total_rem + total_no_rem - total_desc
     neto = float_to_format_currency(neto)
-    totales.text(f'Neto a cobrar {neto}', bold=True, x=1, y=2.5, format_=F7)
+    totales.text(f'Neto a cobrar {neto}', bold=True, x=1, y=1.8, format_=F7)
 
     PDF.finish_page()
     PDF.save()
@@ -210,13 +210,14 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
         """ Devuelve el nombre del concepto con la cantidad si la tiene """
         cantidad = cpt.get('cantidad')
         final = cpt['name']
-        # sie l nombre es muy largo, cortarlo
+
+        # Si el nombre es muy largo, cortarlo al final sin puntos suspensivos
         if len(final) > max_length:
-            half_length = (max_length - 4) // 2
-            final = f'{final[:half_length]}....{final[-half_length:]}'
+            final = final[:max_length]
 
         if cantidad:
             final = f'{final} ({cantidad})'
+
         return final
 
     # REMUNERATIVOS
