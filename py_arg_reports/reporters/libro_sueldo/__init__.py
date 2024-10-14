@@ -186,6 +186,9 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     empleado_block.text_column(lista, start_x=3.5, start_y=y, line_sep=t9_line_sep, format_=F7)
     # División automática del contrato
     contrato_text = empleado["contrato"]
+    # Si el contrato es muy largo, cortarlo al final sin puntos suspensivos
+    if len(contrato_text) > 50:
+        contrato_text = contrato_text[:55] + "..."
 
     lista = ['Estado civil', 'Puesto', 'Mod.Contrato']
     empleado_block.text_column(lista, start_x=6, start_y=y, line_sep=t9_line_sep, format_=F7, bold=True)
@@ -194,9 +197,9 @@ def draw_empleado(PDF: CanvasPDF, empleado: dict, start_y, height):
     # Información adicional del empleado
     lista = ['CUIL', 'Categoría', 'Seccion']
     y = 0.5 + t9_line_sep + 0.1
-    empleado_block.text_column(lista, start_x=13.5, start_y=y, line_sep=t9_line_sep, format_=F7, bold=True)
+    empleado_block.text_column(lista, start_x=14.5, start_y=y, line_sep=t9_line_sep, format_=F7, bold=True)
     lista = [empleado["cuil"], empleado["categoria"], empleado["area"]]
-    empleado_block.text_column(lista, start_x=15, start_y=y, line_sep=t9_line_sep, format_=F7)
+    empleado_block.text_column(lista, start_x=16, start_y=y, line_sep=t9_line_sep, format_=F7)
 
     empleado_block.line(Rect(2, 2, 16, 1.9), line_with=2)
 
