@@ -130,7 +130,7 @@ def genera_archivo_final_lsd(txt_liquidaciones: list, output_path: str, filename
     for i, txt_liquidacion in enumerate(txt_liquidaciones):
         fpath = os.path.join(output_path, f'{filename}_{i+1}.txt')
 
-        with open(fpath, 'w') as f:
+        with open(fpath, 'w', encoding='latin-1') as f:
             f.write(txt_liquidacion)
 
         txt_liquidaciones_files.append(fpath)
