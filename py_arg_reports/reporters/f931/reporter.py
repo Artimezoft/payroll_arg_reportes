@@ -28,7 +28,7 @@ def genera_txt_f931(
 
     # Crear archivo vacio
     full_path = f'{output_path}/{filename}.txt'
-    with open(full_path, 'w') as f:
+    with open(full_path, 'w', encoding='cp1252') as f:
         f.write('')
 
     # Comienzo dato por dato de json_data a generar en el txt linea por linea
