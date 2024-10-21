@@ -524,7 +524,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
 
     if numero_cuenta or cbu:
         this_cuenta = numero_cuenta if numero_cuenta else cbu
-        pagado_como = f"Depositado en Cuenta Nº {this_cuenta}"
+        pagado_como = f"Depositado en Cta Nº {this_cuenta}"
     else:
         numero_cuenta = info_recibo['relaciones_bancarias'][legajo]['numero_cuenta']
 
