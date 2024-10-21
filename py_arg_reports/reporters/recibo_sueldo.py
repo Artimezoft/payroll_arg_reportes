@@ -351,13 +351,17 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     basico = info_recibo['basicos'][legajo]
     lugar_trabajo = info_recibo['lugares_trabajo'][legajo]
 
+    # si obra_social tiene mas de 70 caracteres se corta
+    if len(obra_social) > 70:
+        obra_social = obra_social[:70] + '...'
+
     # Original
     c.drawString(coordinates['nombre_x'], coordinates['nombre_y'], f"Nombre: {nombre_completo}")
     c.drawString(coordinates['categoria_x'], coordinates['categoria_y'], f"Categoria: {categoria}")
     c.drawString(coordinates['posicion_x'], coordinates['posicion_y'], f"Posición: {posicion}")
     c.drawString(coordinates['area_x'], coordinates['area_y'], f"Area: {area}")
     c.drawString(coordinates['contrato_x'], coordinates['contrato_y'], f"Contrato: {contrato}")
-    c.drawString(coordinates['obra_social_x'], coordinates['obra_social_y'], f"O.Social: {obra_social}")
+    c.drawString(coordinates['obra_social_x'], coordinates['obra_social_y'], f"O.Social: {obra_social}", charSpace=-0.1)
     draw_text_with_end_coordinate(
         canvas=c,
         x_end=coordinates['legajo_e_ingreso_x_ends'],
