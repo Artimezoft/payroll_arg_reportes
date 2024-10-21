@@ -509,15 +509,20 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     dupl_pie_pagina_column_2 = coordinates['dupl_pie_de_pagina_x'] + coordinates['pie_de_pagina_width'] / 2
 
     # Original
-    forma_pago = info_recibo['relaciones_bancarias'][legajo]['forma_pago']
-    numero_cuenta = info_recibo['relaciones_bancarias'][legajo]['numero_cuenta']
+    relacion_bancaria = info_recibo['relaciones_bancarias'][legajo]
+    forma_pago = relacion_bancaria['forma_pago']
+    numero_cuenta = relacion_bancaria['numero_cuenta']
+    cbu = relacion_bancaria['cbu']
 
     pagado_como = "Abonado en Efectivo"
     if forma_pago.lower()[:2] == 'ch':
         pagado_como = "Abonado con Cheque"
 
-    if numero_cuenta:
-        pagado_como = f"Depositado en Cuenta Nº {numero_cuenta}"
+    if numero_cuenta or cbu:
+        this_cuenta = numero_cuenta if numero_cuenta else cbu
+        pagado_como = f"Depositado en Cuenta Nº {this_cuenta}"
+    else:
+        numero_cuenta = info_recibo['relaciones_bancarias'][legajo]['numero_cuenta']
 
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {info_recibo["fecha_pago"]}')
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_2_y, f'Lugar: {lugar_trabajo}')
