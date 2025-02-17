@@ -53,13 +53,11 @@ def descarga_excel(info_dict: dict, sheet_name: str = 'Reporte'):
     })
 
     # Formato de celdas
-    cell_format = workbook.add_format()
-    cell_format.set_font(DEFAULT_FONT)
-    cell_format.set_font_size(DEFAULT_FONT_SIZE)
     base_dict_format = {
         'font_name': DEFAULT_FONT,
         'font_size': DEFAULT_FONT_SIZE,
     }
+    workbook.add_format(base_dict_format)
     # -------------------------------------------------
 
     # Algo de formato

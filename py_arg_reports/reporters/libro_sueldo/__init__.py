@@ -116,11 +116,13 @@ def draw_header(PDF: CanvasPDF):
     # Verificar que haya al menos una actividad principal
     if actividad_principal:
         apri_label = 'Actividad principal: '
+        apri_code = actividad_principal.get('code', 'No especificada').zfill(6)
         apri_name = actividad_principal.get('name', 'No especificada')
+        apri_full_name = f'{apri_code} - {apri_name}'
 
         # Mostrar la actividad principal
         header.text(apri_label, x=0.4, y=2.2, format_=F7, bold=True)
-        header.text(apri_name, x=0.4 + 2.5, y=2.2, format_=F7)
+        header.text(apri_full_name, x=0.4 + 2.5, y=2.2, format_=F7)
 
         # Mostrar actividades secundarias si existen
         if actividades_secundarias:
@@ -128,9 +130,11 @@ def draw_header(PDF: CanvasPDF):
             header.text(asec_label, x=0.4, y=2.7, format_=F7, bold=True)
 
             for i, actividad in enumerate(actividades_secundarias):
+                asec_code = actividad.get('code', 'No especificada').zfill(6)
                 asec_name = actividad.get('name', 'No especificada')
+                asec_full_name = f'{asec_code} - {asec_name}'
                 y_pos = 2.55 + (i + 0.5) * 0.3
-                header.text(asec_name, x=0.4 + 3.19, y=y_pos, format_=F7)
+                header.text(asec_full_name, x=0.4 + 3.19, y=y_pos, format_=F7)
     else:
         header.text(' Actividades no especificadas', x=0.4, y=2.2, format_=F7)
 
