@@ -14,7 +14,12 @@ t10_line_sep = 0.5
 t9_line_sep = 0.3
 
 
-def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
+def descargar_libro(
+    json_data: dict,
+    output_path: str,
+    filename: str,
+    titulo_libro_sueldos: str = None,
+) -> tuple:
     """ Descarga el libro sueldo en formato PDF,
         Retorna una tupla:
          - False, error: si falla
@@ -47,7 +52,7 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
     )
     log.info(f'Creando PDF en {my_file_path}')
 
-    draw_header(PDF)
+    draw_header(PDF, titulo_libro_sueldos)
     draw_footer(PDF)
 
     pos_y = PDF.last_y + 0.1
@@ -85,7 +90,13 @@ def descargar_libro(json_data: dict, output_path: str, filename: str) -> tuple:
     return my_file_path_str, None
 
 
-def draw_header(PDF: CanvasPDF):
+def draw_header(PDF: CanvasPDF, titulo_libro_sueldos: str = None):
+    """ Dibuja el header del libro sueldo
+        Recibe el PDF y el título del libro sueldo
+        Devuelve el bloque de header
+    """
+    titulo_ls = titulo_libro_sueldos or 'Hojas Móviles Libro Art. 52 Ley 20744'
+
     info_recibo = PDF.data
     log.info(f'Creando header en pagina {PDF.page}')
     # Estimar el alto que va a tener esto, necesito las actividades que son las que me pueden hacer variar esto
@@ -109,7 +120,7 @@ def draw_header(PDF: CanvasPDF):
     )
 
     # Agregar contenido al header
-    header.text('Hojas Móviles Libro Art. 52 Ley 20744', align='center', y=0.7, format_=F10, bold=True)
+    header.text(titulo_ls, align='center', y=0.7, format_=F10, bold=True)
     col = [info_recibo['company_name'], info_recibo['domicilio']]
     header.text_column(col, start_x=0.4, start_y=1.3, format_=F7, bold=True)
 
