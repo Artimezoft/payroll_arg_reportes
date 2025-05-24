@@ -45,8 +45,8 @@ def get_recibo_info(json_data: dict) -> dict:
 
     resp = {
         "empresa": {},
-        "liquidacion": {},
-        "empleados": {},
+        "liquidaciones": [],
+        "empleados": [],
         "conceptos_liquidados": [],
         'totales_liquidacion': {},
         "error": "",
@@ -59,8 +59,8 @@ def get_recibo_info(json_data: dict) -> dict:
     resp["empresa"] = empresa_info
 
     # Liquidación info -----------------------------------------------------------------------
-    liquidacion_info = serialized_emp_liqs[0]['liquidacion']
-    resp["liquidacion"] = liquidacion_info
+    liquidaciones_info = [emp_liq['liquidacion'] for emp_liq in serialized_emp_liqs]
+    resp["liquidaciones"] = liquidaciones_info
 
     # Empleados info -------------------------------------------------------------------------
     empleado_list = [item['empleado'] for item in serialized_emp_liqs]
@@ -97,8 +97,8 @@ def get_recibo_info(json_data: dict) -> dict:
 
 
 def get_info_final_for_recibo(api_dict: dict) -> dict:
-    periodo = api_dict["liquidacion"]["periodo"]["periodo"]
-    tipo_liquidacion = api_dict["liquidacion"]["tipo_liquidacion"]
+    first_liquidacion = api_dict["liquidaciones"][0]
+    periodo = first_liquidacion["periodo"]["periodo"]
     company_name = api_dict["empresa"]["name"]
     cuit = api_dict["empresa"]["cuit"]
     domicilio_obj = api_dict["empresa"]["domicilio"]
@@ -112,13 +112,12 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
     provincia = domicilio_obj["localidad"]["provincia"]["name"]
     domicilio += f', {localidad}, {provincia}'
 
-    periodo = api_dict["liquidacion"]["periodo"]["periodo"]
-    tipo_liquidacion = api_dict["liquidacion"]["tipo_liquidacion"]
-    fecha_pago = formatted_date_str(api_dict["liquidacion"]["fecha_pago"])
+    fecha_pago = formatted_date_str(first_liquidacion["fecha_pago"])
     ultimo_pago_ss = api_dict["empresa"]["ultimo_pago_seguridad_social"]
 
     # Datos que varían por página, todos van a ser diccionarios con la key con el legajo, salvo el mismo legajo
     legajos = []
+    tipos_liquidacion = {}
     nombres_completos = {}
     cuiles = {}
     categorias = {}
@@ -134,7 +133,7 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
     conceptos_liquidados = {}
     totales_liquidacion = {}
 
-    for empleado in api_dict['empleados']:
+    for ix, empleado in enumerate(api_dict["empleados"]):
         legajo = str(empleado["legajo"])
         legajos.append(legajo)
 
@@ -142,6 +141,7 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
         apellido = empleado["last_name"]
         nombre_completo = f'{apellido}, {nombre}'
         nombres_completos[legajo] = nombre_completo.upper()
+        tipos_liquidacion[legajo] = api_dict["liquidaciones"][ix]["tipo_liquidacion"]
 
         cuil = empleado["cuil"]
         cuil = f'{cuil[:2]}-{cuil[2:10]}-{cuil[10:]}'
@@ -172,10 +172,10 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
         "company_name": company_name,
         "cuit": cuit,
         "domicilio": domicilio,
-        "tipo_liquidacion": tipo_liquidacion,
 
         # Empleados
         "nombres_completos": nombres_completos,
+        "tipo_liquidacion": tipos_liquidacion,
         'cuiles': cuiles,
         'legajos': legajos,
         "categorias": categorias,
@@ -303,9 +303,10 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     return resp
 
 
-def draw_liquidacion_info(c: canvas.Canvas, coordinates: dict, info_recibo: dict) -> None:
+def draw_liquidacion_info(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: int) -> None:
     """Dibuja la información de la liquidación en el recibo."""
-    text = info_recibo['tipo_liquidacion']
+    text = info_recibo['tipo_liquidacion'][legajo]
+
     offset_x = -0.4 * cm
 
     # Original - Dibuja "Liquidación Final" centrado o usa drawString para otros casos
@@ -351,7 +352,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     # End of Company name -------------------------------------------------------------------------
 
     # Liquidación Info ----------------------------------------------------------------------------
-    draw_liquidacion_info(c, coordinates, info_recibo)
+    draw_liquidacion_info(c, coordinates, info_recibo, legajo)
 
     # End of Liquidación Info ---------------------------------------------------------------------
 
