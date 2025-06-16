@@ -112,11 +112,11 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
     provincia = domicilio_obj["localidad"]["provincia"]["name"]
     domicilio += f', {localidad}, {provincia}'
 
-    fecha_pago = formatted_date_str(first_liquidacion["fecha_pago"])
     ultimo_pago_ss = api_dict["empresa"]["ultimo_pago_seguridad_social"]
 
     # Datos que varían por página, todos van a ser diccionarios con la key con el legajo, salvo el mismo legajo
     legajos = []
+    fechas_pago = {}
     tipos_liquidacion = {}
     nombres_completos = {}
     cuiles = {}
@@ -154,6 +154,10 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
         fecha_ingreso_2 = empleado.get("fecha_ingreso_2")
         if fecha_ingreso_2:
             fechas_ingreso_2[legajo] = formatted_date_str(fecha_ingreso_2)
+
+        this_fecha_pago = api_dict["liquidaciones"][ix].get("fecha_pago")
+        fecha_pago = formatted_date_str(this_fecha_pago) if this_fecha_pago else ''
+        fechas_pago[legajo] = fecha_pago
 
         contratos[legajo] = empleado["contrato"]
         obras_sociales[legajo] = empleado["obra_social"]
@@ -193,7 +197,7 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
         'totales_liquidacion': totales_liquidacion,
 
         # Pie de página
-        "fecha_pago": fecha_pago,
+        "fechas_pago": fechas_pago,
         "ultimo_pago_ss": ultimo_pago_ss,
         "relaciones_bancarias": relaciones_bancarias,
     }
@@ -370,6 +374,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     cuil = info_recibo['cuiles'][legajo]
     fecha_ingreso = info_recibo['fechas_ingreso'].get(legajo)
     fecha_ingreso_2 = info_recibo['fechas_ingreso_2'].get(legajo)
+    fecha_pago = info_recibo['fechas_pago'][legajo]
     basico = info_recibo['basicos'][legajo]
     lugar_trabajo = info_recibo['lugares_trabajo'][legajo]
 
@@ -550,7 +555,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     else:
         numero_cuenta = info_recibo['relaciones_bancarias'][legajo]['numero_cuenta']
 
-    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {info_recibo["fecha_pago"]}')
+    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {fecha_pago}')
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_2_y, f'Lugar: {lugar_trabajo}')
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_3_y, pagado_como)
 
