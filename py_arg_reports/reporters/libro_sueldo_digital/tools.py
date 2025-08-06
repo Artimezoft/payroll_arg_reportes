@@ -104,6 +104,7 @@ INDICE_TIPO_LIQUIDACIONES = {
     'Gratificaciones': 'M',
     'Adelantos': 'M',
     'Otros': 'M',
+    'Ajustes': 'M',
 }
 
 
