@@ -55,7 +55,7 @@ FORMATO_TXT_F931 = {
     'remuneracion_09': {'from': 439, 'long': 12, 'type': 'DE'},
     'porc_contr_dif_ss': {'from': 451, 'long': 9, 'type': 'DE'},
     'k_horas': {'from': 460, 'long': 3, 'type': 'EN'},
-    'seguro_vida_obligatorio': {'from': 463, 'long': 1, 'type': 'BO'},
+    'seguro_vida_obligatorio': {'from': 463, 'long': 1, 'type': 'DE'},
     'detraccion': {'from': 464, 'long': 12, 'type': 'DE'},
     'incremento': {'from': 476, 'long': 12, 'type': 'DE'},
     'remuneracion_11': {'from': 488, 'long': 12, 'type': 'DE'},
