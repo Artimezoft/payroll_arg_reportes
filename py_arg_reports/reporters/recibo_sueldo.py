@@ -457,7 +457,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         # code = concepto['code']
         name = concepto['name']
         tipo_concepto = concepto['tipo_concepto']
-        cantidad = concepto['cantidad']
+        cantidad = concepto['cantidad'] if concepto['cantidad'] != 0.0 else ''
         importe = concepto['importe']
         # Si tipo de no es ni 1, ni 2, ni 3, no se muestra
         # Si bien no debería pasar por el filtro del QS, por las dudas
