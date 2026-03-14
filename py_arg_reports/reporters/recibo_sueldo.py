@@ -10,7 +10,7 @@ from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo
 from py_arg_reports.config import config_constants
 from py_arg_reports.tools.recibos_utils import (
     draw_text_with_end_coordinate,
-    draw_text_with_max_width,
+    # draw_text_with_max_width,
     float_to_format_currency,
     formatted_date_str,
     nombre_mes,
@@ -22,6 +22,9 @@ FONT_FAMILY = config_constants['FONT_FAMILY']
 FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']
 FONT_SIZE_MAIN = config_constants['FONT_SIZE_MAIN']
 FONT_SIZE_BODY = config_constants['FONT_SIZE_BODY']
+EXCLUDED_CONCEPTS = [
+    'CREFIS',
+]
 
 
 def get_recibo_info(json_data: dict) -> dict:
@@ -215,6 +218,7 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     starting_y_employee_info = my_recibo_info['employee_info_y'] + my_recibo_info['employee_info_height'] - 0.45 * cm
 
     starting_y_conceptos = my_recibo_info['conceptos_titles_y'] - 0.45 * cm
+    starting_y_contribuciones = my_recibo_info['contribuciones_titles_y'] - 0.45 * cm
 
     resp = {
         'company_x': base_x,
@@ -271,6 +275,7 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
         'dupl_fecha_ingreso_2_x_ends': base_duplicate_x_ends,
 
         'starting_y_conceptos': starting_y_conceptos,
+        'starting_y_contribuciones': starting_y_contribuciones,
         'conceptos_x': base_x,
         'dupl_conceptos_x': base_duplicate_x,
         'concepto_titles_x_cant': my_recibo_info['concepto_titles_x_cant'],
@@ -295,6 +300,7 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
         'totales_x_rem': my_recibo_info['concepto_titles_x_rem'],
         'totales_x_nr': my_recibo_info['concepto_titles_x_nr'],
         'totales_x_ap': my_recibo_info['concepto_titles_x_ap'],
+        'contribuciones_titles_y': my_recibo_info['contribuciones_titles_y'],
         'neto_letras_y': my_recibo_info['starting_y_totales_neto'] - base_line_between_2 + 0.05 * cm,
 
         'pie_de_pagina_x': base_x,
@@ -376,7 +382,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     fecha_ingreso_2 = info_recibo['fechas_ingreso_2'].get(legajo)
     fecha_pago = info_recibo['fechas_pago'][legajo]
     basico = info_recibo['basicos'][legajo]
-    lugar_trabajo = info_recibo['lugares_trabajo'][legajo]
+    # lugar_trabajo = info_recibo['lugares_trabajo'][legajo]
 
     # si obra_social tiene mas de 70 caracteres se corta
     if len(obra_social) > 70:
@@ -453,47 +459,78 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     # Conceptos ----------------------------------------------------------------------------------
     conceptos_liquidados = info_recibo['conceptos_liquidados'][legajo]
     this_y = coordinates['starting_y_conceptos']
+    this_contribuciones_y = coordinates['starting_y_contribuciones']
+    max_contibuciones_for_column = 4
+    contribuciones_count = 0
+    contribuciones_x = coordinates['conceptos_x']
+    dupl_contribuciones_x = coordinates['dupl_conceptos_x']
+    total_contribuciones = 0.0
+
     for concepto in conceptos_liquidados:
-        # code = concepto['code']
+        code = concepto['code']
         name = concepto['name']
         tipo_concepto = concepto['tipo_concepto']
         cantidad = concepto['cantidad'] if concepto['cantidad'] != 0.0 else ''
         importe = concepto['importe']
-        # Si tipo de no es ni 1, ni 2, ni 3, no se muestra
-        # Si bien no debería pasar por el filtro del QS, por las dudas
-        if tipo_concepto not in [1, 2, 3]:
+        if code in EXCLUDED_CONCEPTS:
             continue
 
-        # TODO: Ver si conviene agregar code
-        c.drawString(coordinates['conceptos_x'], this_y, name)
-        c.drawString(coordinates['concepto_titles_x_cant'], this_y, str(cantidad))
+        if tipo_concepto in [1, 2, 3]:
+            # Remunerativos, no remunerativos y aportes se dibujan con el mismo formato pero en columnas diferentes
+            # En la tabla de recibos
 
-        c.drawString(coordinates['dupl_conceptos_x'], this_y, name)
-        c.drawString(coordinates['dupl_concepto_titles_x_cant'], this_y, str(cantidad))
+            c.drawString(coordinates['conceptos_x'], this_y, name)
+            c.drawString(coordinates['concepto_titles_x_cant'], this_y, str(cantidad))
 
-        if tipo_concepto == 1:
-            x_to_use = coordinates['concepto_titles_x_rem_ends']
-            x_to_use_dupl = coordinates['dupl_concepto_titles_x_rem_ends']
-        elif tipo_concepto == 2:
-            x_to_use = coordinates['concepto_titles_x_nr_ends']
-            x_to_use_dupl = coordinates['dupl_concepto_titles_x_nr_ends']
-        elif tipo_concepto == 3:
-            x_to_use = coordinates['concepto_titles_x_ap_ends']
-            x_to_use_dupl = coordinates['dupl_concepto_titles_x_ap_ends']
+            c.drawString(coordinates['dupl_conceptos_x'], this_y, name)
+            c.drawString(coordinates['dupl_concepto_titles_x_cant'], this_y, str(cantidad))
 
-        draw_text_with_end_coordinate(
-            canvas=c,
-            x_end=x_to_use,
-            y=this_y,
-            text=float_to_format_currency(importe, include_currency=False),
-        )
-        draw_text_with_end_coordinate(
-            canvas=c,
-            x_end=x_to_use_dupl,
-            y=this_y,
-            text=float_to_format_currency(importe, include_currency=False),
-        )
-        this_y -= 0.4 * cm
+            if tipo_concepto == 1:
+                x_to_use = coordinates['concepto_titles_x_rem_ends']
+                x_to_use_dupl = coordinates['dupl_concepto_titles_x_rem_ends']
+            elif tipo_concepto == 2:
+                x_to_use = coordinates['concepto_titles_x_nr_ends']
+                x_to_use_dupl = coordinates['dupl_concepto_titles_x_nr_ends']
+            elif tipo_concepto == 3:
+                x_to_use = coordinates['concepto_titles_x_ap_ends']
+                x_to_use_dupl = coordinates['dupl_concepto_titles_x_ap_ends']
+
+            draw_text_with_end_coordinate(
+                canvas=c,
+                x_end=x_to_use,
+                y=this_y,
+                text=float_to_format_currency(importe, include_currency=False),
+            )
+            draw_text_with_end_coordinate(
+                canvas=c,
+                x_end=x_to_use_dupl,
+                y=this_y,
+                text=float_to_format_currency(importe, include_currency=False),
+            )
+            this_y -= 0.4 * cm
+        elif tipo_concepto == 4:
+            # Sólo se dibujan las contribuciones de hasta 2 columnas, el resto se omite
+            if contribuciones_count >= max_contibuciones_for_column * 2 or importe == 0.0:
+                continue
+
+            this_contribucion = name
+            if cantidad:
+                this_contribucion += f" ({cantidad})"
+            this_contribucion += f": {float_to_format_currency(importe, include_currency=False)}"
+            total_contribuciones += importe
+
+            # Contribuciones se dibujan en el sector de contribucione
+            c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
+            c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
+            contribuciones_count += 1
+
+            if contribuciones_count % max_contibuciones_for_column == 0:
+                this_contribuciones_y = coordinates['starting_y_contribuciones']
+                contribuciones_x += 7 * cm
+                dupl_contribuciones_x += 7 * cm
+            else:
+                this_contribuciones_y -= 0.4 * cm
+
     # End of Conceptos ----------------------------------------------------------------------------
 
     # Totales ----------------------------------------------------------------------------
@@ -513,6 +550,11 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
     c.drawString(coordinates['totales_x_ap'] - 0.5 * cm, coordinates['starting_y_totales_neto'],
                  float_to_format_currency(neto_liquidacion, include_currency=False))
+    c.drawString(
+        coordinates['conceptos_x'] + 3 * cm,
+        coordinates['contribuciones_titles_y'],
+        float_to_format_currency(total_contribuciones, include_currency=False)
+    )
     c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
 
     # Duplicate
@@ -525,6 +567,11 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
     c.drawString(coordinates['dupl_concepto_titles_x_ap'] - 0.5 * cm, coordinates['starting_y_totales_neto'],
                  float_to_format_currency(neto_liquidacion, include_currency=False))
+    c.drawString(
+        coordinates['dupl_conceptos_x'] + 3 * cm,
+        coordinates['contribuciones_titles_y'],
+        float_to_format_currency(total_contribuciones, include_currency=False)
+    )
     c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
     c.drawString(coordinates['company_x'], coordinates['neto_letras_y'], f"Son: {neto_en_letras}")
     c.drawString(coordinates['dupl_company_x'], coordinates['neto_letras_y'], f"Son: {neto_en_letras}")
@@ -550,14 +597,16 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         pagado_como = "Abonado con Cheque"
 
     if numero_cuenta or cbu:
-        this_cuenta = numero_cuenta if numero_cuenta else cbu
-        pagado_como = f"Depositado en Cta Nº {this_cuenta}"
+        this_cuenta = f'CBU {cbu}' if cbu else f'Cuenta Nº {numero_cuenta}'
+        pagado_como = f"Depositado en {this_cuenta}"
     else:
         numero_cuenta = info_recibo['relaciones_bancarias'][legajo]['numero_cuenta']
 
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {fecha_pago}')
-    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_2_y, f'Lugar: {lugar_trabajo}')
-    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_3_y, pagado_como)
+    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_2_y, pagado_como)
+
+    c.drawString(coordinates['dupl_pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {fecha_pago}')
+    c.drawString(coordinates['dupl_pie_de_pagina_x'], pie_linea_2_y, pagado_como)
 
     c.drawString(pie_pagina_column_2, pie_linea_1_y, "Último Depósito Aportes y Contribuciones")
     c.line(
@@ -573,18 +622,6 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         c.drawString(pie_pagina_column_2, pie_linea_2_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
         c.drawString(pie_pagina_column_2, pie_linea_3_y, f'Banco: {banco_ss}')
 
-    # Duplicate
-    recibi_conforme_text = "Recibi de conformidad importe neto y copia de este recibo, dejando constancia que "
-    recibi_conforme_text += "a la fecha no se me adeudan haberes, licencias ni horas extras."
-
-    draw_text_with_max_width(
-        canvas=c,
-        text=recibi_conforme_text,
-        max_width=coordinates['pie_de_pagina_width'] * 0.47,
-        # max_width=20,
-        x=coordinates['dupl_pie_de_pagina_x'],
-        y=pie_linea_1_y,
-    )
     c.drawString(dupl_pie_pagina_column_2, pie_linea_1_y, "Último Depósito Aportes y Contribuciones")
     c.line(
         x1=dupl_pie_pagina_column_2,
@@ -641,7 +678,7 @@ def draw_recibo(my_file_path, recibo_info):
         pagesize=landscape(A4),
     )
     c.setTitle("Recibo de Sueldo")
-    c.setAuthor("Payroll311")
+    c.setAuthor("PayrollJE")
 
     # Get info from recibo_info
     info_recibo = get_info_final_for_recibo(recibo_info)
