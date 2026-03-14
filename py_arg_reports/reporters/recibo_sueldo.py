@@ -22,6 +22,7 @@ FONT_FAMILY = config_constants['FONT_FAMILY']
 FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']
 FONT_SIZE_MAIN = config_constants['FONT_SIZE_MAIN']
 FONT_SIZE_BODY = config_constants['FONT_SIZE_BODY']
+FONT_SIZE_SMALL = config_constants['FONT_SIZE_SMALL']
 EXCLUDED_CONCEPTS = [
     'CREFIS',
 ]
@@ -460,7 +461,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     conceptos_liquidados = info_recibo['conceptos_liquidados'][legajo]
     this_y = coordinates['starting_y_conceptos']
     this_contribuciones_y = coordinates['starting_y_contribuciones']
-    max_contribuciones_per_column = 4
+    max_contribuciones_per_column = 5
     contribuciones_count = 0
     contribuciones_x = coordinates['conceptos_x']
     dupl_contribuciones_x = coordinates['dupl_conceptos_x']
@@ -470,7 +471,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         code = concepto['code']
         name = concepto['name']
         tipo_concepto = concepto['tipo_concepto']
-        cantidad = concepto['cantidad'] if concepto['cantidad'] != 0.0 else ''
+        cantidad = f"{concepto['cantidad']:.2f}" if concepto['cantidad'] != 0.0 else ''
         importe = concepto['importe']
         if code in EXCLUDED_CONCEPTS:
             continue
@@ -520,9 +521,11 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
             total_contribuciones += importe
 
             # Contribuciones se dibujan en el sector de contribuciones
+            c.setFont(FONT_FAMILY, FONT_SIZE_SMALL)
             c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
             c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
             contribuciones_count += 1
+            c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
 
             if contribuciones_count % max_contribuciones_per_column == 0:
                 this_contribuciones_y = coordinates['starting_y_contribuciones']

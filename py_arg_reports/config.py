@@ -6,6 +6,7 @@ config_constants = {
     'FONT_SIZE_MAIN': 9,
     'FONT_SIZE_HEADER': 12,
     'FONT_SIZE_BODY': 8,
+    'FONT_SIZE_SMALL': 7,
 
     # Excel
     'EXCEL_FONT_FAMILY': 'Arial',
