@@ -20,3 +20,6 @@ build/
 
 # Temp files
 temp/
+
+# Flake 8
+.flake8
