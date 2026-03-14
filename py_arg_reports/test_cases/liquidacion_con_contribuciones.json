@@ -1,0 +1,126 @@
+[
+    {
+        "empresa": {
+            "pk": 1,
+            "name": "Empresa de Prueba",
+            "cuit": "20333333333",
+            "domicilio": {
+                "pk": 1,
+                "calle": "Calle de Prueba",
+                "numero": "123",
+                "piso": null,
+                "oficina": null,
+                "barrio": null,
+                "localidad": {
+                    "pk": 1252,
+                    "provincia": {
+                        "pk": 10,
+                        "name": "Formosa",
+                        "pais": {
+                            "pk": 11,
+                            "code": "AR",
+                            "name": "Argentina"
+                        }
+                    },
+                    "name": "10",
+                    "text": "10 (Formosa)"
+                },
+                "cod_postal": null
+            },
+            "ultimo_pago_seguridad_social": {
+                "id": 31,
+                "banco": "Banco De La Ciudad De Buenos Aires",
+                "mes": 12,
+                "anio": 2023,
+                "fecha_pago": "2024-01-09",
+                "empresa": 1
+            }
+        },
+        "liquidacion": {
+            "nro_liq": 0,
+            "tipo_liquidacion": "Mensual",
+            "periodo": {
+                "periodo": "2023-12"
+            },
+            "fecha_pago": "2024-01-04"
+        },
+        "empleado": {
+            "legajo": 1,
+            "first_name": "Empleado 1",
+            "last_name": "Apellido 1",
+            "cuil": "20999999991",
+            "fecha_ingreso": "2019-01-01",
+            "fecha_ingreso_2": null,
+            "categoria": "Vendedor B",
+            "contrato": "A tiempo parcial: Indeterminado /permanente",
+            "obra_social": "O.S.DE LOS EMPLEADOS DE COMERCIO Y ACTIVIDADES CIVILES",
+            "area": "Area 1",
+            "posicion": "Posicion 1",
+            "basico": 111750.19,
+            "lugar_trabajo": "25 de Mayo",
+            "relacion_bancaria": {
+                "forma_pago": "EFVO",
+                "numero_cuenta": null,
+                "cbu": null
+            }
+        },
+        "conceptos_liquidados": [
+            {
+                "concepto": {
+                    "code": "SUELDO",
+                    "tipo_concepto": 1,
+                    "name": "Sueldo Básico"
+                },
+                "orden": 12,
+                "cantidad": 30.0,
+                "importe": 111739.19
+            },
+            {
+                "concepto": {
+                    "code": "ANTIGU",
+                    "tipo_concepto": 1,
+                    "name": "Antiguedad"
+                },
+                "orden": 49,
+                "cantidad": 4.0,
+                "importe": 4469.57
+            },
+            {
+                "concepto": {
+                    "code": "CONTRIB1",
+                    "tipo_concepto": 4,
+                    "name": "Contribución Obra Social"
+                },
+                "orden": 51,
+                "cantidad": 1.0,
+                "importe": 2500.50
+            },
+            {
+                "concepto": {
+                    "code": "CONTRIB2",
+                    "tipo_concepto": 4,
+                    "name": "Contribución Sindical"
+                },
+                "orden": 52,
+                "cantidad": 1.0,
+                "importe": 1200.75
+            },
+            {
+                "concepto": {
+                    "code": "CREFIS",
+                    "tipo_concepto": 4,
+                    "name": "CREFIS - Excluido"
+                },
+                "orden": 53,
+                "cantidad": 1.0,
+                "importe": 500.00
+            }
+        ],
+        "totales_liquidacion": {
+            "total_remunerativo": 116208.76,
+            "total_no_remunerativo": 0.0,
+            "total_retenciones": 500.00,
+            "neto_liquidacion": 115708.76
+        }
+    }
+]
