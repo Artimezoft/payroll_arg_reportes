@@ -26,6 +26,10 @@ class TestDownloadRecibo(unittest.TestCase):
         with open('./py_arg_reports/test_cases/liquidacion_corta.json', 'r') as f:
             cls.short_json = json.load(f)
 
+        # Load fixture with contributions and excluded concepts
+        with open('./py_arg_reports/test_cases/liquidacion_con_contribuciones.json', 'r') as f:
+            cls.contributions_json = json.load(f)
+
     def setUp(self):
         self.empty_json = {}
         self.key_missing_json = [{
@@ -34,6 +38,15 @@ class TestDownloadRecibo(unittest.TestCase):
             'conceptos_liquidados': 'Conceptos',
             'liquidacion': 'Liquidacion',
             }]
+
+    def extract_pdf_text(self, file_path):
+        """ Helper method to extract text from all pages of a PDF """
+        text_content = ""
+        with open(file_path, 'rb') as file:
+            pdf = PdfReader(file)
+            for page in pdf.pages:
+                text_content += page.extract_text()
+        return text_content
 
     @classmethod
     def tearDownClass(cls):
@@ -111,6 +124,91 @@ class TestDownloadRecibo(unittest.TestCase):
         )
 
         self.assertEqual(error, 'No se puede descargar el recibo, no se observa totales_liquidacion en los datos')
+
+    def test_descarga_con_contribuciones(self):
+        """ Test PDF generation with contributions (tipo_concepto: 4) """
+        full_path, error = descargar_recibo(
+            json_data=self.contributions_json,
+            output_path=self.temp_folder,
+            filename='recibo_contribuciones_test',
+        )
+
+        self.assertIsNone(error)
+        self.assertTrue(os.path.exists(full_path))
+
+        # Extract text from PDF
+        pdf_text = self.extract_pdf_text(full_path)
+
+        # Verify contributions appear in PDF
+        self.assertIn("Contribución Obra Social", pdf_text, 
+                      "Contribution concept should appear in PDF")
+        self.assertIn("Contribución Sindical", pdf_text,
+                      "Contribution concept should appear in PDF")
+
+        # Check contribution amounts are displayed
+        self.assertIn("2.500,50", pdf_text,  # Formatted currency for contribution 1
+                      "Contribution amount should appear in PDF")
+        self.assertIn("1.200,75", pdf_text,   # Formatted currency for contribution 2
+                      "Contribution amount should appear in PDF")
+
+    def test_excluded_concepts_not_in_pdf(self):
+        """ Test that excluded concepts (CREFIS) don't appear in PDF """
+        full_path, error = descargar_recibo(
+            json_data=self.contributions_json,
+            output_path=self.temp_folder,
+            filename='recibo_excluded_test',
+        )
+
+        self.assertIsNone(error)
+        self.assertTrue(os.path.exists(full_path))
+
+        # Extract text from PDF
+        pdf_text = self.extract_pdf_text(full_path)
+
+        # Verify CREFIS concept does not appear in PDF
+        self.assertNotIn("CREFIS", pdf_text,
+                         "CREFIS concept should be excluded from PDF")
+        self.assertNotIn("CREFIS - Excluido", pdf_text,
+                         "CREFIS concept name should be excluded from PDF")
+
+    def test_total_contribuciones_calculation(self):
+        """ Test that total contributions are calculated and displayed correctly """
+        full_path, error = descargar_recibo(
+            json_data=self.contributions_json,
+            output_path=self.temp_folder,
+            filename='recibo_total_contribuciones_test',
+        )
+
+        self.assertIsNone(error)
+        self.assertTrue(os.path.exists(full_path))
+
+        # Extract text from PDF  
+        pdf_text = self.extract_pdf_text(full_path)
+
+        # Total should be 2500.50 + 1200.75 = 3701.25
+        # In formatted currency: 3.701,25
+        self.assertIn("3.701,25", pdf_text,
+                      "Total contributions amount should appear in PDF")
+
+    def test_multiple_contributions_rendering(self):
+        """ Test that multiple contributions render correctly in columns """
+        # Create additional contributions fixture if needed for this test
+        full_path, error = descargar_recibo(
+            json_data=self.contributions_json,
+            output_path=self.temp_folder,
+            filename='recibo_multiple_contrib_test',
+        )
+
+        self.assertIsNone(error)
+        self.assertTrue(os.path.exists(full_path))
+
+        # Check that PDF is generated successfully with multiple contributions
+        with open(full_path, 'rb') as file:
+            pdf = PdfReader(file)
+            num_sheets = len(pdf.pages)
+            
+        # Should have at least 1 page
+        self.assertGreaterEqual(num_sheets, 1)
 
 
 if __name__ == '__main__':

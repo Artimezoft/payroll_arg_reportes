@@ -460,7 +460,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     conceptos_liquidados = info_recibo['conceptos_liquidados'][legajo]
     this_y = coordinates['starting_y_conceptos']
     this_contribuciones_y = coordinates['starting_y_contribuciones']
-    max_contibuciones_for_column = 4
+    max_contribuciones_per_column = 4
     contribuciones_count = 0
     contribuciones_x = coordinates['conceptos_x']
     dupl_contribuciones_x = coordinates['dupl_conceptos_x']
@@ -510,7 +510,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
             this_y -= 0.4 * cm
         elif tipo_concepto == 4:
             # Sólo se dibujan las contribuciones de hasta 2 columnas, el resto se omite
-            if contribuciones_count >= max_contibuciones_for_column * 2 or importe == 0.0:
+            if contribuciones_count >= max_contribuciones_per_column * 2 or importe == 0.0:
                 continue
 
             this_contribucion = name
@@ -519,12 +519,12 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
             this_contribucion += f": {float_to_format_currency(importe, include_currency=False)}"
             total_contribuciones += importe
 
-            # Contribuciones se dibujan en el sector de contribucione
+            # Contribuciones se dibujan en el sector de contribuciones
             c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
             c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
             contribuciones_count += 1
 
-            if contribuciones_count % max_contibuciones_for_column == 0:
+            if contribuciones_count % max_contribuciones_per_column == 0:
                 this_contribuciones_y = coordinates['starting_y_contribuciones']
                 contribuciones_x += 7 * cm
                 dupl_contribuciones_x += 7 * cm
@@ -599,8 +599,6 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     if numero_cuenta or cbu:
         this_cuenta = f'CBU {cbu}' if cbu else f'Cuenta Nº {numero_cuenta}'
         pagado_como = f"Depositado en {this_cuenta}"
-    else:
-        numero_cuenta = info_recibo['relaciones_bancarias'][legajo]['numero_cuenta']
 
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {fecha_pago}')
     c.drawString(coordinates['pie_de_pagina_x'], pie_linea_2_y, pagado_como)
