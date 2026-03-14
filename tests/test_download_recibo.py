@@ -140,7 +140,7 @@ class TestDownloadRecibo(unittest.TestCase):
         pdf_text = self.extract_pdf_text(full_path)
 
         # Verify contributions appear in PDF
-        self.assertIn("Contribución Obra Social", pdf_text, 
+        self.assertIn("Contribución Obra Social", pdf_text,
                       "Contribution concept should appear in PDF")
         self.assertIn("Contribución Sindical", pdf_text,
                       "Contribution concept should appear in PDF")
@@ -182,7 +182,7 @@ class TestDownloadRecibo(unittest.TestCase):
         self.assertIsNone(error)
         self.assertTrue(os.path.exists(full_path))
 
-        # Extract text from PDF  
+        # Extract text from PDF
         pdf_text = self.extract_pdf_text(full_path)
 
         # Total should be 2500.50 + 1200.75 = 3701.25
@@ -206,7 +206,7 @@ class TestDownloadRecibo(unittest.TestCase):
         with open(full_path, 'rb') as file:
             pdf = PdfReader(file)
             num_sheets = len(pdf.pages)
-            
+
         # Should have at least 1 page
         self.assertGreaterEqual(num_sheets, 1)
 
