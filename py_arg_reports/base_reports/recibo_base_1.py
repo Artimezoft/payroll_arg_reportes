@@ -28,14 +28,14 @@ def my_base_recibo(c: Canvas) -> dict:
     }
 
     # Aprox Margins
-    margin_y = 0.3 * cm
+    # margin_x = 1.5 * cm
+    margin_y = 1.2 * cm
 
     # Defining heights
     available_height = tot_y - 2 * margin_y
     company_name_height = available_height * 0.09 - margin_between_lines
     employee_info_height = available_height * 0.16 - margin_between_lines
-    conceptos_height = available_height * 0.53 - margin_between_lines
-    contribuciones_height = available_height * 0.12 - margin_between_lines
+    conceptos_height = available_height * 0.65 - margin_between_lines
     total_height = available_height * 0.1 - margin_between_lines
 
     c.translate(cm, cm)
@@ -46,7 +46,7 @@ def my_base_recibo(c: Canvas) -> dict:
     c.setFillColorRGB(gray_value, gray_value, gray_value)
 
     company_name_width = 10.5 * cm
-    starting_y = tot_y - margin_y - company_name_height - 0.9 * cm
+    starting_y = tot_y - margin_y - company_name_height
     resp['company_info_y'] = starting_y
     resp['company_info_height'] = company_name_height
     resp['duplicate_x'] = half_of_width + mid_margin
@@ -176,37 +176,10 @@ def my_base_recibo(c: Canvas) -> dict:
     c.drawString(half_of_width + mid_margin + 0.5 * cm, starting_y_totales_texto, "Totales:")
     c.drawString(half_of_width + mid_margin + conceptos_width - 5 * cm, starting_y_totales_neto, "Neto a Pagar:")
 
-    # Contribuciones --------------------------------------------------------------------------------
-    starting_y -= contribuciones_height + margin_between_lines
-    contribuciones_width = employee_info_width
-    resp['contribuciones_y'] = starting_y + contribuciones_height
-    resp['contribuciones_height'] = contribuciones_height
-
-    c.roundRect(0, starting_y, contribuciones_width, contribuciones_height, radius=def_radius, stroke=1, fill=0)
-    c.roundRect(
-        half_of_width + mid_margin,
-        starting_y,
-        contribuciones_width,
-        contribuciones_height,
-        radius=def_radius,
-        stroke=1,
-        fill=0
-    )
-
-    # Títulos de contribuciones
-    c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
-    c.setFillColorRGB(0, 0, 0)
-
-    contribuciones_titles_y = resp['contribuciones_y'] - 0.3 * cm
-
-    resp['contribuciones_titles_y'] = contribuciones_titles_y
-
-    c.drawString(0.5 * cm, contribuciones_titles_y, "Contribuciones")
-    c.drawString(half_of_width + mid_margin + 0.5 * cm, contribuciones_titles_y, "Contribuciones")
-
     # Total --------------------------------------------------------------------------------
     # Original
-    starting_y -= total_height + margin_between_lines + 0.25 * cm
+    starting_y -= total_height + margin_between_lines + 0.45 * cm
+    firma_width = 5 * cm
     rect_height = total_height * 1.1
 
     resp['pie_pagina_y'] = starting_y + rect_height - 0.45 * cm
@@ -230,6 +203,16 @@ def my_base_recibo(c: Canvas) -> dict:
         starting_y + rect_height,
     )
 
+    c.line(
+        half_of_width / 2 - firma_width / 2 - 1 * cm,
+        0,
+        half_of_width / 2 + firma_width / 2 - 1 * cm,
+        0,
+    )
+    c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
+
+    c.drawString(half_of_width / 2 - firma_width / 2, -0.5 * cm, "Firma del empleador")
+
     # Duplicate
     c.roundRect(
         half_of_width + mid_margin,
@@ -247,6 +230,14 @@ def my_base_recibo(c: Canvas) -> dict:
         half_of_width + mid_margin + conceptos_width / 2,
         starting_y + rect_height,
     )
+
+    c.line(
+        half_of_width + mid_margin + 1 * cm,
+        0,
+        half_of_width + mid_margin + firma_width + 1 * cm,
+        0,
+    )
+    c.drawString(half_of_width + mid_margin + 2 * cm, -0.5 * cm, "Firma del empleado")
 
     resp['canvas'] = c
 
