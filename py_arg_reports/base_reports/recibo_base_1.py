@@ -226,21 +226,21 @@ def my_base_recibo(c: Canvas) -> dict:
     )
 
     c.line(
-        (conceptos_width + 2 * cm) / 2,
+        conceptos_width / 2 + 2 * cm,
         starting_y,
-        (conceptos_width + 2 * cm) / 2,
+        conceptos_width / 2 + 2 * cm,
         starting_y + rect_height,
     )
 
     # Firma ------
     c.line(
-        half_of_width - firma_width - 0.5 * cm,
+        half_of_width - firma_width,
         0,
-        half_of_width - (firma_width - 1 * cm) / 2,
+        half_of_width - (firma_width) / 2 + 1 * cm,
         0,
     )
     c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
-    c.drawString(half_of_width - firma_width + 0.2 * cm, -0.5 * cm, "Firma empleado")
+    c.drawString(half_of_width - firma_width + 0.7 * cm, -0.5 * cm, "Firma empleador")
     # Fin firma ------
 
     # Duplicate
@@ -256,21 +256,21 @@ def my_base_recibo(c: Canvas) -> dict:
     )
 
     c.line(
-        duplic_dif + (conceptos_width + 2 * cm) / 2,
+        duplic_dif + conceptos_width / 2 + 2 * cm,
         starting_y,
-        duplic_dif + (conceptos_width + 2 * cm) / 2,
+        duplic_dif + conceptos_width / 2 + 2 * cm,
         starting_y + rect_height,
     )
 
     # Firma ------
     c.line(
-        duplic_dif + half_of_width - firma_width - 0.5 * cm,
+        duplic_dif + half_of_width - firma_width,
         0,
-        duplic_dif + half_of_width - (firma_width - 1 * cm) / 2,
+        duplic_dif + half_of_width - (firma_width) / 2 + 1 * cm,
         0,
     )
     c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
-    c.drawString(duplic_dif + half_of_width - firma_width + 0.2 * cm, -0.5 * cm, "Firma empleado")
+    c.drawString(duplic_dif + half_of_width - firma_width + 0.7 * cm, -0.5 * cm, "Firma empleado")
     # Fin firma ------
 
     resp['canvas'] = c
