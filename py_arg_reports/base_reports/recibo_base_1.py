@@ -261,7 +261,7 @@ def my_base_recibo(c: Canvas) -> dict:
         duplic_dif + (conceptos_width + 2 * cm) / 2,
         starting_y + rect_height,
     )
-   
+
     # Firma ------
     c.line(
         duplic_dif + half_of_width - firma_width - 0.5 * cm,

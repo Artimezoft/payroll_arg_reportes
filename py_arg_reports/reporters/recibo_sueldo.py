@@ -613,7 +613,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         periodo_ss = f'{nombre_mes(int(info_recibo["ultimo_pago_ss"]["mes"]))} {info_recibo["ultimo_pago_ss"]["anio"]}'
         fecha_pago_ss = formatted_date_str(info_recibo['ultimo_pago_ss']['fecha_pago'])
         banco_ss = info_recibo['ultimo_pago_ss']['banco']
-        
+
         c.drawString(pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
         c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
@@ -626,7 +626,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         periodo_ss = f'{nombre_mes(int(info_recibo["ultimo_pago_ss"]["mes"]))} {info_recibo["ultimo_pago_ss"]["anio"]}'
         fecha_pago_ss = formatted_date_str(info_recibo['ultimo_pago_ss']['fecha_pago'])
         banco_ss = info_recibo['ultimo_pago_ss']['banco']
-        
+
         c.drawString(dupl_pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
         c.drawString(dupl_pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
