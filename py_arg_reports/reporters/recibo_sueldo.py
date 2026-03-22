@@ -343,6 +343,11 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     # Variables Base ----------------------------------------------------------------------------
     base_line_between = 0.5 * cm
 
+    # Get the main variables
+    pie_de_pagina_x = coordinates['pie_de_pagina_x']
+    pie_de_pagina_y = coordinates['pie_de_pagina_y']
+    dupl_pie_de_pagina_x = coordinates['dupl_pie_de_pagina_x']
+
     # Company name -------------------------------------------------------------------------------
     # Original
     c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
@@ -582,12 +587,10 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     # End of Totales ----------------------------------------------------------------------------
 
     # Pie de página -------------------------------------------------------------------------------
-    pie_linea_1_y = coordinates['pie_de_pagina_y']
-    pie_linea_2_y = coordinates['pie_de_pagina_y'] - base_line_between
-    pie_linea_3_y = coordinates['pie_de_pagina_y'] - base_line_between * 2
-
-    pie_pagina_column_2 = coordinates['pie_de_pagina_x'] + coordinates['pie_de_pagina_width'] / 2
-    dupl_pie_pagina_column_2 = coordinates['dupl_pie_de_pagina_x'] + coordinates['pie_de_pagina_width'] / 2
+    pie_linea_1_y = pie_de_pagina_y
+    pie_linea_2_y = pie_de_pagina_y - base_line_between
+    pie_linea_3_y = pie_de_pagina_y - base_line_between * 2
+    pie_linea_4_y = pie_de_pagina_y - base_line_between * 3
 
     # Original
     relacion_bancaria = info_recibo['relaciones_bancarias'][legajo]
@@ -600,42 +603,32 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         pagado_como = "Abonado con Cheque"
 
     if numero_cuenta or cbu:
-        this_cuenta = f'CBU {cbu}' if cbu else f'Cuenta Nº {numero_cuenta}'
-        pagado_como = f"Depositado en {this_cuenta}"
+        pagado_como = f'CBU: {cbu}' if cbu else f'Cuenta: {numero_cuenta}'
 
-    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {fecha_pago}')
-    c.drawString(coordinates['pie_de_pagina_x'], pie_linea_2_y, pagado_como)
-
-    c.drawString(coordinates['dupl_pie_de_pagina_x'], pie_linea_1_y, f'Fecha de Pago: {fecha_pago}')
-    c.drawString(coordinates['dupl_pie_de_pagina_x'], pie_linea_2_y, pagado_como)
-
-    c.drawString(pie_pagina_column_2, pie_linea_1_y, "Último Depósito Aportes y Contribuciones")
-    c.line(
-        x1=pie_pagina_column_2,
-        y1=pie_linea_1_y - 0.12 * cm,
-        x2=pie_pagina_column_2 + coordinates['pie_de_pagina_width'] * 0.41,
-        y2=pie_linea_1_y - 0.12 * cm
-    )
+    c.drawString(pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
+    c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_BODY)
+    c.drawString(pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
+    c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
     if info_recibo['ultimo_pago_ss']['id']:
         periodo_ss = f'{nombre_mes(int(info_recibo["ultimo_pago_ss"]["mes"]))} {info_recibo["ultimo_pago_ss"]["anio"]}'
         fecha_pago_ss = formatted_date_str(info_recibo['ultimo_pago_ss']['fecha_pago'])
         banco_ss = info_recibo['ultimo_pago_ss']['banco']
-        c.drawString(pie_pagina_column_2, pie_linea_2_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
-        c.drawString(pie_pagina_column_2, pie_linea_3_y, f'Banco: {banco_ss}')
+        
+        c.drawString(pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
+        c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
-    c.drawString(dupl_pie_pagina_column_2, pie_linea_1_y, "Último Depósito Aportes y Contribuciones")
-    c.line(
-        x1=dupl_pie_pagina_column_2,
-        y1=pie_linea_1_y - 0.12 * cm,
-        x2=dupl_pie_pagina_column_2 + coordinates['pie_de_pagina_width'] * 0.41,
-        y2=pie_linea_1_y - 0.12 * cm
-    )
+    # Duplicate
+    c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
+    c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_BODY)
+    c.drawString(dupl_pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
+    c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
     if info_recibo['ultimo_pago_ss']['id']:
         periodo_ss = f'{nombre_mes(int(info_recibo["ultimo_pago_ss"]["mes"]))} {info_recibo["ultimo_pago_ss"]["anio"]}'
         fecha_pago_ss = formatted_date_str(info_recibo['ultimo_pago_ss']['fecha_pago'])
         banco_ss = info_recibo['ultimo_pago_ss']['banco']
-        c.drawString(dupl_pie_pagina_column_2, pie_linea_2_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
-        c.drawString(dupl_pie_pagina_column_2, pie_linea_3_y, f'Banco: {banco_ss}')
+        
+        c.drawString(dupl_pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
+        c.drawString(dupl_pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
     # Fin de Pie de página ------------------------------------------------------------------------
 

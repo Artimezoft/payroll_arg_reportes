@@ -34,9 +34,9 @@ def my_base_recibo(c: Canvas) -> dict:
     available_height = tot_y - 2 * margin_y
     company_name_height = available_height * 0.09 - margin_between_lines
     employee_info_height = available_height * 0.16 - margin_between_lines
-    conceptos_height = available_height * 0.52 - margin_between_lines
+    conceptos_height = available_height * 0.51 - margin_between_lines
     contribuciones_height = available_height * 0.13 - margin_between_lines
-    total_height = available_height * 0.1 - margin_between_lines
+    total_height = available_height * 0.11 - margin_between_lines
 
     c.translate(cm, cm)
 
@@ -207,9 +207,11 @@ def my_base_recibo(c: Canvas) -> dict:
     # Total --------------------------------------------------------------------------------
     # Original
     starting_y -= total_height + margin_between_lines + 0.25 * cm
+    firma_width = 5 * cm
     rect_height = total_height * 1.1
 
-    resp['pie_pagina_y'] = starting_y + rect_height - 0.45 * cm
+    pie_pagina_y = starting_y + rect_height - 0.45 * cm
+    resp['pie_pagina_y'] = pie_pagina_y
     resp['pie_pagina_height'] = rect_height
     resp['pie_pagina_width'] = conceptos_width
 
@@ -224,15 +226,27 @@ def my_base_recibo(c: Canvas) -> dict:
     )
 
     c.line(
-        conceptos_width / 2,
+        (conceptos_width + 2 * cm) / 2,
         starting_y,
-        conceptos_width / 2,
+        (conceptos_width + 2 * cm) / 2,
         starting_y + rect_height,
     )
 
+    # Firma ------
+    c.line(
+        half_of_width - firma_width - 0.5 * cm,
+        0,
+        half_of_width - (firma_width - 1 * cm) / 2,
+        0,
+    )
+    c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
+    c.drawString(half_of_width - firma_width + 0.2 * cm, -0.5 * cm, "Firma empleado")
+    # Fin firma ------
+
     # Duplicate
+    duplic_dif = half_of_width + mid_margin
     c.roundRect(
-        half_of_width + mid_margin,
+        duplic_dif,
         starting_y,
         conceptos_width,
         rect_height,
@@ -242,11 +256,22 @@ def my_base_recibo(c: Canvas) -> dict:
     )
 
     c.line(
-        half_of_width + mid_margin + conceptos_width / 2,
+        duplic_dif + (conceptos_width + 2 * cm) / 2,
         starting_y,
-        half_of_width + mid_margin + conceptos_width / 2,
+        duplic_dif + (conceptos_width + 2 * cm) / 2,
         starting_y + rect_height,
     )
+   
+    # Firma ------
+    c.line(
+        duplic_dif + half_of_width - firma_width - 0.5 * cm,
+        0,
+        duplic_dif + half_of_width - (firma_width - 1 * cm) / 2,
+        0,
+    )
+    c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
+    c.drawString(duplic_dif + half_of_width - firma_width + 0.2 * cm, -0.5 * cm, "Firma empleado")
+    # Fin firma ------
 
     resp['canvas'] = c
 
