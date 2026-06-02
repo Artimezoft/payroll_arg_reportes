@@ -226,17 +226,17 @@ def my_base_recibo(c: Canvas) -> dict:
     )
 
     c.line(
-        conceptos_width / 2 + 2 * cm,
+        conceptos_width / 2 + 2.8 * cm,
         starting_y,
-        conceptos_width / 2 + 2 * cm,
+        conceptos_width / 2 + 2.8 * cm,
         starting_y + rect_height,
     )
 
     # Firma ------
     c.line(
-        half_of_width - firma_width,
+        half_of_width - firma_width + 0.5 * cm,
         0,
-        half_of_width - (firma_width) / 2 + 1 * cm,
+        half_of_width - (firma_width) / 2 + 1.5 * cm,
         0,
     )
     c.setFont(FONT_FAMILY, FONT_SIZE_BODY)

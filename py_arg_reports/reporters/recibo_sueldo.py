@@ -314,6 +314,111 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     return resp
 
 
+def draw_pie_chart(c: canvas.Canvas, x: float, y: float, size: float,
+                   totales: dict, conceptos: list) -> None:
+    """Dibuja un gráfico de torta con la distribución salarial.
+    Solo se dibuja si 'main_agrupadores' está presente en totales.
+    """
+    try:
+        from reportlab.graphics.shapes import Drawing
+        from reportlab.graphics.charts.piecharts import Pie
+        from reportlab.graphics import renderPDF
+        from reportlab.lib import colors as rl_colors
+    except ImportError as e:
+        log.error(f"[draw_pie_chart] Error importando reportlab graphics: {e}")
+        return
+
+    main_agrupadores = totales.get('main_agrupadores', {})
+    if not main_agrupadores:
+        log.debug("[draw_pie_chart] main_agrupadores ausente o vacío, omitiendo gráfico")
+        return
+
+    neto = totales.get('neto_liquidacion', 0)
+    seg_social = main_agrupadores.get('AP_SS', 0) + main_agrupadores.get('CT_SS', 0)
+    obra_social = main_agrupadores.get('AP_OS', 0) + main_agrupadores.get('CT_OS', 0)
+    sindical = main_agrupadores.get('AP_SIN', 0) + main_agrupadores.get('CT_SIN', 0)
+
+    art = next((item['importe'] for item in conceptos if item['code'] == 'CTRART'), 0)
+    svida = next((item['importe'] for item in conceptos if item['code'] == 'SEGOBL'), 0)
+
+    total_rem = totales.get('total_remunerativo', 0)
+    total_no_rem = totales.get('total_no_remunerativo', 0)
+    total_contribuciones = totales.get('total_contribuciones') or sum(
+        item['importe'] for item in conceptos if item.get('tipo_concepto') == 4
+    )
+    total = total_rem + total_no_rem + total_contribuciones
+    otros = max(0, total - neto - seg_social - obra_social - sindical - art - svida)
+
+    SHORT_LABELS = {
+        'Neto': 'Neto',
+        'Seg.Social': 'SS',
+        'O.Social': 'OS',
+        'Sindical': 'Sin',
+        'A.R.T.': 'ART',
+        'S.Vida': 'SV',
+        'Otros': 'Ot',
+    }
+
+    slices = [
+        ('Neto', neto, rl_colors.Color(0.2, 0.6, 0.2)),
+        ('Seg.Social', seg_social, rl_colors.Color(0.8, 0.2, 0.2)),
+        ('O.Social', obra_social, rl_colors.Color(0.2, 0.4, 0.8)),
+        ('Sindical', sindical, rl_colors.Color(0.9, 0.6, 0.1)),
+        ('A.R.T.', art, rl_colors.Color(0.6, 0.2, 0.6)),
+        ('S.Vida', svida, rl_colors.Color(0.2, 0.8, 0.8)),
+        ('Otros', otros, rl_colors.Color(0.75, 0.75, 0.75)),
+    ]
+    slices = [(lbl, val, col) for lbl, val, col in slices if val > 0]
+    if not slices:
+        log.warning("[draw_pie_chart] Todos los slices son 0, omitiendo gráfico")
+        return
+
+    try:
+        # Pie (no labels — legend drawn manually below)
+        d = Drawing(size, size)
+        pie = Pie()
+        pie.x = 0
+        pie.y = 0
+        pie.width = size
+        pie.height = size
+        pie.data = [s[1] for s in slices]
+        pie.slices.strokeWidth = 0.5
+        pie.slices.strokeColor = rl_colors.white
+        for i, (_, _, col) in enumerate(slices):
+            pie.slices[i].fillColor = col
+        d.add(pie)
+        pie_draw_x = x + 0.4 * cm
+        renderPDF.draw(d, c, pie_draw_x, y)
+
+        # "Costo Total" label above the pie
+        c.saveState()
+        c.setFont(FONT_FAMILY_BOLD, 6)
+        c.drawString(pie_draw_x, y + size + 0.08 * cm, f"Costo Total {float_to_format_currency(total)}")
+        c.restoreState()
+
+        # 1-column legend to the right of the pie (fixed absolute position)
+        sq = 0.18 * cm
+        row_h = 0.27 * cm
+        legend_x = x + size + 0.7 * cm
+        legend_top = y + size - 0.03 * cm
+
+        c.saveState()
+        c.setFont(FONT_FAMILY, 5)
+        for i, (lbl, _, col) in enumerate(slices):
+            short = SHORT_LABELS.get(lbl, lbl[:3])
+            lx = legend_x
+            ly = legend_top - i * row_h
+            c.setFillColor(col)
+            c.rect(lx, ly - sq, sq, sq, fill=1, stroke=0)
+            c.setFillColorRGB(0, 0, 0)
+            c.drawString(lx + sq + 0.05 * cm, ly - sq + 0.02 * cm, short)
+        c.restoreState()
+
+        log.debug("[draw_pie_chart] Pie chart renderizado OK")
+    except Exception as e:
+        log.error(f"[draw_pie_chart] Error al renderizar el gráfico: {e}", exc_info=True)
+
+
 def draw_liquidacion_info(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: int) -> None:
     """Dibuja la información de la liquidación en el recibo."""
     text = info_recibo['tipo_liquidacion'][legajo]
@@ -616,6 +721,19 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
 
         c.drawString(pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
         c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
+
+    # Pie chart next to "Último Depósito" (original only) -------------------------------------
+    pie_size = 1.5 * cm  # 60% of original 2.5 cm
+    pie_x = pie_de_pagina_x + coordinates['pie_de_pagina_width'] * 0.42 + 0.5 * cm
+    pie_y = pie_linea_4_y + 0.2 * cm
+    draw_pie_chart(
+        c=c,
+        x=pie_x,
+        y=pie_y,
+        size=pie_size,
+        totales=info_recibo['totales_liquidacion'][legajo],
+        conceptos=info_recibo['conceptos_liquidados'][legajo],
+    )
 
     # Duplicate
     c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
