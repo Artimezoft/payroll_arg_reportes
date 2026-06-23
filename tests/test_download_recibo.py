@@ -20,14 +20,14 @@ class TestDownloadRecibo(unittest.TestCase):
         if cls.temp_folder[-1] != '/':
             cls.temp_folder += '/'
 
-        with open('./py_arg_reports/test_cases/liquidacion_completa.json', 'r') as f:
+        with open('./py_arg_reports/test_cases/liquidacion_completa.json', 'r', encoding='utf-8') as f:
             cls.long_json = json.load(f)
 
-        with open('./py_arg_reports/test_cases/liquidacion_corta.json', 'r') as f:
+        with open('./py_arg_reports/test_cases/liquidacion_corta.json', 'r', encoding='utf-8') as f:
             cls.short_json = json.load(f)
 
         # Load fixture with contributions and excluded concepts
-        with open('./py_arg_reports/test_cases/liquidacion_con_contribuciones.json', 'r') as f:
+        with open('./py_arg_reports/test_cases/liquidacion_con_contribuciones.json', 'r', encoding='utf-8') as f:
             cls.contributions_json = json.load(f)
 
     def setUp(self):
@@ -50,14 +50,15 @@ class TestDownloadRecibo(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
+        pass
         # Clean up: Delete the temporary folder and its contents
-        if os.path.exists(cls.temp_folder):
-            for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
-                for file in files:
-                    os.remove(os.path.join(root, file))
-                for dir in dirs:
-                    os.rmdir(os.path.join(root, dir))
-            os.rmdir(cls.temp_folder)
+        # if os.path.exists(cls.temp_folder):
+        #     for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
+        #         for file in files:
+        #             os.remove(os.path.join(root, file))
+        #         for dir in dirs:
+        #             os.rmdir(os.path.join(root, dir))
+        #     os.rmdir(cls.temp_folder)
 
     def test_descarga_recibo_1(self):
         """ Prueba la descarga del archivo
