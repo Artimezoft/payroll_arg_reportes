@@ -6,7 +6,7 @@ from pathlib import Path
 # Ensure the local workspace copy is imported, not the installed package
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from py_arg_reports.reporters.recibo_sueldo import descargar_recibo
+from py_arg_reports.reporters.recibo_sueldo import descargar_recibo  # noqa: E402
 
 HERE = Path(__file__).parent
 
@@ -38,23 +38,23 @@ liquidacion_for_preview = add_mock_pie_data(liquidacion)
 downloads_dir = HERE / 'downloads'
 downloads_dir.mkdir(exist_ok=True)
 
-recibo_1_name = 'recibo_1_base2_portrait'
-recibo_2_name = 'recibo_2_base1_landscape'
+recibo_1_name = 'recibo_1_base1_landscape'
+recibo_2_name = 'recibo_2_base2_portrait'
 
-# recibo_1 -> Base 2 (portrait, single copy)
+# recibo_1 -> Base 1 (landscape, duplicated)
 path, error = descargar_recibo(
     json_data=liquidacion_for_preview,
     output_path=str(downloads_dir),
     filename=recibo_1_name,
-    base_version=2,
+    base_version=1,
 )
-print(f'[recibo_1|base2] path: {path}  error: {error}')
+print(f'[recibo_1|base1] path: {path}  error: {error}')
 
-# recibo_2 -> Base 1 (landscape, duplicated)
+# recibo_2 -> Base 2 (portrait, single copy)
 path, error = descargar_recibo(
     json_data=liquidacion_for_preview,
     output_path=str(downloads_dir),
     filename=recibo_2_name,
-    base_version=1,
+    base_version=2,
 )
-print(f'[recibo_2|base1] path: {path}  error: {error}')
+print(f'[recibo_2|base2] path: {path}  error: {error}')
