@@ -746,6 +746,17 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     )
 
     if has_duplicate:
+        dupl_pie_x = dupl_pie_de_pagina_x + coordinates['pie_de_pagina_width'] * 0.58
+        draw_pie_chart(
+            c=c,
+            x=dupl_pie_x,
+            y=pie_y,
+            size=pie_size,
+            totales=info_recibo['totales_liquidacion'][legajo],
+            conceptos=info_recibo['conceptos_liquidados'][legajo],
+        )
+
+    if has_duplicate:
         c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
         c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_BODY)
         c.drawString(dupl_pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
