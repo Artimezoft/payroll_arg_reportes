@@ -12,7 +12,7 @@ FONT_SIZE_BODY = config_constants['FONT_SIZE_BODY']
 def my_base_recibo(c: Canvas) -> dict:
     """ Base of payslip, it set all the lines and texts that are common to all payslips
     """
-    tot_x = 21 * cm
+    tot_x = 19 * cm
     tot_y = 29.7 * cm
     margin_between_lines = 0.2 * cm
     def_radius = 7
@@ -142,7 +142,6 @@ def my_base_recibo(c: Canvas) -> dict:
 
     # Total --------------------------------------------------------------------------------
     starting_y -= total_height + margin_between_lines + 0.25 * cm
-    firma_width = 5 * cm
     rect_height = total_height * 1.1
 
     pie_pagina_y = starting_y + rect_height - 0.45 * cm
@@ -168,16 +167,6 @@ def my_base_recibo(c: Canvas) -> dict:
     )
 
     # Firma ------
-    c.line(
-        margin_x + conceptos_width - firma_width - 0.5 * cm,
-        0,
-        margin_x + conceptos_width - 0.5 * cm,
-        0,
-    )
-    c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
-    c.drawString(margin_x + conceptos_width - firma_width - 0.3 * cm, -0.5 * cm, "Firma empleado")
-    # Fin firma ------
-
     resp['canvas'] = c
 
     return resp

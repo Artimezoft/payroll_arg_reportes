@@ -729,9 +729,13 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
         c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
     # Pie chart next to "Último Depósito" (original only) -------------------------------------
-    pie_size = 1.5 * cm  # 60% of original 2.5 cm
-    pie_x = pie_de_pagina_x + coordinates['pie_de_pagina_width'] * 0.42 + 0.5 * cm
-    pie_y = pie_linea_4_y + 0.2 * cm
+    if has_duplicate:
+        pie_size = 1.0 * cm
+        pie_x = pie_de_pagina_x + coordinates['pie_de_pagina_width'] * 0.58
+    else:
+        pie_size = 1.5 * cm
+        pie_x = pie_de_pagina_x + coordinates['pie_de_pagina_width'] * 0.42 + 0.5 * cm
+    pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
     draw_pie_chart(
         c=c,
         x=pie_x,
@@ -757,7 +761,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     # Fin de Pie de página ------------------------------------------------------------------------
 
 
-def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
+def descargar_recibo(json_data: dict, output_path: str, filename: str, base_version: int = 2) -> str:
     """ Descarga el recibo de sueldo en formato PDF,
         Retorna:
           - final_path, None if OK
@@ -781,7 +785,7 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
     log.info(f"Descargando recibo en {my_file_path}")
 
     try:
-        draw_recibo(my_file_path, recibo_info)
+        draw_recibo(my_file_path, recibo_info, base_version=base_version)
     except Exception as e:
         log.error(f"Error al renderizar recibo: {e}")
         return False, "Error al renderizar el recibo"
@@ -789,11 +793,19 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str) -> str:
     return my_file_path, None
 
 
-def draw_recibo(my_file_path, recibo_info):
+def draw_recibo(my_file_path, recibo_info, base_version: int = 2):
+    from reportlab.lib.pagesizes import landscape
+    if base_version == 1:
+        from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo as base_fn
+        pagesize = landscape(A4)
+    else:
+        base_fn = my_base_recibo
+        pagesize = A4
+
     # Create a canvas
     c = canvas.Canvas(
         filename=my_file_path,
-        pagesize=A4,
+        pagesize=pagesize,
     )
     c.setTitle("Recibo de Sueldo")
     c.setAuthor("PayrollJE")
@@ -802,8 +814,7 @@ def draw_recibo(my_file_path, recibo_info):
     info_recibo = get_info_final_for_recibo(recibo_info)
 
     # Add the format to the file
-    my_recibo_info = my_base_recibo(c)
-    # c = my_recibo_info['canvas']
+    my_recibo_info = base_fn(c)
 
     # Get coordinates for recibo
     coordinates = get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
@@ -815,7 +826,7 @@ def draw_recibo(my_file_path, recibo_info):
         # Add the format to the file
         # TODO: Chequear porque debo hacerlo, antes funcionaba ok
         if legajo != info_recibo['legajos'][0]:
-            my_recibo_info = my_base_recibo(c)
+            my_recibo_info = base_fn(c)
 
         # Draw the employee
         draw_empleado(
