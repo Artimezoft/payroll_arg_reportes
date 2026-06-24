@@ -1,15 +1,3 @@
-
-def draw_text_with_end_coordinate(canvas, x_end, y, text, font_family='Helvetica', font_size=8):
-    # Calculate the width of the text
-    text_width = canvas.stringWidth(text, font_family, font_size)
-
-    # Adjust the starting x-coordinate to place the text's end at x_end
-    x_start = x_end - text_width
-
-    # Draw the text
-    canvas.drawString(x_start, y, text)
-
-
 def formatted_date_str(date_str: str) -> str:
     """
     Converts a date string in the format YYYY-MM-DD to the format DD/MM/YYYY

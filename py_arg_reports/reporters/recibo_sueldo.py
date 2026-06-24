@@ -9,8 +9,6 @@ from reportlab.pdfgen import canvas
 from py_arg_reports.base_reports.recibo_base_2 import my_base_recibo
 from py_arg_reports.config import config_constants
 from py_arg_reports.tools.num_n_date_tools import (
-    draw_text_with_end_coordinate,
-    # draw_text_with_max_width,
     float_to_format_currency,
     formatted_date_str,
     nombre_mes,
@@ -259,6 +257,17 @@ class ReciboSueldo:
             'basico': self.info_recibo['basicos'][self.legajo],
         }
 
+    @staticmethod
+    def draw_text_with_end_coordinate(canvas, x_end, y, text, font_family='Helvetica', font_size=8):
+        # Calculate the width of the text
+        text_width = canvas.stringWidth(text, font_family, font_size)
+
+        # Adjust the starting x-coordinate to place the text's end at x_end
+        x_start = x_end - text_width
+
+        # Draw the text
+        canvas.drawString(x_start, y, text)
+
     def textObject(self, canvas, text, max_width, x, y):
         # Create a text object with the specified max width
         text_object = canvas.beginText(0, 0)
@@ -317,16 +326,16 @@ class ReciboSueldo:
         self.c.drawString(coords['area_x'], coords['area_y'], f"Area: {data['area']}")
         self.c.drawString(coords['contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
         self.c.drawString(coords['obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}", charSpace=-0.1)
-        draw_text_with_end_coordinate(
+        self.draw_text_with_end_coordinate(
             self.c,
             coords['legajo_e_ingreso_x_ends'],
             coords['legajo_e_ingreso_y'],
             f"Legajo: {self.legajo} - Ingreso: {data['fecha_ingreso']}"
         )
-        draw_text_with_end_coordinate(self.c, coords['cuil_x_ends'], coords['cuil_y'], f"CUIL: {data['cuil']}")
-        draw_text_with_end_coordinate(self.c, coords['basico_x_ends'], coords['basico_y'], f"Remuneración Asignada: {data['basico']}")
+        self.draw_text_with_end_coordinate(self.c, coords['cuil_x_ends'], coords['cuil_y'], f"CUIL: {data['cuil']}")
+        self.draw_text_with_end_coordinate(self.c, coords['basico_x_ends'], coords['basico_y'], f"Remuneración Asignada: {data['basico']}")
         if data['fecha_ingreso_2']:
-            draw_text_with_end_coordinate(
+            self.draw_text_with_end_coordinate(
                 self.c,
                 coords['fecha_ingreso_2_x_ends'],
                 coords['fecha_ingreso_2_y'],
@@ -340,26 +349,26 @@ class ReciboSueldo:
             self.c.drawString(coords['dupl_area_x'], coords['area_y'], f"Area: {data['area']}")
             self.c.drawString(coords['dupl_contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
             self.c.drawString(coords['dupl_obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}")
-            draw_text_with_end_coordinate(
+            self.draw_text_with_end_coordinate(
                 self.c,
                 coords['dupl_legajo_e_ingreso_x_ends'],
                 coords['legajo_e_ingreso_y'],
                 f"Legajo: {self.legajo} - Ingreso: {data['fecha_ingreso']}"
             )
-            draw_text_with_end_coordinate(
+            self.draw_text_with_end_coordinate(
                 self.c,
                 coords['dupl_cuil_x_ends'],
                 coords['cuil_y'],
                 f"CUIL: {data['cuil']}"
             )
-            draw_text_with_end_coordinate(
+            self.draw_text_with_end_coordinate(
                 self.c,
                 coords['dupl_basico_x_ends'],
                 coords['basico_y'],
                 f"Remuneración Asignada: {data['basico']}"
             )
             if data['fecha_ingreso_2']:
-                draw_text_with_end_coordinate(
+                self.draw_text_with_end_coordinate(
                     self.c,
                     coords['dupl_fecha_ingreso_2_x_ends'],
                     coords['fecha_ingreso_2_y'],
@@ -404,9 +413,9 @@ class ReciboSueldo:
                     x_to_use = coords['concepto_titles_x_ap_ends']
                     x_to_use_dupl = coords.get('dupl_concepto_titles_x_ap_ends')
 
-                draw_text_with_end_coordinate(self.c, x_to_use, this_y, float_to_format_currency(importe, include_currency=False))
+                self.draw_text_with_end_coordinate(self.c, x_to_use, this_y, float_to_format_currency(importe, include_currency=False))
                 if self.has_duplicate:
-                    draw_text_with_end_coordinate(
+                    self.draw_text_with_end_coordinate(
                         self.c,
                         x_to_use_dupl,
                         this_y,
@@ -721,10 +730,11 @@ class ReciboSueldo:
             log.error(f"[draw_pie_chart] Error al renderizar el gráfico: {e}", exc_info=True)
 
 
-    def draw_liquidacion_info(self, coordinates: dict) -> None:
+    def draw_liquidacion_info(self) -> None:
         """Dibuja la información de la liquidación en el recibo."""
         text = self.info_recibo['tipo_liquidacion'][self.legajo]
 
+        coordinates = self.coordinates
         offset_x = -0.4 * cm
 
         # Original - Dibuja "Liquidación Final" centrado o usa drawString para otros casos
@@ -752,6 +762,7 @@ class ReciboDownloader:
         self.json_data = json_data
         self.output_path = output_path
         self.filename = filename
+        self.recibo_info = get_recibo_info(json_data)
 
     @staticmethod
     def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
@@ -899,7 +910,14 @@ class ReciboDownloader:
                 my_recibo_info = base_fn(c)
                 coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
 
-            self.draw_empleado(c, coordinates, info_recibo, legajo)
+            recibo_sueldo = ReciboSueldo(
+                c=c,
+                coordinates=coordinates,
+                info_recibo=info_recibo,
+                legajo=legajo,
+                base_version=self.base_version
+            )
+            recibo_sueldo.draw_empleado()
 
             if index < len(legajos) - 1:
                 c.showPage()
@@ -912,10 +930,8 @@ class ReciboDownloader:
             - final_path, None if OK
             - False, error message if error
         """
-
-        recibo_info = get_recibo_info(self.json_data)
-        if recibo_info.get("error"):
-            error_detail = recibo_info["error"]
+        if self.recibo_info.get("error"):
+            error_detail = self.recibo_info["error"]
             return False, error_detail
 
         # Cada liquidación va a tener su propia carpeta en download
