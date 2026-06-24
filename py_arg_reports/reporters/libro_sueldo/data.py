@@ -1,7 +1,7 @@
 """
 Process data from origin to what we need
 """
-from py_arg_reports.tools.recibos_utils import (
+from py_arg_reports.tools.num_n_date_tools import (
     float_to_format_currency,
     formatted_date_str,
 )

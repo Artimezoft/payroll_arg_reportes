@@ -2,13 +2,13 @@ import logging
 import os
 from pathlib import Path
 from numero_a_letras import numero_a_letras
-from reportlab.lib.pagesizes import A4
+from reportlab.lib.pagesizes import A4, landscape
 from reportlab.lib.units import cm
 from reportlab.pdfgen import canvas
 
 from py_arg_reports.base_reports.recibo_base_2 import my_base_recibo
 from py_arg_reports.config import config_constants
-from py_arg_reports.tools.recibos_utils import (
+from py_arg_reports.tools.num_n_date_tools import (
     draw_text_with_end_coordinate,
     # draw_text_with_max_width,
     float_to_format_currency,
@@ -208,269 +208,21 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
     return resp
 
 
-def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
-    first_line_y = my_recibo_info['company_info_y'] + my_recibo_info['company_info_height'] - 0.35 * cm
-    has_duplicate = my_recibo_info.get('has_duplicate', True)
-    base_x = my_recibo_info.get('margin_x', 0) + 0.2 * cm
-    base_x_ends = base_x + my_recibo_info['employee_info_width'] - 0.4 * cm
-    employee_right_ends = base_x_ends if has_duplicate else (base_x_ends - 1.0 * cm)
-    rem_column_shift = 0 if has_duplicate else 0.6 * cm
-    nr_column_shift = 0 if has_duplicate else 0.4 * cm
-    ap_column_shift = 0 if has_duplicate else 0.2 * cm
-    base_line_between = 0.5 * cm
-    base_line_between_2 = 0.43 * cm
-    starting_y_employee_info = my_recibo_info['employee_info_y'] + my_recibo_info['employee_info_height'] - 0.45 * cm
-
-    starting_y_conceptos = my_recibo_info['conceptos_titles_y'] - 0.45 * cm
-    starting_y_contribuciones = my_recibo_info['contribuciones_titles_y'] - 0.45 * cm
-    liquidacion_y_offset = -0.1 * cm if has_duplicate else -0.2 * cm
-    periodo_y_offset = -0.2 * cm if has_duplicate else -0.4 * cm
-
-    resp = {
-        'has_duplicate': has_duplicate,
-        'company_x': base_x,
-        'company_y': first_line_y,
-        'company_domicilio_x': base_x,
-        'company_domicilio_y': first_line_y - base_line_between,
-        'company_cuit_x': base_x,
-        'company_cuit_y': first_line_y - base_line_between * 2,
-
-        'liquidacion_info_x': my_recibo_info['liquidacion_info_x'] + my_recibo_info['liquidacion_info_width'] / 4,
-        'liquidacion_info_y': first_line_y - 0.1 * cm + liquidacion_y_offset,
-        'periodo_x': my_recibo_info['liquidacion_info_x'] + my_recibo_info['liquidacion_info_width'] / 4,
-        'periodo_y': first_line_y - 0.8 * cm + periodo_y_offset,
-
-        'nombre_x': base_x,
-        'nombre_y': starting_y_employee_info,
-        'categoria_x': base_x,
-        'categoria_y': starting_y_employee_info - base_line_between_2,
-        'posicion_x': base_x,
-        'posicion_y': starting_y_employee_info - base_line_between_2 * 2,
-        'area_x': base_x,
-        'area_y': starting_y_employee_info - base_line_between_2 * 3,
-        'contrato_x': base_x,
-        'contrato_y': starting_y_employee_info - base_line_between_2 * 4,
-        'obra_social_x': base_x,
-        'obra_social_y': starting_y_employee_info - base_line_between_2 * 5,
-        'legajo_e_ingreso_x_ends': employee_right_ends,
-        'legajo_e_ingreso_y': starting_y_employee_info,
-        'cuil_x_ends': employee_right_ends,
-        'cuil_y': starting_y_employee_info - base_line_between_2,
-        'basico_x_ends': employee_right_ends,
-        'basico_y': starting_y_employee_info - base_line_between_2 * 2,
-        'fecha_ingreso_2_x_ends': employee_right_ends,
-        'fecha_ingreso_2_y': starting_y_employee_info - base_line_between_2 * 3,
-
-        'starting_y_conceptos': starting_y_conceptos,
-        'starting_y_contribuciones': starting_y_contribuciones,
-        'conceptos_x': base_x,
-        'concepto_titles_x_cant': my_recibo_info['concepto_titles_x_cant'],
-        'concepto_titles_x_rem': my_recibo_info['concepto_titles_x_rem'],
-        'concepto_titles_x_nr': my_recibo_info['concepto_titles_x_nr'],
-        'concepto_titles_x_ap': my_recibo_info['concepto_titles_x_ap'],
-
-        'concepto_titles_x_cant_ends': my_recibo_info['concepto_titles_x_rem'],
-        'concepto_titles_x_rem_ends': my_recibo_info['concepto_titles_x_nr'] - rem_column_shift,
-        'concepto_titles_x_nr_ends': my_recibo_info['concepto_titles_x_ap'] - nr_column_shift,
-        'concepto_titles_x_ap_ends': base_x_ends - ap_column_shift,
-        'starting_y_totales': my_recibo_info['starting_y_totales'],
-        'starting_y_totales_neto': my_recibo_info['starting_y_totales_neto'],
-        'totales_x_rem': my_recibo_info['concepto_titles_x_rem'] - rem_column_shift,
-        'totales_x_nr': my_recibo_info['concepto_titles_x_nr'] - nr_column_shift,
-        'totales_x_ap': my_recibo_info['concepto_titles_x_ap'] - ap_column_shift,
-        'contribuciones_titles_y': my_recibo_info['contribuciones_titles_y'],
-        'neto_letras_y': my_recibo_info['starting_y_totales_neto'] - base_line_between_2 + 0.05 * cm,
-
-        'pie_de_pagina_x': base_x,
-        'pie_de_pagina_y': my_recibo_info['pie_pagina_y'],
-        'pie_de_pagina_width': my_recibo_info['pie_pagina_width'],
-        'pie_de_pagina_height': my_recibo_info['pie_pagina_height'],
-    }
-
-    if has_duplicate:
-        base_duplicate_x = my_recibo_info['duplicate_x'] + 0.2 * cm
-        base_duplicate_x_ends = base_duplicate_x + my_recibo_info['employee_info_width'] - 0.4 * cm
-        resp.update({
-            'dupl_company_x': base_duplicate_x,
-            'dupl_company_domicilio_x': base_duplicate_x,
-            'dupl_company_cuit_x': base_duplicate_x,
-            'dupl_liq_info_x': my_recibo_info['liquidacion_info_x_duplicate'] + my_recibo_info['liquidacion_info_width'] / 4,
-            'dupl_periodo_x': my_recibo_info['liquidacion_info_x_duplicate'] + my_recibo_info['liquidacion_info_width'] / 4,
-            'dupl_nombre_x': base_duplicate_x,
-            'dupl_categoria_x': base_duplicate_x,
-            'dupl_posicion_x': base_duplicate_x,
-            'dupl_area_x': base_duplicate_x,
-            'dupl_contrato_x': base_duplicate_x,
-            'dupl_obra_social_x': base_duplicate_x,
-            'dupl_legajo_e_ingreso_x_ends': base_duplicate_x_ends,
-            'dupl_cuil_x_ends': base_duplicate_x_ends,
-            'dupl_basico_x_ends': base_duplicate_x_ends,
-            'dupl_fecha_ingreso_2_x_ends': base_duplicate_x_ends,
-            'dupl_conceptos_x': base_duplicate_x,
-            'dupl_concepto_titles_x_cant': my_recibo_info['dupl_concepto_titles_x_cant'],
-            'dupl_concepto_titles_x_rem': my_recibo_info['dupl_concepto_titles_x_rem'],
-            'dupl_concepto_titles_x_nr': my_recibo_info['dupl_concepto_titles_x_nr'],
-            'dupl_concepto_titles_x_ap': my_recibo_info['dupl_concepto_titles_x_ap'],
-            'dupl_concepto_titles_x_cant_ends': my_recibo_info['dupl_concepto_titles_x_rem'],
-            'dupl_concepto_titles_x_rem_ends': my_recibo_info['dupl_concepto_titles_x_nr'],
-            'dupl_concepto_titles_x_nr_ends': my_recibo_info['dupl_concepto_titles_x_ap'],
-            'dupl_concepto_titles_x_ap_ends': base_duplicate_x_ends,
-            'dupl_pie_de_pagina_x': base_duplicate_x,
-        })
-
-    return resp
-
-
-def draw_pie_chart(
-    c: canvas.Canvas,
-    x: float,
-    y: float,
-    size: float,
-    totales: dict,
-    conceptos: list,
-    font_delta: int = 0
-) -> None:
-    """Dibuja un gráfico de torta con la distribución salarial.
-    Solo se dibuja si 'main_agrupadores' está presente en totales.
-    """
-    try:
-        from reportlab.graphics.shapes import Drawing
-        from reportlab.graphics.charts.piecharts import Pie
-        from reportlab.graphics import renderPDF
-        from reportlab.lib import colors as rl_colors
-    except ImportError as e:
-        log.error(f"[draw_pie_chart] Error importando reportlab graphics: {e}")
-        return
-
-    main_agrupadores = totales.get('main_agrupadores', {})
-    if not main_agrupadores:
-        log.debug("[draw_pie_chart] main_agrupadores ausente o vacío, omitiendo gráfico")
-        return
-
-    neto = totales.get('neto_liquidacion', 0)
-    seg_social = main_agrupadores.get('AP_SS', 0) + main_agrupadores.get('CT_SS', 0)
-    obra_social = main_agrupadores.get('AP_OS', 0) + main_agrupadores.get('CT_OS', 0)
-    sindical = main_agrupadores.get('AP_SIN', 0) + main_agrupadores.get('CT_SIN', 0)
-
-    art = next((item['importe'] for item in conceptos if item['code'] == 'CTRART'), 0)
-    svida = next((item['importe'] for item in conceptos if item['code'] == 'SEGOBL'), 0)
-
-    total_rem = totales.get('total_remunerativo', 0)
-    total_no_rem = totales.get('total_no_remunerativo', 0)
-    total_contribuciones = totales.get('total_contribuciones') or sum(
-        item['importe'] for item in conceptos if item.get('tipo_concepto') == 4
-    )
-    total = totales.get('costo_conceptos') or (total_rem + total_no_rem + total_contribuciones)
-    otros = max(0, total - neto - seg_social - obra_social - sindical - art - svida)
-
-    SHORT_LABELS = {
-        'Neto': 'Neto',
-        'Seg.Social': 'SS',
-        'O.Social': 'OS',
-        'Sindical': 'Sin',
-        'A.R.T.': 'ART',
-        'S.Vida': 'SV',
-        'Otros': 'Ot',
-    }
-
-    slices = [
-        ('Neto', neto, rl_colors.Color(0.2, 0.6, 0.2)),
-        ('Seg.Social', seg_social, rl_colors.Color(0.8, 0.2, 0.2)),
-        ('O.Social', obra_social, rl_colors.Color(0.2, 0.4, 0.8)),
-        ('Sindical', sindical, rl_colors.Color(0.9, 0.6, 0.1)),
-        ('A.R.T.', art, rl_colors.Color(0.6, 0.2, 0.6)),
-        ('S.Vida', svida, rl_colors.Color(0.2, 0.8, 0.8)),
-        ('Otros', otros, rl_colors.Color(0.75, 0.75, 0.75)),
-    ]
-    slices = [(lbl, val, col) for lbl, val, col in slices if val > 0]
-    if not slices:
-        log.warning("[draw_pie_chart] Todos los slices son 0, omitiendo gráfico")
-        return
-
-    try:
-        # Pie (no labels — legend drawn manually below)
-        d = Drawing(size, size)
-        pie = Pie()
-        pie.x = 0
-        pie.y = 0
-        pie.width = size
-        pie.height = size
-        pie.data = [s[1] for s in slices]
-        pie.slices.strokeWidth = 0.5
-        pie.slices.strokeColor = rl_colors.white
-        for i, (_, _, col) in enumerate(slices):
-            pie.slices[i].fillColor = col
-        d.add(pie)
-        pie_draw_x = x + 1 * cm
-        renderPDF.draw(d, c, pie_draw_x, y - 0.33 * cm)
-
-        # "Costo Total" label above the pie
-        c.saveState()
-        c.setFont(FONT_FAMILY_BOLD, 6 + font_delta)
-        c.drawString(pie_draw_x, y + size + 0.1 * cm, "Total Costo")
-        c.drawString(pie_draw_x, y + size - 0.2 * cm, float_to_format_currency(total))
-        c.restoreState()
-
-        # 1-column legend to the right of the pie (fixed absolute position)
-        sq = 0.18 * cm
-        row_h = 0.27 * cm
-        legend_x = x + size + 1.3 * cm
-        legend_top = y + size - 0.33 * cm
-
-        c.saveState()
-        c.setFont(FONT_FAMILY, 5 + font_delta)
-        for i, (lbl, _, col) in enumerate(slices):
-            short = SHORT_LABELS.get(lbl, lbl[:3])
-            lx = legend_x
-            ly = legend_top - i * row_h
-            c.setFillColor(col)
-            c.rect(lx, ly - sq, sq, sq, fill=1, stroke=0)
-            c.setFillColorRGB(0, 0, 0)
-            c.drawString(lx + sq + 0.05 * cm, ly - sq + 0.02 * cm, short)
-        c.restoreState()
-
-        log.debug("[draw_pie_chart] Pie chart renderizado OK")
-    except Exception as e:
-        log.error(f"[draw_pie_chart] Error al renderizar el gráfico: {e}", exc_info=True)
-
-
-def draw_liquidacion_info(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: int) -> None:
-    """Dibuja la información de la liquidación en el recibo."""
-    text = info_recibo['tipo_liquidacion'][legajo]
-
-    offset_x = -0.4 * cm
-
-    # Original - Dibuja "Liquidación Final" centrado o usa drawString para otros casos
-    if text == 'Liquidación Final':
-        c.drawString(coordinates['liquidacion_info_x'] + offset_x, coordinates['liquidacion_info_y'], text)
-    else:
-        c.drawString(coordinates['liquidacion_info_x'], coordinates['liquidacion_info_y'], text)
-
-    # Dibuja el período en el recibo original
-    c.drawString(coordinates['periodo_x'], coordinates['periodo_y'], info_recibo['periodo'])
-
-    if coordinates.get('has_duplicate', True):
-        if text == 'Liquidación Final':
-            c.drawString(coordinates['dupl_liq_info_x'] + offset_x, coordinates['liquidacion_info_y'], text)
-        else:
-            c.drawString(coordinates['dupl_liq_info_x'], coordinates['liquidacion_info_y'], text)
-
-        c.drawString(coordinates['dupl_periodo_x'], coordinates['periodo_y'], info_recibo['periodo'])
-
-
 class ReciboSueldo:
     """Orquesta el dibujo de un recibo individual por empleado."""
 
     FONT_FAMILY = config_constants['FONT_FAMILY']
     FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']
 
-    def __init__(self, c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: str):
+    def __init__(self, c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: str, base_version: int = 1) -> None:
         self.c = c
         self.coordinates = coordinates
         self.info_recibo = info_recibo
         self.legajo = legajo
         self.has_duplicate = coordinates.get('has_duplicate', True)
         self.total_contribuciones = 0.0
+        self.base_version = base_version
+
         if self.has_duplicate:
             self.font_size_main = FONT_SIZE_MAIN
             self.font_size_body = FONT_SIZE_BODY
@@ -507,84 +259,114 @@ class ReciboSueldo:
             'basico': self.info_recibo['basicos'][self.legajo],
         }
 
+    def textObject(self, canvas, text, max_width, x, y):
+        # Create a text object with the specified max width
+        text_object = canvas.beginText(0, 0)
+        text_object.setTextOrigin(x, y)
+        canvas_font = canvas._fontname
+        canvas_font_size = canvas._fontsize
+        text_object.setFont(canvas_font, canvas_font_size)
+
+        words = text.split()
+        current_line = []
+        current_line_width = 0
+
+        for word in words:
+            word_width = canvas.stringWidth(word + " ", canvas_font, canvas_font_size)
+            if current_line_width + word_width <= max_width:
+                current_line.append(word)
+                current_line_width += word_width
+            else:
+                text_object.textLine(" ".join(current_line))
+                current_line = [word]
+                current_line_width = word_width
+
+        if current_line:
+            text_object.textLine(" ".join(current_line))
+
+        return text_object
+
+    def draw_text_with_max_width(self, canvas, text, max_width, x, y):
+        formatted_text = self.textObject(canvas, text, max_width, x, y)
+
+        canvas.drawText(formatted_text)
+
     def draw_titles(self) -> None:
-        c = self.c
         coords = self.coordinates
 
         self._set_font(bold=True, size=self.font_size_main)
-        c.drawString(coords['company_x'], coords['company_y'], self.info_recibo['company_name'])
+        self.c.drawString(coords['company_x'], coords['company_y'], self.info_recibo['company_name'])
         self._set_font(bold=False, size=self.font_size_main)
-        c.drawString(coords['company_domicilio_x'], coords['company_domicilio_y'], self.info_recibo['domicilio'])
-        c.drawString(coords['company_cuit_x'], coords['company_cuit_y'], f'CUIT: {self.info_recibo["cuit"]}')
+        self.c.drawString(coords['company_domicilio_x'], coords['company_domicilio_y'], self.info_recibo['domicilio'])
+        self.c.drawString(coords['company_cuit_x'], coords['company_cuit_y'], f'CUIT: {self.info_recibo["cuit"]}')
 
         if self.has_duplicate:
             self._set_font(bold=True, size=self.font_size_main)
-            c.drawString(coords['dupl_company_x'], coords['company_y'], self.info_recibo['company_name'])
+            self.c.drawString(coords['dupl_company_x'], coords['company_y'], self.info_recibo['company_name'])
             self._set_font(bold=False, size=self.font_size_main)
-            c.drawString(coords['dupl_company_domicilio_x'], coords['company_domicilio_y'], self.info_recibo['domicilio'])
-            c.drawString(coords['dupl_company_cuit_x'], coords['company_cuit_y'], f'CUIT: {self.info_recibo["cuit"]}')
+            self.c.drawString(coords['dupl_company_domicilio_x'], coords['company_domicilio_y'], self.info_recibo['domicilio'])
+            self.c.drawString(coords['dupl_company_cuit_x'], coords['company_cuit_y'], f'CUIT: {self.info_recibo["cuit"]}')
 
-        draw_liquidacion_info(c, coords, self.info_recibo, self.legajo)
+        self.draw_liquidacion_info()
         self._set_font(bold=False, size=self.font_size_body)
 
         data = self._get_employee_data()
-        c.drawString(coords['nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
-        c.drawString(coords['categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
-        c.drawString(coords['posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
-        c.drawString(coords['area_x'], coords['area_y'], f"Area: {data['area']}")
-        c.drawString(coords['contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
-        c.drawString(coords['obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}", charSpace=-0.1)
+        self.c.drawString(coords['nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
+        self.c.drawString(coords['categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
+        self.c.drawString(coords['posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
+        self.c.drawString(coords['area_x'], coords['area_y'], f"Area: {data['area']}")
+        self.c.drawString(coords['contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
+        self.c.drawString(coords['obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}", charSpace=-0.1)
         draw_text_with_end_coordinate(
-            c,
+            self.c,
             coords['legajo_e_ingreso_x_ends'],
             coords['legajo_e_ingreso_y'],
             f"Legajo: {self.legajo} - Ingreso: {data['fecha_ingreso']}"
         )
-        draw_text_with_end_coordinate(c, coords['cuil_x_ends'], coords['cuil_y'], f"CUIL: {data['cuil']}")
-        draw_text_with_end_coordinate(c, coords['basico_x_ends'], coords['basico_y'], f"Remuneración Asignada: {data['basico']}")
+        draw_text_with_end_coordinate(self.c, coords['cuil_x_ends'], coords['cuil_y'], f"CUIL: {data['cuil']}")
+        draw_text_with_end_coordinate(self.c, coords['basico_x_ends'], coords['basico_y'], f"Remuneración Asignada: {data['basico']}")
         if data['fecha_ingreso_2']:
             draw_text_with_end_coordinate(
-                c,
+                self.c,
                 coords['fecha_ingreso_2_x_ends'],
                 coords['fecha_ingreso_2_y'],
                 f"Fecha Ing. Reconocida: {data['fecha_ingreso_2']}"
             )
 
         if self.has_duplicate:
-            c.drawString(coords['dupl_nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
-            c.drawString(coords['dupl_categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
-            c.drawString(coords['dupl_posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
-            c.drawString(coords['dupl_area_x'], coords['area_y'], f"Area: {data['area']}")
-            c.drawString(coords['dupl_contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
-            c.drawString(coords['dupl_obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}")
+            self.c.drawString(coords['dupl_nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
+            self.c.drawString(coords['dupl_categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
+            self.c.drawString(coords['dupl_posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
+            self.c.drawString(coords['dupl_area_x'], coords['area_y'], f"Area: {data['area']}")
+            self.c.drawString(coords['dupl_contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
+            self.c.drawString(coords['dupl_obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}")
             draw_text_with_end_coordinate(
-                c,
+                self.c,
                 coords['dupl_legajo_e_ingreso_x_ends'],
                 coords['legajo_e_ingreso_y'],
                 f"Legajo: {self.legajo} - Ingreso: {data['fecha_ingreso']}"
             )
             draw_text_with_end_coordinate(
-                c,
+                self.c,
                 coords['dupl_cuil_x_ends'],
                 coords['cuil_y'],
                 f"CUIL: {data['cuil']}"
             )
             draw_text_with_end_coordinate(
-                c,
+                self.c,
                 coords['dupl_basico_x_ends'],
                 coords['basico_y'],
                 f"Remuneración Asignada: {data['basico']}"
             )
             if data['fecha_ingreso_2']:
                 draw_text_with_end_coordinate(
-                    c,
+                    self.c,
                     coords['dupl_fecha_ingreso_2_x_ends'],
                     coords['fecha_ingreso_2_y'],
                     f"Fecha Ing. Reconocida: {data['fecha_ingreso_2']}"
                 )
 
     def draw_conceptos(self) -> None:
-        c = self.c
         coords = self.coordinates
         conceptos_liquidados = self.info_recibo['conceptos_liquidados'][self.legajo]
 
@@ -605,12 +387,12 @@ class ReciboSueldo:
                 continue
 
             if tipo_concepto in [1, 2, 3]:
-                c.drawString(coords['conceptos_x'], this_y, name)
-                c.drawString(coords['concepto_titles_x_cant'], this_y, str(cantidad))
+                self.c.drawString(coords['conceptos_x'], this_y, name)
+                self.c.drawString(coords['concepto_titles_x_cant'], this_y, str(cantidad))
 
                 if self.has_duplicate:
-                    c.drawString(coords['dupl_conceptos_x'], this_y, name)
-                    c.drawString(coords['dupl_concepto_titles_x_cant'], this_y, str(cantidad))
+                    self.c.drawString(coords['dupl_conceptos_x'], this_y, name)
+                    self.c.drawString(coords['dupl_concepto_titles_x_cant'], this_y, str(cantidad))
 
                 if tipo_concepto == 1:
                     x_to_use = coords['concepto_titles_x_rem_ends']
@@ -622,10 +404,10 @@ class ReciboSueldo:
                     x_to_use = coords['concepto_titles_x_ap_ends']
                     x_to_use_dupl = coords.get('dupl_concepto_titles_x_ap_ends')
 
-                draw_text_with_end_coordinate(c, x_to_use, this_y, float_to_format_currency(importe, include_currency=False))
+                draw_text_with_end_coordinate(self.c, x_to_use, this_y, float_to_format_currency(importe, include_currency=False))
                 if self.has_duplicate:
                     draw_text_with_end_coordinate(
-                        c,
+                        self.c,
                         x_to_use_dupl,
                         this_y,
                         float_to_format_currency(importe, include_currency=False)
@@ -643,9 +425,9 @@ class ReciboSueldo:
                 self.total_contribuciones += importe
 
                 self._set_font(bold=False, size=self.font_size_small)
-                c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
+                self.c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
                 if self.has_duplicate:
-                    c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
+                    self.c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
                 contribuciones_count += 1
                 self._set_font(bold=False, size=self.font_size_body)
 
@@ -658,7 +440,6 @@ class ReciboSueldo:
                     this_contribuciones_y -= 0.4 * cm
 
     def draw_total(self) -> None:
-        c = self.c
         coords = self.coordinates
         totales = self.info_recibo['totales_liquidacion'][self.legajo]
 
@@ -668,28 +449,28 @@ class ReciboSueldo:
         neto_liquidacion = totales['neto_liquidacion']
         neto_en_letras = numero_a_letras(neto_liquidacion)
 
-        c.drawString(
+        self.c.drawString(
             coords['totales_x_rem'],
             coords['starting_y_totales'],
             float_to_format_currency(totales_remunerativo, include_currency=False)
         )
-        c.drawString(
+        self.c.drawString(
             coords['totales_x_nr'],
             coords['starting_y_totales'],
             float_to_format_currency(totales_no_remunerativo, include_currency=False)
         )
-        c.drawString(
+        self.c.drawString(
             coords['totales_x_ap'],
             coords['starting_y_totales'],
             float_to_format_currency(totales_retenciones, include_currency=False)
         )
         self._set_font(bold=True, size=self.font_size_main)
-        c.drawString(
+        self.c.drawString(
             coords['totales_x_ap'] - 0.5 * cm,
             coords['starting_y_totales_neto'],
             float_to_format_currency(neto_liquidacion, include_currency=False)
         )
-        c.drawString(
+        self.c.drawString(
             coords['conceptos_x'] + 3 * cm,
             coords['contribuciones_titles_y'],
             float_to_format_currency(self.total_contribuciones, include_currency=False)
@@ -697,39 +478,38 @@ class ReciboSueldo:
         self._set_font(bold=False, size=self.font_size_body)
 
         if self.has_duplicate:
-            c.drawString(
+            self.c.drawString(
                 coords['dupl_concepto_titles_x_rem'],
                 coords['starting_y_totales'],
                 float_to_format_currency(totales_remunerativo, include_currency=False)
             )
-            c.drawString(
+            self.c.drawString(
                 coords['dupl_concepto_titles_x_nr'],
                 coords['starting_y_totales'],
                 float_to_format_currency(totales_no_remunerativo, include_currency=False)
             )
-            c.drawString(
+            self.c.drawString(
                 coords['dupl_concepto_titles_x_ap'],
                 coords['starting_y_totales'],
                 float_to_format_currency(totales_retenciones, include_currency=False)
             )
             self._set_font(bold=True, size=self.font_size_main)
-            c.drawString(
+            self.c.drawString(
                 coords['dupl_concepto_titles_x_ap'] - 0.5 * cm,
                 coords['starting_y_totales_neto'], float_to_format_currency(neto_liquidacion, include_currency=False)
             )
-            c.drawString(
+            self.c.drawString(
                 coords['dupl_conceptos_x'] + 3 * cm,
                 coords['contribuciones_titles_y'],
                 float_to_format_currency(self.total_contribuciones, include_currency=False)
             )
 
         self._set_font(bold=False, size=self.font_size_body)
-        c.drawString(coords['company_x'], coords['neto_letras_y'], f"Son: {neto_en_letras}")
+        self.c.drawString(coords['company_x'], coords['neto_letras_y'], f"Son: {neto_en_letras}")
         if self.has_duplicate:
-            c.drawString(coords['dupl_company_x'], coords['neto_letras_y'], f"Son: {neto_en_letras}")
+            self.c.drawString(coords['dupl_company_x'], coords['neto_letras_y'], f"Son: {neto_en_letras}")
 
     def draw_signature(self) -> None:
-        c = self.c
         coords = self.coordinates
         pie_de_pagina_x = coords['pie_de_pagina_x']
         pie_de_pagina_y = coords['pie_de_pagina_y']
@@ -752,17 +532,17 @@ class ReciboSueldo:
         if numero_cuenta or cbu:
             pagado_como = f'CBU: {cbu}' if cbu else f'Cuenta: {numero_cuenta}'
 
-        c.drawString(pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
+        self.c.drawString(pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
         self._set_font(bold=True, size=self.font_size_body)
-        c.drawString(pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
+        self.c.drawString(pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
         self._set_font(bold=False, size=self.font_size_body)
         if self.info_recibo['ultimo_pago_ss']['id']:
             periodo_ss = f'{nombre_mes(int(self.info_recibo["ultimo_pago_ss"]["mes"]))}'
             periodo_ss += f' {self.info_recibo["ultimo_pago_ss"]["anio"]}'
             fecha_pago_ss = formatted_date_str(self.info_recibo['ultimo_pago_ss']['fecha_pago'])
             banco_ss = self.info_recibo['ultimo_pago_ss']['banco']
-            c.drawString(pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
-            c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
+            self.c.drawString(pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
+            self.c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
         if self.has_duplicate:
             pie_size = 1.0 * cm
@@ -774,8 +554,7 @@ class ReciboSueldo:
             pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm) - 1.0 * cm + 1.0 * cm
 
         font_delta = 2 if not self.has_duplicate else 0
-        draw_pie_chart(
-            c,
+        self.draw_pie_chart(
             pie_x,
             pie_y,
             pie_size,
@@ -785,94 +564,375 @@ class ReciboSueldo:
         )
 
         if self.has_duplicate:
-            c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
+            self.c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
             self._set_font(bold=True, size=self.font_size_body)
-            c.drawString(dupl_pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
+            self.c.drawString(dupl_pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
             self._set_font(bold=False, size=self.font_size_body)
             if self.info_recibo['ultimo_pago_ss']['id']:
                 periodo_ss = f'{nombre_mes(int(self.info_recibo["ultimo_pago_ss"]["mes"]))}'
                 periodo_ss += f' {self.info_recibo["ultimo_pago_ss"]["anio"]}'
                 fecha_pago_ss = formatted_date_str(self.info_recibo['ultimo_pago_ss']['fecha_pago'])
                 banco_ss = self.info_recibo['ultimo_pago_ss']['banco']
-                c.drawString(dupl_pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
-                c.drawString(dupl_pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
+                self.c.drawString(dupl_pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
+                self.c.drawString(dupl_pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
 
-def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: str) -> None:
-    """Compat layer over ReciboSueldo to preserve current public API."""
-    recibo = ReciboSueldo(c=c, coordinates=coordinates, info_recibo=info_recibo, legajo=legajo)
-    recibo.draw_titles()
-    recibo.draw_conceptos()
-    recibo.draw_total()
-    recibo.draw_signature()
+    def draw_empleado(self) -> None:
+        """Compat layer over ReciboSueldo to preserve current public API."""
+        self.draw_titles()
+        self.draw_conceptos()
+        self.draw_total()
+        self.draw_signature()
 
 
-def descargar_recibo(json_data: dict, output_path: str, filename: str, base_version: int = 1) -> str:
-    """ Descarga el recibo de sueldo en formato PDF,
-        Retorna:
-          - final_path, None if OK
-          - False, error message if error
-    """
+    def draw_pie_chart(
+        self,
+        x: float,
+        y: float,
+        size: float,
+        totales: dict,
+        conceptos: list,
+        font_delta: int = 0
+    ) -> None:
+        """Dibuja un gráfico de torta con la distribución salarial.
+        Solo se dibuja si 'main_agrupadores' está presente en totales.
+        """
+        try:
+            from reportlab.graphics.shapes import Drawing
+            from reportlab.graphics.charts.piecharts import Pie
+            from reportlab.graphics import renderPDF
+            from reportlab.lib import colors as rl_colors
+        except ImportError as e:
+            log.error(f"[draw_pie_chart] Error importando reportlab graphics: {e}")
+            return
 
-    recibo_info = get_recibo_info(json_data)
-    if recibo_info.get("error"):
-        error_detail = recibo_info["error"]
-        return False, error_detail
+        main_agrupadores = totales.get('main_agrupadores', {})
+        if not main_agrupadores:
+            log.debug("[draw_pie_chart] main_agrupadores ausente o vacío, omitiendo gráfico")
+            return
 
-    # Cada liquidación va a tener su propia carpeta en download
-    my_path = output_path
-    if not os.path.exists(my_path):
-        os.makedirs(my_path)
+        neto = totales.get('neto_liquidacion', 0)
+        seg_social = main_agrupadores.get('AP_SS', 0) + main_agrupadores.get('CT_SS', 0)
+        obra_social = main_agrupadores.get('AP_OS', 0) + main_agrupadores.get('CT_OS', 0)
+        sindical = main_agrupadores.get('AP_SIN', 0) + main_agrupadores.get('CT_SIN', 0)
 
-    if not filename.lower().endswith('.pdf'):
-        filename += '.pdf'
-    my_file_path = Path(my_path) / filename
-    my_file_path = str(my_file_path)
-    log.info(f"Descargando recibo en {my_file_path}")
+        art = next((item['importe'] for item in conceptos if item['code'] == 'CTRART'), 0)
+        svida = next((item['importe'] for item in conceptos if item['code'] == 'SEGOBL'), 0)
 
-    try:
-        draw_recibo(my_file_path, recibo_info, base_version=base_version)
-    except Exception as e:
-        log.error(f"Error al renderizar recibo: {e}")
-        return False, "Error al renderizar el recibo"
+        total_rem = totales.get('total_remunerativo', 0)
+        total_no_rem = totales.get('total_no_remunerativo', 0)
+        total_contribuciones = totales.get('total_contribuciones') or sum(
+            item['importe'] for item in conceptos if item.get('tipo_concepto') == 4
+        )
+        total = totales.get('costo_conceptos') or (total_rem + total_no_rem + total_contribuciones)
+        otros = max(0, total - neto - seg_social - obra_social - sindical - art - svida)
 
-    return my_file_path, None
+        LABELS = {
+            'Neto': {
+                'short': 'Neto',
+                'full': 'Neto a Cobrar',
+            },
+            'Seg.Social': {
+                'short': 'SS',
+                'full': 'Seguridad Social',
+            },
+            'O.Social': {
+                'short': 'OS',
+                'full': 'Obra Social',
+            },
+            'Sindical': {
+                'short': 'Sin',
+                'full': 'Sindicato',
+            },
+            'A.R.T.': {
+                'short': 'ART',
+                'full': 'A.R.T.',
+            },
+            'S.Vida': {
+                'short': 'SV',
+                'full': 'Seguro de Vida',
+            },
+            'Otros': {
+                'short': 'Ot',
+                'full': 'Otros',
+            },
+        }
+
+        slices = [
+            ('Neto', neto, rl_colors.Color(0.2, 0.6, 0.2)),
+            ('Seg.Social', seg_social, rl_colors.Color(0.8, 0.2, 0.2)),
+            ('O.Social', obra_social, rl_colors.Color(0.2, 0.4, 0.8)),
+            ('Sindical', sindical, rl_colors.Color(0.9, 0.6, 0.1)),
+            ('A.R.T.', art, rl_colors.Color(0.6, 0.2, 0.6)),
+            ('S.Vida', svida, rl_colors.Color(0.2, 0.8, 0.8)),
+            ('Otros', otros, rl_colors.Color(0.75, 0.75, 0.75)),
+        ]
+        slices = [(lbl, val, col) for lbl, val, col in slices if val > 0]
+        if not slices:
+            log.warning("[draw_pie_chart] Todos los slices son 0, omitiendo gráfico")
+            return
+
+        try:
+            # Pie (no labels — legend drawn manually below)
+            d = Drawing(size, size)
+            pie = Pie()
+            pie.x = 0
+            pie.y = 0
+            pie.width = size
+            pie.height = size
+            pie.data = [s[1] for s in slices]
+            pie.slices.strokeWidth = 0.5
+            pie.slices.strokeColor = rl_colors.white
+            for i, (_, _, col) in enumerate(slices):
+                pie.slices[i].fillColor = col
+            d.add(pie)
+            pie_draw_x = x + 1 * cm
+            renderPDF.draw(d, self.c, pie_draw_x, y - 0.33 * cm)
+
+            # "Costo Total" label above the pie
+            self.c.saveState()
+            self.c.setFont(FONT_FAMILY_BOLD, 6 + font_delta)
+            self.c.drawString(pie_draw_x, y + size + 0.1 * cm, "Total Costo")
+            self.c.drawString(pie_draw_x, y + size - 0.2 * cm, float_to_format_currency(total))
+            self.c.restoreState()
+
+            # 1-column legend to the right of the pie (fixed absolute position)
+            sq = 0.18 * cm
+            row_h = 0.27 * cm
+            legend_x = x + size + 1.3 * cm
+            legend_top = y + size - 0.33 * cm
+
+            self.c.saveState()
+            self.c.setFont(FONT_FAMILY, 5 + font_delta)
+            for i, (lbl, _, col) in enumerate(slices):
+                short = LABELS.get(lbl, {}).get('short', lbl[:3])
+                long = LABELS.get(lbl, {}).get('full', lbl)
+                description = long if self.has_duplicate else short
+                lx = legend_x
+                ly = legend_top - i * row_h
+                self.c.setFillColor(col)
+                self.c.rect(lx, ly - sq, sq, sq, fill=1, stroke=0)
+                self.c.setFillColorRGB(0, 0, 0)
+                self.c.drawString(lx + sq + 0.05 * cm, ly - sq + 0.02 * cm, description)
+            self.c.restoreState()
+
+            log.debug("[draw_pie_chart] Pie chart renderizado OK")
+        except Exception as e:
+            log.error(f"[draw_pie_chart] Error al renderizar el gráfico: {e}", exc_info=True)
 
 
-def draw_recibo(my_file_path, recibo_info, base_version: int = 1):
-    from reportlab.lib.pagesizes import landscape
-    if base_version == 1:
-        from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo as base_fn
-        pagesize = landscape(A4)
-    else:
-        base_fn = my_base_recibo
-        pagesize = A4
+    def draw_liquidacion_info(self, coordinates: dict) -> None:
+        """Dibuja la información de la liquidación en el recibo."""
+        text = self.info_recibo['tipo_liquidacion'][self.legajo]
 
-    # Create a canvas
-    c = canvas.Canvas(
-        filename=my_file_path,
-        pagesize=pagesize,
-    )
-    c.setTitle("Recibo de Sueldo")
-    c.setAuthor("PayrollJE")
+        offset_x = -0.4 * cm
 
-    # Get info from recibo_info
-    info_recibo = get_info_final_for_recibo(recibo_info)
+        # Original - Dibuja "Liquidación Final" centrado o usa drawString para otros casos
+        if text == 'Liquidación Final':
+            self.c.drawString(coordinates['liquidacion_info_x'] + offset_x, coordinates['liquidacion_info_y'], text)
+        else:
+            self.c.drawString(coordinates['liquidacion_info_x'], coordinates['liquidacion_info_y'], text)
 
-    # Add the format to the file
-    my_recibo_info = base_fn(c)
+        # Dibuja el período en el recibo original
+        self.c.drawString(coordinates['periodo_x'], coordinates['periodo_y'], self.info_recibo['periodo'])
 
-    # Get coordinates for recibo
-    coordinates = get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
-    legajos = info_recibo['legajos']
-    for index, legajo in enumerate(legajos):
-        if index > 0:
-            my_recibo_info = base_fn(c)
-            coordinates = get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
+        if coordinates.get('has_duplicate', True):
+            if text == 'Liquidación Final':
+                self.c.drawString(coordinates['dupl_liq_info_x'] + offset_x, coordinates['liquidacion_info_y'], text)
+            else:
+                self.c.drawString(coordinates['dupl_liq_info_x'], coordinates['liquidacion_info_y'], text)
 
-        draw_empleado(c, coordinates, info_recibo, legajo)
+            self.c.drawString(coordinates['dupl_periodo_x'], coordinates['periodo_y'], self.info_recibo['periodo'])
 
-        if index < len(legajos) - 1:
-            c.showPage()
 
-    c.save()
+
+class ReciboDownloader:
+    def __init__(self, json_data: dict, output_path: str, filename: str, base_version: int = 1):
+        self.base_version = base_version
+        self.json_data = json_data
+        self.output_path = output_path
+        self.filename = filename
+
+    @staticmethod
+    def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
+        first_line_y = my_recibo_info['company_info_y'] + my_recibo_info['company_info_height'] - 0.35 * cm
+        has_duplicate = my_recibo_info.get('has_duplicate', True)
+        base_x = my_recibo_info.get('margin_x', 0) + 0.2 * cm
+        base_x_ends = base_x + my_recibo_info['employee_info_width'] - 0.4 * cm
+        employee_right_ends = base_x_ends if has_duplicate else (base_x_ends - 1.0 * cm)
+        rem_column_shift = 0 if has_duplicate else 0.6 * cm
+        nr_column_shift = 0 if has_duplicate else 0.4 * cm
+        ap_column_shift = 0 if has_duplicate else 0.2 * cm
+        base_line_between = 0.5 * cm
+        base_line_between_2 = 0.43 * cm
+        starting_y_employee_info = my_recibo_info['employee_info_y'] + my_recibo_info['employee_info_height'] - 0.45 * cm
+
+        starting_y_conceptos = my_recibo_info['conceptos_titles_y'] - 0.45 * cm
+        starting_y_contribuciones = my_recibo_info['contribuciones_titles_y'] - 0.45 * cm
+        liquidacion_y_offset = -0.1 * cm if has_duplicate else -0.2 * cm
+        periodo_y_offset = -0.2 * cm if has_duplicate else -0.4 * cm
+
+        resp = {
+            'has_duplicate': has_duplicate,
+            'company_x': base_x,
+            'company_y': first_line_y,
+            'company_domicilio_x': base_x,
+            'company_domicilio_y': first_line_y - base_line_between,
+            'company_cuit_x': base_x,
+            'company_cuit_y': first_line_y - base_line_between * 2,
+
+            'liquidacion_info_x': my_recibo_info['liquidacion_info_x'] + my_recibo_info['liquidacion_info_width'] / 4,
+            'liquidacion_info_y': first_line_y - 0.1 * cm + liquidacion_y_offset,
+            'periodo_x': my_recibo_info['liquidacion_info_x'] + my_recibo_info['liquidacion_info_width'] / 4,
+            'periodo_y': first_line_y - 0.8 * cm + periodo_y_offset,
+
+            'nombre_x': base_x,
+            'nombre_y': starting_y_employee_info,
+            'categoria_x': base_x,
+            'categoria_y': starting_y_employee_info - base_line_between_2,
+            'posicion_x': base_x,
+            'posicion_y': starting_y_employee_info - base_line_between_2 * 2,
+            'area_x': base_x,
+            'area_y': starting_y_employee_info - base_line_between_2 * 3,
+            'contrato_x': base_x,
+            'contrato_y': starting_y_employee_info - base_line_between_2 * 4,
+            'obra_social_x': base_x,
+            'obra_social_y': starting_y_employee_info - base_line_between_2 * 5,
+            'legajo_e_ingreso_x_ends': employee_right_ends,
+            'legajo_e_ingreso_y': starting_y_employee_info,
+            'cuil_x_ends': employee_right_ends,
+            'cuil_y': starting_y_employee_info - base_line_between_2,
+            'basico_x_ends': employee_right_ends,
+            'basico_y': starting_y_employee_info - base_line_between_2 * 2,
+            'fecha_ingreso_2_x_ends': employee_right_ends,
+            'fecha_ingreso_2_y': starting_y_employee_info - base_line_between_2 * 3,
+
+            'starting_y_conceptos': starting_y_conceptos,
+            'starting_y_contribuciones': starting_y_contribuciones,
+            'conceptos_x': base_x,
+            'concepto_titles_x_cant': my_recibo_info['concepto_titles_x_cant'],
+            'concepto_titles_x_rem': my_recibo_info['concepto_titles_x_rem'],
+            'concepto_titles_x_nr': my_recibo_info['concepto_titles_x_nr'],
+            'concepto_titles_x_ap': my_recibo_info['concepto_titles_x_ap'],
+
+            'concepto_titles_x_cant_ends': my_recibo_info['concepto_titles_x_rem'],
+            'concepto_titles_x_rem_ends': my_recibo_info['concepto_titles_x_nr'] - rem_column_shift,
+            'concepto_titles_x_nr_ends': my_recibo_info['concepto_titles_x_ap'] - nr_column_shift,
+            'concepto_titles_x_ap_ends': base_x_ends - ap_column_shift,
+            'starting_y_totales': my_recibo_info['starting_y_totales'],
+            'starting_y_totales_neto': my_recibo_info['starting_y_totales_neto'],
+            'totales_x_rem': my_recibo_info['concepto_titles_x_rem'] - rem_column_shift,
+            'totales_x_nr': my_recibo_info['concepto_titles_x_nr'] - nr_column_shift,
+            'totales_x_ap': my_recibo_info['concepto_titles_x_ap'] - ap_column_shift,
+            'contribuciones_titles_y': my_recibo_info['contribuciones_titles_y'],
+            'neto_letras_y': my_recibo_info['starting_y_totales_neto'] - base_line_between_2 + 0.05 * cm,
+
+            'pie_de_pagina_x': base_x,
+            'pie_de_pagina_y': my_recibo_info['pie_pagina_y'],
+            'pie_de_pagina_width': my_recibo_info['pie_pagina_width'],
+            'pie_de_pagina_height': my_recibo_info['pie_pagina_height'],
+        }
+
+        if has_duplicate:
+            base_duplicate_x = my_recibo_info['duplicate_x'] + 0.2 * cm
+            base_duplicate_x_ends = base_duplicate_x + my_recibo_info['employee_info_width'] - 0.4 * cm
+            resp.update({
+                'dupl_company_x': base_duplicate_x,
+                'dupl_company_domicilio_x': base_duplicate_x,
+                'dupl_company_cuit_x': base_duplicate_x,
+                'dupl_liq_info_x': my_recibo_info['liquidacion_info_x_duplicate'] + my_recibo_info['liquidacion_info_width'] / 4,
+                'dupl_periodo_x': my_recibo_info['liquidacion_info_x_duplicate'] + my_recibo_info['liquidacion_info_width'] / 4,
+                'dupl_nombre_x': base_duplicate_x,
+                'dupl_categoria_x': base_duplicate_x,
+                'dupl_posicion_x': base_duplicate_x,
+                'dupl_area_x': base_duplicate_x,
+                'dupl_contrato_x': base_duplicate_x,
+                'dupl_obra_social_x': base_duplicate_x,
+                'dupl_legajo_e_ingreso_x_ends': base_duplicate_x_ends,
+                'dupl_cuil_x_ends': base_duplicate_x_ends,
+                'dupl_basico_x_ends': base_duplicate_x_ends,
+                'dupl_fecha_ingreso_2_x_ends': base_duplicate_x_ends,
+                'dupl_conceptos_x': base_duplicate_x,
+                'dupl_concepto_titles_x_cant': my_recibo_info['dupl_concepto_titles_x_cant'],
+                'dupl_concepto_titles_x_rem': my_recibo_info['dupl_concepto_titles_x_rem'],
+                'dupl_concepto_titles_x_nr': my_recibo_info['dupl_concepto_titles_x_nr'],
+                'dupl_concepto_titles_x_ap': my_recibo_info['dupl_concepto_titles_x_ap'],
+                'dupl_concepto_titles_x_cant_ends': my_recibo_info['dupl_concepto_titles_x_rem'],
+                'dupl_concepto_titles_x_rem_ends': my_recibo_info['dupl_concepto_titles_x_nr'],
+                'dupl_concepto_titles_x_nr_ends': my_recibo_info['dupl_concepto_titles_x_ap'],
+                'dupl_concepto_titles_x_ap_ends': base_duplicate_x_ends,
+                'dupl_pie_de_pagina_x': base_duplicate_x,
+            })
+
+        return resp
+
+    def draw_recibo(self, my_file_path):
+        """ Dibuja el recibo de sueldo en un archivo PDF.
+        """
+
+        if self.base_version == 1:
+            from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo as base_fn
+            pagesize = landscape(A4)
+        else:
+            base_fn = my_base_recibo
+            pagesize = A4
+
+        # Create a canvas
+        c = canvas.Canvas(
+            filename=my_file_path,
+            pagesize=pagesize,
+        )
+        c.setTitle("Recibo de Sueldo")
+        c.setAuthor("PayrollJE")
+
+        # Get info from recibo_info
+        info_recibo = get_info_final_for_recibo(self.recibo_info)
+
+        # Add the format to the file
+        my_recibo_info = base_fn(c)
+
+        # Get coordinates for recibo
+        coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
+        legajos = info_recibo['legajos']
+        for index, legajo in enumerate(legajos):
+            if index > 0:
+                my_recibo_info = base_fn(c)
+                coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
+
+            self.draw_empleado(c, coordinates, info_recibo, legajo)
+
+            if index < len(legajos) - 1:
+                c.showPage()
+
+        c.save()
+
+    def descargar_recibo(self) -> str:
+        """ Descarga el recibo de sueldo en formato PDF,
+            Retorna:
+            - final_path, None if OK
+            - False, error message if error
+        """
+
+        recibo_info = get_recibo_info(self.json_data)
+        if recibo_info.get("error"):
+            error_detail = recibo_info["error"]
+            return False, error_detail
+
+        # Cada liquidación va a tener su propia carpeta en download
+        my_path = self.output_path
+        if not os.path.exists(my_path):
+            os.makedirs(my_path)
+
+        if not self.filename.lower().endswith('.pdf'):
+            self.filename += '.pdf'
+        my_file_path = Path(my_path) / self.filename
+        my_file_path = str(my_file_path)
+        log.info(f"Descargando recibo en {my_file_path}")
+
+        try:
+            self.draw_recibo(my_file_path)
+        except Exception as e:
+            log.error(f"Error al renderizar recibo: {e}")
+            return False, "Error al renderizar el recibo"
+
+        return my_file_path, None

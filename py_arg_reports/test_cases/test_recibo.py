@@ -6,7 +6,7 @@ from pathlib import Path
 # Ensure the local workspace copy is imported, not the installed package
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from py_arg_reports.reporters.recibo_sueldo import descargar_recibo  # noqa: E402
+from py_arg_reports.reporters.recibo_sueldo import ReciboSueldo  # noqa: E402
 
 HERE = Path(__file__).parent
 
@@ -162,12 +162,15 @@ recibo_1_name = 'recibo_1_base1_landscape'
 recibo_2_name = 'recibo_2_base2_portrait'
 
 # recibo_1 -> Base 1 (landscape, duplicated)
-path, error = descargar_recibo(
+recibo_1 = ReciboSueldo(
     json_data=liquidacion_for_preview,
     output_path=str(downloads_dir),
     filename=recibo_1_name,
     base_version=1,
 )
+path, error = recibo_1.descargar_recibo()
+
+
 print(f'[recibo_1|base1] path: {path}  error: {error}')
 
 # recibo_2 -> Base 2 (portrait, single copy)
