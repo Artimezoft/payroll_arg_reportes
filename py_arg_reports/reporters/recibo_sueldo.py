@@ -210,15 +210,19 @@ def get_info_final_for_recibo(api_dict: dict) -> dict:
 
 def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     first_line_y = my_recibo_info['company_info_y'] + my_recibo_info['company_info_height'] - 0.35 * cm
+    has_duplicate = my_recibo_info.get('has_duplicate', True)
     base_x = my_recibo_info.get('margin_x', 0) + 0.2 * cm
     base_x_ends = base_x + my_recibo_info['employee_info_width'] - 0.4 * cm
+    employee_right_ends = base_x_ends if has_duplicate else (base_x_ends - 1.0 * cm)
+    rem_column_shift = 0 if has_duplicate else 0.6 * cm
+    nr_column_shift = 0 if has_duplicate else 0.4 * cm
+    ap_column_shift = 0 if has_duplicate else 0.2 * cm
     base_line_between = 0.5 * cm
     base_line_between_2 = 0.43 * cm
     starting_y_employee_info = my_recibo_info['employee_info_y'] + my_recibo_info['employee_info_height'] - 0.45 * cm
 
     starting_y_conceptos = my_recibo_info['conceptos_titles_y'] - 0.45 * cm
     starting_y_contribuciones = my_recibo_info['contribuciones_titles_y'] - 0.45 * cm
-    has_duplicate = my_recibo_info.get('has_duplicate', True)
     liquidacion_y_offset = -0.1 * cm if has_duplicate else -0.2 * cm
     periodo_y_offset = -0.2 * cm if has_duplicate else -0.4 * cm
 
@@ -248,13 +252,13 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
         'contrato_y': starting_y_employee_info - base_line_between_2 * 4,
         'obra_social_x': base_x,
         'obra_social_y': starting_y_employee_info - base_line_between_2 * 5,
-        'legajo_e_ingreso_x_ends': base_x_ends,
+        'legajo_e_ingreso_x_ends': employee_right_ends,
         'legajo_e_ingreso_y': starting_y_employee_info,
-        'cuil_x_ends': base_x_ends,
+        'cuil_x_ends': employee_right_ends,
         'cuil_y': starting_y_employee_info - base_line_between_2,
-        'basico_x_ends': base_x_ends,
+        'basico_x_ends': employee_right_ends,
         'basico_y': starting_y_employee_info - base_line_between_2 * 2,
-        'fecha_ingreso_2_x_ends': base_x_ends,
+        'fecha_ingreso_2_x_ends': employee_right_ends,
         'fecha_ingreso_2_y': starting_y_employee_info - base_line_between_2 * 3,
 
         'starting_y_conceptos': starting_y_conceptos,
@@ -266,14 +270,14 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
         'concepto_titles_x_ap': my_recibo_info['concepto_titles_x_ap'],
 
         'concepto_titles_x_cant_ends': my_recibo_info['concepto_titles_x_rem'],
-        'concepto_titles_x_rem_ends': my_recibo_info['concepto_titles_x_nr'],
-        'concepto_titles_x_nr_ends': my_recibo_info['concepto_titles_x_ap'],
-        'concepto_titles_x_ap_ends': base_x_ends,
+        'concepto_titles_x_rem_ends': my_recibo_info['concepto_titles_x_nr'] - rem_column_shift,
+        'concepto_titles_x_nr_ends': my_recibo_info['concepto_titles_x_ap'] - nr_column_shift,
+        'concepto_titles_x_ap_ends': base_x_ends - ap_column_shift,
         'starting_y_totales': my_recibo_info['starting_y_totales'],
         'starting_y_totales_neto': my_recibo_info['starting_y_totales_neto'],
-        'totales_x_rem': my_recibo_info['concepto_titles_x_rem'],
-        'totales_x_nr': my_recibo_info['concepto_titles_x_nr'],
-        'totales_x_ap': my_recibo_info['concepto_titles_x_ap'],
+        'totales_x_rem': my_recibo_info['concepto_titles_x_rem'] - rem_column_shift,
+        'totales_x_nr': my_recibo_info['concepto_titles_x_nr'] - nr_column_shift,
+        'totales_x_ap': my_recibo_info['concepto_titles_x_ap'] - ap_column_shift,
         'contribuciones_titles_y': my_recibo_info['contribuciones_titles_y'],
         'neto_letras_y': my_recibo_info['starting_y_totales_neto'] - base_line_between_2 + 0.05 * cm,
 
@@ -474,7 +478,7 @@ class ReciboSueldo:
             self.base_line_between = 0.5 * cm
 
         else:
-            self.font_size_main = FONT_SIZE_MAIN + 1 
+            self.font_size_main = FONT_SIZE_MAIN + 1
             self.font_size_body = FONT_SIZE_BODY + 1
             self.font_size_small = FONT_SIZE_SMALL + 1
             self.base_line_between = 0.7 * cm
@@ -766,10 +770,10 @@ class ReciboSueldo:
             pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
         else:
             pie_size = 1.5 * cm
-            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm
-            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm) - 1.0 * cm
+            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm + 3.0 * cm
+            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm) - 1.0 * cm + 1.0 * cm
 
-        font_delta = 2 if self.has_duplicate else 0
+        font_delta = 2 if not self.has_duplicate else 0
         draw_pie_chart(
             c,
             pie_x,
