@@ -219,8 +219,8 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     starting_y_conceptos = my_recibo_info['conceptos_titles_y'] - 0.45 * cm
     starting_y_contribuciones = my_recibo_info['contribuciones_titles_y'] - 0.45 * cm
     has_duplicate = my_recibo_info.get('has_duplicate', True)
-    liquidacion_y_offset = -0.1 * cm if has_duplicate else 0
-    periodo_y_offset = -0.2 * cm if has_duplicate else 0
+    liquidacion_y_offset = -0.1 * cm if has_duplicate else -0.2 * cm
+    periodo_y_offset = -0.2 * cm if has_duplicate else -0.4 * cm
 
     resp = {
         'has_duplicate': has_duplicate,
@@ -465,12 +465,19 @@ class ReciboSueldo:
         self.coordinates = coordinates
         self.info_recibo = info_recibo
         self.legajo = legajo
-        self.base_line_between = 0.5 * cm
         self.has_duplicate = coordinates.get('has_duplicate', True)
         self.total_contribuciones = 0.0
-        self.font_size_main = FONT_SIZE_MAIN + (1 if not self.has_duplicate else 0)
-        self.font_size_body = FONT_SIZE_BODY + (1 if not self.has_duplicate else 0)
-        self.font_size_small = FONT_SIZE_SMALL + (1 if not self.has_duplicate else 0)
+        if self.has_duplicate:
+            self.font_size_main = FONT_SIZE_MAIN
+            self.font_size_body = FONT_SIZE_BODY
+            self.font_size_small = FONT_SIZE_SMALL
+            self.base_line_between = 0.5 * cm
+
+        else:
+            self.font_size_main = FONT_SIZE_MAIN + 1 
+            self.font_size_body = FONT_SIZE_BODY + 1
+            self.font_size_small = FONT_SIZE_SMALL + 1
+            self.base_line_between = 0.7 * cm
 
     def _set_font(self, bold: bool = False, size: int | None = None) -> None:
         font_name = self.FONT_FAMILY_BOLD if bold else self.FONT_FAMILY

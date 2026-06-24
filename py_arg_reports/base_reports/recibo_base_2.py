@@ -32,9 +32,9 @@ def my_base_recibo(c: Canvas) -> dict:
     # Defining heights
     available_height = tot_y - 2 * margin_y
     available_width = tot_x - 2 * margin_x
-    company_name_height = available_height * 0.09 - margin_between_lines
-    employee_info_height = available_height * 0.16 - margin_between_lines
-    conceptos_height = available_height * 0.51 - margin_between_lines
+    company_name_height = available_height * 0.07 - margin_between_lines
+    employee_info_height = available_height * 0.13 - margin_between_lines
+    conceptos_height = available_height * 0.56 - margin_between_lines
     contribuciones_height = available_height * 0.13 - margin_between_lines
     total_height = available_height * 0.11 - margin_between_lines
 
