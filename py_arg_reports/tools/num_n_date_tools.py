@@ -16,6 +16,7 @@ def float_to_format_currency(float_value: float, include_currency: bool = True) 
 
     return f'{currency}{resp}'
 
+
 def nombre_mes(mes: int) -> str:
     month_names = {
         1: "Enero",

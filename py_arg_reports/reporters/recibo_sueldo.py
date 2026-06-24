@@ -333,7 +333,12 @@ class ReciboSueldo:
             f"Legajo: {self.legajo} - Ingreso: {data['fecha_ingreso']}"
         )
         self.draw_text_with_end_coordinate(self.c, coords['cuil_x_ends'], coords['cuil_y'], f"CUIL: {data['cuil']}")
-        self.draw_text_with_end_coordinate(self.c, coords['basico_x_ends'], coords['basico_y'], f"Remuneración Asignada: {data['basico']}")
+        self.draw_text_with_end_coordinate(
+            self.c,
+            coords['basico_x_ends'],
+            coords['basico_y'],
+            f"Remuneración Asignada: {data['basico']}"
+        )
         if data['fecha_ingreso_2']:
             self.draw_text_with_end_coordinate(
                 self.c,
@@ -413,7 +418,12 @@ class ReciboSueldo:
                     x_to_use = coords['concepto_titles_x_ap_ends']
                     x_to_use_dupl = coords.get('dupl_concepto_titles_x_ap_ends')
 
-                self.draw_text_with_end_coordinate(self.c, x_to_use, this_y, float_to_format_currency(importe, include_currency=False))
+                self.draw_text_with_end_coordinate(
+                    self.c,
+                    x_to_use,
+                    this_y,
+                    float_to_format_currency(importe, include_currency=False)
+                )
                 if self.has_duplicate:
                     self.draw_text_with_end_coordinate(
                         self.c,
@@ -585,14 +595,12 @@ class ReciboSueldo:
                 self.c.drawString(dupl_pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
                 self.c.drawString(dupl_pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
-
     def draw_empleado(self) -> None:
         """Compat layer over ReciboSueldo to preserve current public API."""
         self.draw_titles()
         self.draw_conceptos()
         self.draw_total()
         self.draw_signature()
-
 
     def draw_pie_chart(
         self,
@@ -640,30 +648,37 @@ class ReciboSueldo:
             'Neto': {
                 'short': 'Neto',
                 'full': 'Neto a Cobrar',
+                'value': neto,
             },
             'Seg.Social': {
                 'short': 'SS',
                 'full': 'Seguridad Social',
+                'value': seg_social,
             },
             'O.Social': {
                 'short': 'OS',
                 'full': 'Obra Social',
+                'value': obra_social,
             },
             'Sindical': {
                 'short': 'Sin',
                 'full': 'Sindicato',
+                'value': sindical,
             },
             'A.R.T.': {
                 'short': 'ART',
                 'full': 'A.R.T.',
+                'value': art,
             },
             'S.Vida': {
                 'short': 'SV',
                 'full': 'Seguro de Vida',
+                'value': svida,
             },
             'Otros': {
                 'short': 'Ot',
                 'full': 'Otros',
+                'value': otros,
             },
         }
 
@@ -708,15 +723,19 @@ class ReciboSueldo:
             # 1-column legend to the right of the pie (fixed absolute position)
             sq = 0.18 * cm
             row_h = 0.27 * cm
-            legend_x = x + size + 1.3 * cm
-            legend_top = y + size - 0.33 * cm
+            legend_x = x + size + 1.8 * cm
+            legend_top = y + size + 0.13 * cm
 
             self.c.saveState()
             self.c.setFont(FONT_FAMILY, 5 + font_delta)
             for i, (lbl, _, col) in enumerate(slices):
                 short = LABELS.get(lbl, {}).get('short', lbl[:3])
                 long = LABELS.get(lbl, {}).get('full', lbl)
-                description = long if self.has_duplicate else short
+                description = short
+                if not self.has_duplicate:
+                    value = LABELS.get(lbl, {}).get('value', 0)
+                    description = f"{long}: {float_to_format_currency(value)}"
+
                 lx = legend_x
                 ly = legend_top - i * row_h
                 self.c.setFillColor(col)
@@ -728,7 +747,6 @@ class ReciboSueldo:
             log.debug("[draw_pie_chart] Pie chart renderizado OK")
         except Exception as e:
             log.error(f"[draw_pie_chart] Error al renderizar el gráfico: {e}", exc_info=True)
-
 
     def draw_liquidacion_info(self) -> None:
         """Dibuja la información de la liquidación en el recibo."""
@@ -753,7 +771,6 @@ class ReciboSueldo:
                 self.c.drawString(coordinates['dupl_liq_info_x'], coordinates['liquidacion_info_y'], text)
 
             self.c.drawString(coordinates['dupl_periodo_x'], coordinates['periodo_y'], self.info_recibo['periodo'])
-
 
 
 class ReciboDownloader:
