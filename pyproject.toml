@@ -4,14 +4,14 @@ build-backend = "hatchling.build"
 
 [project]
 name = "payroll_arg_reportes"
-version = "0.0.94"
+version = "0.1.00"
 dependencies = [
   "numero-a-letras>=0.0.7",
   "reportlab>=4.4.10",
   "XlsxWriter>=3.2.9",
   "openpyxl>=3.1.4",
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.14"
 authors = [
   {name="Eugenio", email="coding_with@eugeniovazquez.com.ar"},
   {name="Andres", email="andres@data99.com.ar"},
