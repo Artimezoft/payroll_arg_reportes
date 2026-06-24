@@ -11,7 +11,7 @@ dependencies = [
   "XlsxWriter>=3.2.9",
   "openpyxl>=3.1.4",
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.14"
 authors = [
   {name="Eugenio", email="coding_with@eugeniovazquez.com.ar"},
   {name="Andres", email="andres@data99.com.ar"},

@@ -774,7 +774,7 @@ class ReciboSueldo:
 
 
 class ReciboDownloader:
-    def __init__(self, json_data: dict, output_path: str, filename: str, base_version: int = 1):
+    def __init__(self, json_data: list[dict] | dict, output_path: str, filename: str, base_version: int = 1):
         self.base_version = base_version
         self.json_data = json_data
         self.output_path = output_path
@@ -941,7 +941,7 @@ class ReciboDownloader:
 
         c.save()
 
-    def descargar_recibo(self) -> str:
+    def descargar_recibo(self) -> tuple[str | bool, str | None]:
         """ Descarga el recibo de sueldo en formato PDF,
             Retorna:
             - final_path, None if OK

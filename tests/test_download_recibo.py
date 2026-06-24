@@ -50,15 +50,14 @@ class TestDownloadRecibo(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls):
-        pass
         # Clean up: Delete the temporary folder and its contents
-        # if os.path.exists(cls.temp_folder):
-        #     for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
-        #         for file in files:
-        #             os.remove(os.path.join(root, file))
-        #         for dir in dirs:
-        #             os.rmdir(os.path.join(root, dir))
-        #     os.rmdir(cls.temp_folder)
+        if os.path.exists(cls.temp_folder):
+            for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
+                for file in files:
+                    os.remove(os.path.join(root, file))
+                for dir in dirs:
+                    os.rmdir(os.path.join(root, dir))
+            os.rmdir(cls.temp_folder)
 
     def test_descarga_recibo_1(self):
         """ Prueba la descarga del archivo
