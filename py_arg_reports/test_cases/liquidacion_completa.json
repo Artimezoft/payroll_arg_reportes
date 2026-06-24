@@ -73,7 +73,7 @@
                 },
                 "orden": 12,
                 "cantidad": 30.0,
-                "importe": 111739.19
+                "importe": 2111739.19
             },
             {
                 "concepto": {
@@ -187,10 +187,10 @@
             }
         ],
         "totales_liquidacion": {
-            "total_remunerativo": 125892.82073333333,
+            "total_remunerativo": 2125892.82073333333,
             "total_no_remunerativo": 28325.884664999998,
             "total_retenciones": 25357.247159624996,
-            "neto_liquidacion": 128861.45823870832
+            "neto_liquidacion": 2128861.45823870832
         }
     },
     {

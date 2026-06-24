@@ -102,7 +102,7 @@ def get_recibo_info(json_data: dict) -> dict:
 
 def get_info_final_for_recibo(api_dict: dict) -> dict:
     first_liquidacion = api_dict["liquidaciones"][0]
-    periodo = first_liquidacion["periodo"]["periodo"]
+    periodo = first_liquidacion["periodo"]["periodo"].replace('-', '/')
     company_name = api_dict["empresa"]["name"]
     cuit = api_dict["empresa"]["cuit"]
     domicilio_obj = api_dict["empresa"]["domicilio"]
@@ -219,6 +219,8 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     starting_y_conceptos = my_recibo_info['conceptos_titles_y'] - 0.45 * cm
     starting_y_contribuciones = my_recibo_info['contribuciones_titles_y'] - 0.45 * cm
     has_duplicate = my_recibo_info.get('has_duplicate', True)
+    liquidacion_y_offset = -0.1 * cm if has_duplicate else 0
+    periodo_y_offset = -0.2 * cm if has_duplicate else 0
 
     resp = {
         'has_duplicate': has_duplicate,
@@ -230,9 +232,9 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
         'company_cuit_y': first_line_y - base_line_between * 2,
 
         'liquidacion_info_x': my_recibo_info['liquidacion_info_x'] + my_recibo_info['liquidacion_info_width'] / 4,
-        'liquidacion_info_y': first_line_y - 0.1 * cm,
+        'liquidacion_info_y': first_line_y - 0.1 * cm + liquidacion_y_offset,
         'periodo_x': my_recibo_info['liquidacion_info_x'] + my_recibo_info['liquidacion_info_width'] / 4,
-        'periodo_y': first_line_y - 0.8 * cm,
+        'periodo_y': first_line_y - 0.8 * cm + periodo_y_offset,
 
         'nombre_x': base_x,
         'nombre_y': starting_y_employee_info,
@@ -315,8 +317,15 @@ def get_coordinates_for_recibo(my_recibo_info: dict) -> dict:
     return resp
 
 
-def draw_pie_chart(c: canvas.Canvas, x: float, y: float, size: float,
-                   totales: dict, conceptos: list) -> None:
+def draw_pie_chart(
+    c: canvas.Canvas,
+    x: float,
+    y: float,
+    size: float,
+    totales: dict,
+    conceptos: list,
+    font_delta: int = 0
+) -> None:
     """Dibuja un gráfico de torta con la distribución salarial.
     Solo se dibuja si 'main_agrupadores' está presente en totales.
     """
@@ -347,7 +356,7 @@ def draw_pie_chart(c: canvas.Canvas, x: float, y: float, size: float,
     total_contribuciones = totales.get('total_contribuciones') or sum(
         item['importe'] for item in conceptos if item.get('tipo_concepto') == 4
     )
-    total = total_rem + total_no_rem + total_contribuciones
+    total = totales.get('costo_conceptos') or (total_rem + total_no_rem + total_contribuciones)
     otros = max(0, total - neto - seg_social - obra_social - sindical - art - svida)
 
     SHORT_LABELS = {
@@ -388,23 +397,24 @@ def draw_pie_chart(c: canvas.Canvas, x: float, y: float, size: float,
         for i, (_, _, col) in enumerate(slices):
             pie.slices[i].fillColor = col
         d.add(pie)
-        pie_draw_x = x + 0.4 * cm
-        renderPDF.draw(d, c, pie_draw_x, y)
+        pie_draw_x = x + 1 * cm
+        renderPDF.draw(d, c, pie_draw_x, y - 0.33 * cm)
 
         # "Costo Total" label above the pie
         c.saveState()
-        c.setFont(FONT_FAMILY_BOLD, 6)
-        c.drawString(pie_draw_x, y + size + 0.08 * cm, f"Costo Total {float_to_format_currency(total)}")
+        c.setFont(FONT_FAMILY_BOLD, 6 + font_delta)
+        c.drawString(pie_draw_x, y + size + 0.1 * cm, "Total Costo")
+        c.drawString(pie_draw_x, y + size - 0.2 * cm, float_to_format_currency(total))
         c.restoreState()
 
         # 1-column legend to the right of the pie (fixed absolute position)
         sq = 0.18 * cm
         row_h = 0.27 * cm
-        legend_x = x + size + 0.7 * cm
-        legend_top = y + size - 0.03 * cm
+        legend_x = x + size + 1.3 * cm
+        legend_top = y + size - 0.33 * cm
 
         c.saveState()
-        c.setFont(FONT_FAMILY, 5)
+        c.setFont(FONT_FAMILY, 5 + font_delta)
         for i, (lbl, _, col) in enumerate(slices):
             short = SHORT_LABELS.get(lbl, lbl[:3])
             lx = legend_x
@@ -458,6 +468,14 @@ class ReciboSueldo:
         self.base_line_between = 0.5 * cm
         self.has_duplicate = coordinates.get('has_duplicate', True)
         self.total_contribuciones = 0.0
+        self.font_size_main = FONT_SIZE_MAIN + (1 if not self.has_duplicate else 0)
+        self.font_size_body = FONT_SIZE_BODY + (1 if not self.has_duplicate else 0)
+        self.font_size_small = FONT_SIZE_SMALL + (1 if not self.has_duplicate else 0)
+
+    def _set_font(self, bold: bool = False, size: int | None = None) -> None:
+        font_name = self.FONT_FAMILY_BOLD if bold else self.FONT_FAMILY
+        font_size = size if size is not None else (self.font_size_main if bold else self.font_size_body)
+        self.c.setFont(font_name, font_size)
 
     def _get_employee_data(self) -> dict:
         obra_social = self.info_recibo['obras_sociales'][self.legajo]
@@ -482,21 +500,21 @@ class ReciboSueldo:
         c = self.c
         coords = self.coordinates
 
-        c.setFont(self.FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
+        self._set_font(bold=True, size=self.font_size_main)
         c.drawString(coords['company_x'], coords['company_y'], self.info_recibo['company_name'])
-        c.setFont(self.FONT_FAMILY, FONT_SIZE_MAIN)
+        self._set_font(bold=False, size=self.font_size_main)
         c.drawString(coords['company_domicilio_x'], coords['company_domicilio_y'], self.info_recibo['domicilio'])
         c.drawString(coords['company_cuit_x'], coords['company_cuit_y'], f'CUIT: {self.info_recibo["cuit"]}')
 
         if self.has_duplicate:
-            c.setFont(self.FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
+            self._set_font(bold=True, size=self.font_size_main)
             c.drawString(coords['dupl_company_x'], coords['company_y'], self.info_recibo['company_name'])
-            c.setFont(self.FONT_FAMILY, FONT_SIZE_MAIN)
+            self._set_font(bold=False, size=self.font_size_main)
             c.drawString(coords['dupl_company_domicilio_x'], coords['company_domicilio_y'], self.info_recibo['domicilio'])
             c.drawString(coords['dupl_company_cuit_x'], coords['company_cuit_y'], f'CUIT: {self.info_recibo["cuit"]}')
 
         draw_liquidacion_info(c, coords, self.info_recibo, self.legajo)
-        c.setFont(self.FONT_FAMILY, FONT_SIZE_BODY)
+        self._set_font(bold=False, size=self.font_size_body)
 
         data = self._get_employee_data()
         c.drawString(coords['nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
@@ -613,12 +631,12 @@ class ReciboSueldo:
                 this_contribucion += f": {float_to_format_currency(importe, include_currency=False)}"
                 self.total_contribuciones += importe
 
-                c.setFont(self.FONT_FAMILY, FONT_SIZE_SMALL)
+                self._set_font(bold=False, size=self.font_size_small)
                 c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
                 if self.has_duplicate:
                     c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
                 contribuciones_count += 1
-                c.setFont(self.FONT_FAMILY, FONT_SIZE_BODY)
+                self._set_font(bold=False, size=self.font_size_body)
 
                 if contribuciones_count % max_contribuciones_per_column == 0:
                     this_contribuciones_y = coords['starting_y_contribuciones']
@@ -654,7 +672,7 @@ class ReciboSueldo:
             coords['starting_y_totales'],
             float_to_format_currency(totales_retenciones, include_currency=False)
         )
-        c.setFont(self.FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
+        self._set_font(bold=True, size=self.font_size_main)
         c.drawString(
             coords['totales_x_ap'] - 0.5 * cm,
             coords['starting_y_totales_neto'],
@@ -665,7 +683,7 @@ class ReciboSueldo:
             coords['contribuciones_titles_y'],
             float_to_format_currency(self.total_contribuciones, include_currency=False)
         )
-        c.setFont(self.FONT_FAMILY, FONT_SIZE_BODY)
+        self._set_font(bold=False, size=self.font_size_body)
 
         if self.has_duplicate:
             c.drawString(
@@ -683,7 +701,7 @@ class ReciboSueldo:
                 coords['starting_y_totales'],
                 float_to_format_currency(totales_retenciones, include_currency=False)
             )
-            c.setFont(self.FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
+            self._set_font(bold=True, size=self.font_size_main)
             c.drawString(
                 coords['dupl_concepto_titles_x_ap'] - 0.5 * cm,
                 coords['starting_y_totales_neto'], float_to_format_currency(neto_liquidacion, include_currency=False)
@@ -694,7 +712,7 @@ class ReciboSueldo:
                 float_to_format_currency(self.total_contribuciones, include_currency=False)
             )
 
-        c.setFont(self.FONT_FAMILY, FONT_SIZE_BODY)
+        self._set_font(bold=False, size=self.font_size_body)
         c.drawString(coords['company_x'], coords['neto_letras_y'], f"Son: {neto_en_letras}")
         if self.has_duplicate:
             c.drawString(coords['dupl_company_x'], coords['neto_letras_y'], f"Son: {neto_en_letras}")
@@ -724,9 +742,9 @@ class ReciboSueldo:
             pagado_como = f'CBU: {cbu}' if cbu else f'Cuenta: {numero_cuenta}'
 
         c.drawString(pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
-        c.setFont(self.FONT_FAMILY_BOLD, FONT_SIZE_BODY)
+        self._set_font(bold=True, size=self.font_size_body)
         c.drawString(pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
-        c.setFont(self.FONT_FAMILY, FONT_SIZE_BODY)
+        self._set_font(bold=False, size=self.font_size_body)
         if self.info_recibo['ultimo_pago_ss']['id']:
             periodo_ss = f'{nombre_mes(int(self.info_recibo["ultimo_pago_ss"]["mes"]))}'
             periodo_ss += f' {self.info_recibo["ultimo_pago_ss"]["anio"]}'
@@ -737,36 +755,29 @@ class ReciboSueldo:
 
         if self.has_duplicate:
             pie_size = 1.0 * cm
-            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.58
+            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.58 - 2.0 * cm
+            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
         else:
             pie_size = 1.5 * cm
-            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm
-        pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
+            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm
+            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm) - 1.0 * cm
 
+        font_delta = 2 if self.has_duplicate else 0
         draw_pie_chart(
             c,
             pie_x,
             pie_y,
             pie_size,
             self.info_recibo['totales_liquidacion'][self.legajo],
-            self.info_recibo['conceptos_liquidados'][self.legajo]
+            self.info_recibo['conceptos_liquidados'][self.legajo],
+            font_delta=font_delta,
         )
 
         if self.has_duplicate:
-            dupl_pie_x = dupl_pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.58
-            draw_pie_chart(
-                c,
-                dupl_pie_x,
-                pie_y,
-                pie_size,
-                self.info_recibo['totales_liquidacion'][self.legajo],
-                self.info_recibo['conceptos_liquidados'][self.legajo]
-            )
-
             c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
-            c.setFont(self.FONT_FAMILY_BOLD, FONT_SIZE_BODY)
+            self._set_font(bold=True, size=self.font_size_body)
             c.drawString(dupl_pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
-            c.setFont(self.FONT_FAMILY, FONT_SIZE_BODY)
+            self._set_font(bold=False, size=self.font_size_body)
             if self.info_recibo['ultimo_pago_ss']['id']:
                 periodo_ss = f'{nombre_mes(int(self.info_recibo["ultimo_pago_ss"]["mes"]))}'
                 periodo_ss += f' {self.info_recibo["ultimo_pago_ss"]["anio"]}'
@@ -785,7 +796,7 @@ def draw_empleado(c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo
     recibo.draw_signature()
 
 
-def descargar_recibo(json_data: dict, output_path: str, filename: str, base_version: int = 2) -> str:
+def descargar_recibo(json_data: dict, output_path: str, filename: str, base_version: int = 1) -> str:
     """ Descarga el recibo de sueldo en formato PDF,
         Retorna:
           - final_path, None if OK
@@ -817,7 +828,7 @@ def descargar_recibo(json_data: dict, output_path: str, filename: str, base_vers
     return my_file_path, None
 
 
-def draw_recibo(my_file_path, recibo_info, base_version: int = 2):
+def draw_recibo(my_file_path, recibo_info, base_version: int = 1):
     from reportlab.lib.pagesizes import landscape
     if base_version == 1:
         from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo as base_fn

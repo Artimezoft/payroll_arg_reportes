@@ -28,6 +28,11 @@ def add_mock_pie_data(data: list) -> list:
                 'AP_SIN': 1500,
                 'CT_SIN': 2500,
             }
+
+        if not totales.get('costo_conceptos'):
+            conceptos = item.get('conceptos_liquidados', [])
+            totales['costo_conceptos'] = round(sum(c.get('importe', 0) for c in conceptos), 2)
+
         item['totales_liquidacion'] = totales
 
     return with_chart_data
