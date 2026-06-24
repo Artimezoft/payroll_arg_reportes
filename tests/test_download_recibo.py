@@ -5,7 +5,7 @@ import unittest
 
 from PyPDF2 import PdfReader
 
-from py_arg_reports.reporters.recibo_sueldo import descargar_recibo
+from py_arg_reports.reporters.recibo_sueldo import ReciboDownloader
 
 
 class TestDownloadRecibo(unittest.TestCase):
@@ -63,12 +63,12 @@ class TestDownloadRecibo(unittest.TestCase):
     def test_descarga_recibo_1(self):
         """ Prueba la descarga del archivo
         """
-        full_path, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.short_json,
             output_path=self.temp_folder,
             filename='recibo_prueba_1',
         )
-
+        full_path, error = recibo_downloader.descargar_recibo()
         self.assertIsNone(error)
 
         # Check if the file exists
@@ -85,11 +85,12 @@ class TestDownloadRecibo(unittest.TestCase):
     def test_descarga_recibo_2(self):
         """ Prueba la descarga del archivo full
         """
-        full_path, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.long_json,
             output_path=self.temp_folder,
             filename='recibo_prueba_2',
         )
+        full_path, error = recibo_downloader.descargar_recibo()
 
         self.assertIsNone(error)
 
@@ -107,32 +108,35 @@ class TestDownloadRecibo(unittest.TestCase):
     def test_descarga_empty_json(self):
         """ Prueba la descarga del archivo para un json vacío
         """
-        _, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.empty_json,
             output_path=self.temp_folder,
             filename='recibo_prueba_3',
         )
+        full_path, error = recibo_downloader.descargar_recibo()
 
         self.assertEqual(error, 'No se puede descargar el recibo, no hay datos')
 
     def test_key_missing_json(self):
         """ Prueba la descarga del archivo para un json sin la key 'results'
         """
-        _, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.key_missing_json,
             output_path=self.temp_folder,
             filename='recibo_prueba_5',
         )
+        _, error = recibo_downloader.descargar_recibo()
 
         self.assertEqual(error, 'No se puede descargar el recibo, no se observa totales_liquidacion en los datos')
 
     def test_descarga_con_contribuciones(self):
         """ Test PDF generation with contributions (tipo_concepto: 4) """
-        full_path, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.contributions_json,
             output_path=self.temp_folder,
             filename='recibo_contribuciones_test',
         )
+        full_path, error = recibo_downloader.descargar_recibo()
 
         self.assertIsNone(error)
         self.assertTrue(os.path.exists(full_path))
@@ -154,11 +158,12 @@ class TestDownloadRecibo(unittest.TestCase):
 
     def test_excluded_concepts_not_in_pdf(self):
         """ Test that excluded concepts (CREFIS) don't appear in PDF """
-        full_path, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.contributions_json,
             output_path=self.temp_folder,
             filename='recibo_excluded_test',
         )
+        full_path, error = recibo_downloader.descargar_recibo()
 
         self.assertIsNone(error)
         self.assertTrue(os.path.exists(full_path))
@@ -174,11 +179,12 @@ class TestDownloadRecibo(unittest.TestCase):
 
     def test_total_contribuciones_calculation(self):
         """ Test that total contributions are calculated and displayed correctly """
-        full_path, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.contributions_json,
             output_path=self.temp_folder,
             filename='recibo_total_contribuciones_test',
         )
+        full_path, error = recibo_downloader.descargar_recibo()
 
         self.assertIsNone(error)
         self.assertTrue(os.path.exists(full_path))
@@ -194,11 +200,12 @@ class TestDownloadRecibo(unittest.TestCase):
     def test_multiple_contributions_rendering(self):
         """ Test that multiple contributions render correctly in columns """
         # Create additional contributions fixture if needed for this test
-        full_path, error = descargar_recibo(
+        recibo_downloader = ReciboDownloader(
             json_data=self.contributions_json,
             output_path=self.temp_folder,
             filename='recibo_multiple_contrib_test',
         )
+        full_path, error = recibo_downloader.descargar_recibo()
 
         self.assertIsNone(error)
         self.assertTrue(os.path.exists(full_path))
