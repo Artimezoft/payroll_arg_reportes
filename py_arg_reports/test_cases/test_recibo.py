@@ -6,7 +6,7 @@ from pathlib import Path
 # Ensure the local workspace copy is imported, not the installed package
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
-from py_arg_reports.reporters.recibo_sueldo import ReciboDownloader  # noqa: E402
+from py_arg_reports.reporters.recibo_sueldo.base import ReciboDownloader  # noqa: E402
 
 HERE = Path(__file__).parent
 

@@ -5,7 +5,7 @@ import unittest
 
 from PyPDF2 import PdfReader
 
-from py_arg_reports.reporters.recibo_sueldo import ReciboDownloader
+from py_arg_reports.reporters.recibo_sueldo.base import ReciboDownloader
 
 
 class TestDownloadRecibo(unittest.TestCase):

@@ -1,13 +1,14 @@
 import logging
 import os
+from abc import ABC, abstractmethod
 from pathlib import Path
-from numero_a_letras import numero_a_letras
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.units import cm
-from reportlab.pdfgen import canvas
 
-from py_arg_reports.base_reports.recibo_base_2 import my_base_recibo
+from numero_a_letras import numero_a_letras
+from reportlab.lib.units import cm
+from reportlab.pdfgen.canvas import Canvas
+
 from py_arg_reports.config import config_constants
+from py_arg_reports.reporters.recibo_sueldo.layouts import get_layout_for_version
 from py_arg_reports.tools.num_n_date_tools import (
     float_to_format_currency,
     formatted_date_str,
@@ -24,6 +25,23 @@ FONT_SIZE_SMALL = config_constants['FONT_SIZE_SMALL']
 EXCLUDED_CONCEPTS = [
     'CREFIS',
 ]
+
+
+
+class FormatoReciboSueldo(ABC):
+    """Base class for all salary receipt layouts."""
+
+    def __init__(self, canvas: Canvas):
+        self.canvas = canvas
+        self.coordinates = {}
+
+    @abstractmethod
+    def draw_background(self) -> None:
+        """Draw rectangles, lines and static labels."""
+        ...
+
+    def get_coordinates(self) -> dict:
+        return self.coordinates
 
 
 def get_recibo_info(json_data: dict) -> dict:
@@ -212,7 +230,7 @@ class ReciboSueldo:
     FONT_FAMILY = config_constants['FONT_FAMILY']
     FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']
 
-    def __init__(self, c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: str, base_version: int = 1) -> None:
+    def __init__(self, c: Canvas, coordinates: dict, info_recibo: dict, legajo: str, base_version: int = 1) -> None:
         self.c = c
         self.coordinates = coordinates
         self.info_recibo = info_recibo
@@ -897,18 +915,12 @@ class ReciboDownloader:
     def draw_recibo(self, my_file_path):
         """ Dibuja el recibo de sueldo en un archivo PDF.
         """
-
-        if self.base_version == 1:
-            from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo as base_fn
-            pagesize = landscape(A4)
-        else:
-            base_fn = my_base_recibo
-            pagesize = A4
+        layout = get_layout_for_version(self.base_version)
 
         # Create a canvas
-        c = canvas.Canvas(
+        c = Canvas(
             filename=my_file_path,
-            pagesize=pagesize,
+            pagesize=layout.pagesize,
         )
         c.setTitle("Recibo de Sueldo")
         c.setAuthor("PayrollJE")
@@ -917,14 +929,14 @@ class ReciboDownloader:
         info_recibo = get_info_final_for_recibo(self.recibo_info)
 
         # Add the format to the file
-        my_recibo_info = base_fn(c)
+        my_recibo_info = layout.draw_background(c)
 
         # Get coordinates for recibo
         coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
         legajos = info_recibo['legajos']
         for index, legajo in enumerate(legajos):
             if index > 0:
-                my_recibo_info = base_fn(c)
+            my_recibo_info = layout.draw_background(c)
                 coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
 
             recibo_sueldo = ReciboSueldo(
