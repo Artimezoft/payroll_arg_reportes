@@ -936,7 +936,7 @@ class ReciboDownloader:
         legajos = info_recibo['legajos']
         for index, legajo in enumerate(legajos):
             if index > 0:
-            my_recibo_info = layout.draw_background(c)
+                my_recibo_info = layout.draw_background(c)
                 coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
 
             recibo_sueldo = ReciboSueldo(

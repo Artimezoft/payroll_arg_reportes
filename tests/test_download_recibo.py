@@ -104,6 +104,25 @@ class TestDownloadRecibo(unittest.TestCase):
 
         self.assertEqual(num_sheets, 25)
 
+    def test_descarga_recibo_3_poc(self):
+        """ Prueba el nuevo enfoque abstracto con layout class-based (base_version=3). """
+        recibo_downloader = ReciboDownloader(
+            json_data=self.short_json,
+            output_path=self.temp_folder,
+            filename='recibo_prueba_3_poc',
+            base_version=3,
+        )
+        full_path, error = recibo_downloader.descargar_recibo()
+
+        self.assertIsNone(error)
+        self.assertTrue(os.path.exists(full_path))
+
+        with open(full_path, 'rb') as file:
+            pdf = PdfReader(file)
+            num_sheets = len(pdf.pages)
+
+        self.assertEqual(num_sheets, 3)
+
     def test_descarga_empty_json(self):
         """ Prueba la descarga del archivo para un json vacío
         """
