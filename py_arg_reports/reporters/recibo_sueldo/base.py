@@ -64,6 +64,10 @@ class ReciboPart(ABC):
     def bounds(self) -> ReciboPartBounds:
         return self.recibo.get_part_bounds(self.name)
 
+    @classmethod
+    def applies_to(cls, recibo: "ReciboSueldo") -> bool:
+        return True
+
     @abstractmethod
     def draw(self) -> None:
         ...
@@ -101,6 +105,10 @@ class ContribucionesPart(ReciboPart):
 class CompositionSalarioPart(ReciboPart):
     name = 'composition_salario'
 
+    @classmethod
+    def applies_to(cls, recibo: "ReciboSueldo") -> bool:
+        return recibo.base_version == 3
+
     def draw(self) -> None:
         self.recibo.draw_composition_salario()
 
@@ -108,8 +116,14 @@ class CompositionSalarioPart(ReciboPart):
 class SignaturePart(ReciboPart):
     name = 'signature'
 
+    @classmethod
+    def applies_to(cls, recibo: "ReciboSueldo") -> bool:
+        return recibo.base_version != 3
+
     def draw(self) -> None:
         self.recibo.draw_signature()
+        # Legacy layouts historically rendered salary composition in this area.
+        self.recibo.draw_composition_salario()
 
 
 def get_recibo_info(json_data: dict) -> dict:
@@ -714,14 +728,15 @@ class ReciboSueldo:
             part.draw()
 
     def get_parts(self) -> list[ReciboPart]:
-        return [
-            TitlePart(self),
-            EmployeePart(self),
-            ContribucionesPart(self),
-            ConceptosPart(self),
-            CompositionSalarioPart(self),
-            SignaturePart(self),
+        part_classes: list[type[ReciboPart]] = [
+            TitlePart,
+            EmployeePart,
+            ContribucionesPart,
+            ConceptosPart,
+            CompositionSalarioPart,
+            SignaturePart,
         ]
+        return [part_cls(self) for part_cls in part_classes if part_cls.applies_to(self)]
 
     def get_part_bounds(self, part_name: str) -> ReciboPartBounds:
         coords = self.coordinates
