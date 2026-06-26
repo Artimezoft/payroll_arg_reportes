@@ -1,7 +1,12 @@
+from __future__ import annotations
+
+from dataclasses import asdict, dataclass
+from typing import Mapping
+
 from reportlab.lib.units import cm
 
-from py_arg_reports.reporters.recibo_sueldo.base import FormatoReciboSueldo
 from py_arg_reports.config import config_constants
+from py_arg_reports.reporters.recibo_sueldo.base import FormatoReciboSueldo
 
 FONT_FAMILY = config_constants["FONT_FAMILY"]
 FONT_FAMILY_BOLD = config_constants["FONT_FAMILY_BOLD"]
@@ -9,114 +14,201 @@ FONT_SIZE_MAIN = config_constants["FONT_SIZE_MAIN"]
 FONT_SIZE_BODY = config_constants["FONT_SIZE_BODY"]
 
 
-class FormatoRecibo3(FormatoReciboSueldo):
-    """Proof-of-concept reusable layout implementation.
+@dataclass(frozen=True)
+class Recibo3LayoutConfig:
+    """Configuracion parametrica para el layout de recibo_3.
 
-    This class keeps the same coordinate contract expected by
-    ReciboDownloader.get_coordinates_for_recibo so the rendering pipeline can
-    remain stable while new layouts become class-based and reusable.
+    Todas las medidas en cm salvo corner_radius (puntos), y los campos *_share
+    y *_ratio que son proporciones.
     """
+
+    page_width_cm: float = 19.0
+    page_height_cm: float = 29.7
+    translate_x_cm: float = 1.0
+    translate_y_cm: float = 1.0
+
+    margin_x_cm: float = 0.4
+    margin_y_cm: float = 0.3
+    section_gap_cm: float = 0.2
+    top_offset_cm: float = 0.9
+
+    corner_radius: float = 7.0
+    gray_fill: float = 0.93
+
+    company_share: float = 0.07
+    employee_share: float = 0.13
+    conceptos_share: float = 0.58
+    contribuciones_share: float = 0.11
+    footer_share: float = 0.11
+
+    company_width_ratio: float = 0.78
+    liquidacion_gap_cm: float = 0.1
+
+    conceptos_title_y_offset_cm: float = 0.3
+    conceptos_title_left_x_offset_cm: float = 0.5
+    conceptos_title_cant_ratio: float = 0.56
+    conceptos_title_rem_ratio: float = 0.68
+    conceptos_title_nr_ratio: float = 0.80
+    conceptos_title_ap_ratio: float = 0.91
+    conceptos_title_cant_label_offset_cm: float = 0.1
+    conceptos_title_rem_label_offset_cm: float = 0.2
+    conceptos_title_nr_label_offset_cm: float = 0.2
+    conceptos_title_ap_label_offset_cm: float = 0.2
+
+    totales_line_ratio_in_conceptos: float = 0.15
+    totales_label_offset_cm: float = 0.5
+    neto_label_y_offset_cm: float = 0.6
+    neto_label_right_padding_cm: float = 5.2
+
+    footer_extra_gap_cm: float = 0.25
+    footer_height_scale: float = 1.1
+    pie_pagina_y_offset_cm: float = 0.45
+    footer_split_ratio: float = 0.5
+    footer_split_offset_cm: float = 2.0
+
+    @classmethod
+    def from_mapping(cls, overrides: Mapping[str, float] | None = None) -> "Recibo3LayoutConfig":
+        if not overrides:
+            return cls()
+
+        known_keys = set(cls.__dataclass_fields__.keys())
+        filtered = {k: v for k, v in overrides.items() if k in known_keys}
+        return cls(**filtered)
+
+    def with_overrides(self, overrides: Mapping[str, float] | None = None) -> "Recibo3LayoutConfig":
+        if not overrides:
+            return self
+        payload = asdict(self)
+        for key, value in overrides.items():
+            if key in payload:
+                payload[key] = value
+        return Recibo3LayoutConfig(**payload)
+
+
+class FormatoRecibo3(FormatoReciboSueldo):
+    """Layout class-based con coordenadas configurables.
+
+    Mantiene el contrato de salida esperado por ReciboDownloader.get_coordinates_for_recibo.
+    Soporta configuracion via config_constants['RECIBO_3_LAYOUT'] y via argumento explicito.
+    """
+
+    _default_config = Recibo3LayoutConfig()
+
+    def __init__(self, canvas, config_overrides: Mapping[str, float] | None = None):
+        super().__init__(canvas)
+        constants_overrides = config_constants.get("RECIBO_3_LAYOUT", {})
+        self.config = self._default_config.with_overrides(constants_overrides).with_overrides(config_overrides)
+
+    @classmethod
+    def configure_defaults(cls, overrides: Mapping[str, float] | None = None) -> None:
+        """Permite ajustar defaults en runtime para nuevos layouts/versiones."""
+        cls._default_config = cls._default_config.with_overrides(overrides)
+
+    def _get_section_heights(self, available_height: float) -> dict[str, float]:
+        cfg = self.config
+        shares = {
+            "company": max(cfg.company_share, 0),
+            "employee": max(cfg.employee_share, 0),
+            "conceptos": max(cfg.conceptos_share, 0),
+            "contribuciones": max(cfg.contribuciones_share, 0),
+            "footer": max(cfg.footer_share, 0),
+        }
+        total_share = sum(shares.values()) or 1.0
+        return {
+            name: available_height * (share / total_share) - cfg.section_gap_cm * cm
+            for name, share in shares.items()
+        }
 
     def draw_background(self):
         c = self.canvas
+        cfg = self.config
 
-        tot_x = 19 * cm
-        tot_y = 29.7 * cm
-        margin_between_lines = 0.2 * cm
-        def_radius = 7
-        margin_x = 0.4 * cm
+        tot_x = cfg.page_width_cm * cm
+        tot_y = cfg.page_height_cm * cm
+        margin_x = cfg.margin_x_cm * cm
+        margin_y = cfg.margin_y_cm * cm
+        section_gap = cfg.section_gap_cm * cm
 
         self.coordinates = {
             "tot_x": tot_x,
             "tot_y": tot_y,
-            "margin_between_lines": margin_between_lines,
+            "margin_between_lines": section_gap,
             "margin_x": margin_x,
             "has_duplicate": False,
         }
 
-        margin_y = 0.3 * cm
-
         available_height = tot_y - 2 * margin_y
         available_width = tot_x - 2 * margin_x
+        section_heights = self._get_section_heights(available_height)
 
-        company_name_height = available_height * 0.07 - margin_between_lines
-        employee_info_height = available_height * 0.13 - margin_between_lines
-        conceptos_height = available_height * 0.58 - margin_between_lines
-        contribuciones_height = available_height * 0.11 - margin_between_lines
-        total_height = available_height * 0.11 - margin_between_lines
+        c.translate(cfg.translate_x_cm * cm, cfg.translate_y_cm * cm)
+        c.setFillColorRGB(cfg.gray_fill, cfg.gray_fill, cfg.gray_fill)
 
-        c.translate(cm, cm)
+        company_height = section_heights["company"]
+        company_width = available_width * cfg.company_width_ratio
+        y = tot_y - margin_y - company_height - cfg.top_offset_cm * cm
 
-        gray_value = 0.93
-        c.setFillColorRGB(gray_value, gray_value, gray_value)
-
-        company_name_width = available_width * 0.78
-        starting_y = tot_y - margin_y - company_name_height - 0.9 * cm
-
-        self.coordinates["company_info_y"] = starting_y
-        self.coordinates["company_info_height"] = company_name_height
+        self.coordinates["company_info_y"] = y
+        self.coordinates["company_info_height"] = company_height
 
         c.roundRect(
             margin_x,
-            starting_y,
-            company_name_width,
-            company_name_height,
-            radius=def_radius,
+            y,
+            company_width,
+            company_height,
+            radius=cfg.corner_radius,
             stroke=1,
             fill=1,
         )
 
-        # Liquidacion Info ---------------------------------------------------------------
-        original_x = margin_x + company_name_width + 0.1 * cm
-        liquidacion_info_width = available_width - company_name_width - 0.1 * cm
-        self.coordinates["liquidacion_info_x"] = original_x
-        self.coordinates["liquidacion_info_width"] = liquidacion_info_width
+        liquidacion_x = margin_x + company_width + cfg.liquidacion_gap_cm * cm
+        liquidacion_width = available_width - company_width - cfg.liquidacion_gap_cm * cm
+        self.coordinates["liquidacion_info_x"] = liquidacion_x
+        self.coordinates["liquidacion_info_width"] = liquidacion_width
 
         c.roundRect(
-            original_x,
-            starting_y,
-            liquidacion_info_width,
-            company_name_height,
-            radius=def_radius,
+            liquidacion_x,
+            y,
+            liquidacion_width,
+            company_height,
+            radius=cfg.corner_radius,
             stroke=1,
             fill=0,
         )
         c.line(
-            original_x,
-            starting_y + company_name_height / 2,
-            original_x + liquidacion_info_width,
-            starting_y + company_name_height / 2,
+            liquidacion_x,
+            y + company_height / 2,
+            liquidacion_x + liquidacion_width,
+            y + company_height / 2,
         )
 
-        # Employee Info -----------------------------------------------------------------
-        starting_y -= employee_info_height + margin_between_lines
-        employee_info_width = available_width
-        self.coordinates["employee_info_y"] = starting_y
-        self.coordinates["employee_info_height"] = employee_info_height
-        self.coordinates["employee_info_width"] = employee_info_width
+        y -= section_heights["employee"] + section_gap
+        employee_width = available_width
+        self.coordinates["employee_info_y"] = y
+        self.coordinates["employee_info_height"] = section_heights["employee"]
+        self.coordinates["employee_info_width"] = employee_width
 
         c.roundRect(
             margin_x,
-            starting_y,
-            employee_info_width,
-            employee_info_height,
-            radius=def_radius,
+            y,
+            employee_width,
+            section_heights["employee"],
+            radius=cfg.corner_radius,
             stroke=1,
             fill=0,
         )
 
-        # Conceptos ---------------------------------------------------------------------
-        starting_y -= conceptos_height + margin_between_lines
-        conceptos_width = employee_info_width
-        self.coordinates["conceptos_y"] = starting_y + conceptos_height
-        self.coordinates["conceptos_height"] = conceptos_height
+        y -= section_heights["conceptos"] + section_gap
+        conceptos_width = employee_width
+        self.coordinates["conceptos_y"] = y + section_heights["conceptos"]
+        self.coordinates["conceptos_height"] = section_heights["conceptos"]
 
         c.roundRect(
             margin_x,
-            starting_y,
+            y,
             conceptos_width,
-            conceptos_height,
-            radius=def_radius,
+            section_heights["conceptos"],
+            radius=cfg.corner_radius,
             stroke=1,
             fill=0,
         )
@@ -124,11 +216,11 @@ class FormatoRecibo3(FormatoReciboSueldo):
         c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
         c.setFillColorRGB(0, 0, 0)
 
-        conceptos_titles_y = self.coordinates["conceptos_y"] - 0.3 * cm
-        concepto_titles_x_cant = margin_x + conceptos_width * 0.56
-        concepto_titles_x_rem = margin_x + conceptos_width * 0.68
-        concepto_titles_x_nr = margin_x + conceptos_width * 0.80
-        concepto_titles_x_ap = margin_x + conceptos_width * 0.91
+        conceptos_titles_y = self.coordinates["conceptos_y"] - cfg.conceptos_title_y_offset_cm * cm
+        concepto_titles_x_cant = margin_x + conceptos_width * cfg.conceptos_title_cant_ratio
+        concepto_titles_x_rem = margin_x + conceptos_width * cfg.conceptos_title_rem_ratio
+        concepto_titles_x_nr = margin_x + conceptos_width * cfg.conceptos_title_nr_ratio
+        concepto_titles_x_ap = margin_x + conceptos_width * cfg.conceptos_title_ap_ratio
 
         self.coordinates["conceptos_titles_y"] = conceptos_titles_y
         self.coordinates["concepto_titles_x_cant"] = concepto_titles_x_cant
@@ -136,18 +228,33 @@ class FormatoRecibo3(FormatoReciboSueldo):
         self.coordinates["concepto_titles_x_nr"] = concepto_titles_x_nr
         self.coordinates["concepto_titles_x_ap"] = concepto_titles_x_ap
 
-        c.drawString(margin_x + 0.5 * cm, conceptos_titles_y, "Conceptos")
-        c.drawString(concepto_titles_x_cant + 0.1 * cm, conceptos_titles_y, "Cant.")
-        c.drawString(concepto_titles_x_rem + 0.2 * cm, conceptos_titles_y, "Remun.")
-        c.drawString(concepto_titles_x_nr + 0.2 * cm, conceptos_titles_y, "No Rem.")
-        c.drawString(concepto_titles_x_ap + 0.2 * cm, conceptos_titles_y, "Retenc.")
+        c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, conceptos_titles_y, "Conceptos")
+        c.drawString(
+            concepto_titles_x_cant + cfg.conceptos_title_cant_label_offset_cm * cm,
+            conceptos_titles_y,
+            "Cant.",
+        )
+        c.drawString(
+            concepto_titles_x_rem + cfg.conceptos_title_rem_label_offset_cm * cm,
+            conceptos_titles_y,
+            "Remun.",
+        )
+        c.drawString(
+            concepto_titles_x_nr + cfg.conceptos_title_nr_label_offset_cm * cm,
+            conceptos_titles_y,
+            "No Rem.",
+        )
+        c.drawString(
+            concepto_titles_x_ap + cfg.conceptos_title_ap_label_offset_cm * cm,
+            conceptos_titles_y,
+            "Retenc.",
+        )
 
-        # Linea para totales -------------------------------------------------------------
-        starting_y_totales = starting_y + conceptos_height * 0.15
-        starting_y_totales_texto = starting_y_totales - 0.5 * cm
-        starting_y_totales_neto = starting_y + 0.6 * cm
+        starting_y_totales = y + section_heights["conceptos"] * cfg.totales_line_ratio_in_conceptos
+        starting_y_totales_text = starting_y_totales - cfg.totales_label_offset_cm * cm
+        starting_y_totales_neto = y + cfg.neto_label_y_offset_cm * cm
 
-        self.coordinates["starting_y_totales"] = starting_y_totales_texto
+        self.coordinates["starting_y_totales"] = starting_y_totales_text
         self.coordinates["starting_y_totales_neto"] = starting_y_totales_neto
 
         c.line(
@@ -156,21 +263,23 @@ class FormatoRecibo3(FormatoReciboSueldo):
             margin_x + conceptos_width,
             starting_y_totales,
         )
-        c.drawString(margin_x + 0.5 * cm, starting_y_totales_texto, "Totales:")
-        c.drawString(margin_x + conceptos_width - 5.2 * cm, starting_y_totales_neto, "Neto a Pagar:")
+        c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, starting_y_totales_text, "Totales:")
+        c.drawString(
+            margin_x + conceptos_width - cfg.neto_label_right_padding_cm * cm,
+            starting_y_totales_neto,
+            "Neto a Pagar:",
+        )
 
-        # Contribuciones ----------------------------------------------------------------
-        starting_y -= contribuciones_height + margin_between_lines
-        contribuciones_width = employee_info_width
-        self.coordinates["contribuciones_y"] = starting_y + contribuciones_height
-        self.coordinates["contribuciones_height"] = contribuciones_height
+        y -= section_heights["contribuciones"] + section_gap
+        self.coordinates["contribuciones_y"] = y + section_heights["contribuciones"]
+        self.coordinates["contribuciones_height"] = section_heights["contribuciones"]
 
         c.roundRect(
             margin_x,
-            starting_y,
-            contribuciones_width,
-            contribuciones_height,
-            radius=def_radius,
+            y,
+            employee_width,
+            section_heights["contribuciones"],
+            radius=cfg.corner_radius,
             stroke=1,
             fill=0,
         )
@@ -178,36 +287,29 @@ class FormatoRecibo3(FormatoReciboSueldo):
         c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
         c.setFillColorRGB(0, 0, 0)
 
-        contribuciones_titles_y = self.coordinates["contribuciones_y"] - 0.3 * cm
+        contribuciones_titles_y = self.coordinates["contribuciones_y"] - cfg.conceptos_title_y_offset_cm * cm
         self.coordinates["contribuciones_titles_y"] = contribuciones_titles_y
+        c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, contribuciones_titles_y, "Contribuciones")
 
-        c.drawString(margin_x + 0.5 * cm, contribuciones_titles_y, "Contribuciones")
+        y -= section_heights["footer"] + section_gap + cfg.footer_extra_gap_cm * cm
+        footer_height = section_heights["footer"] * cfg.footer_height_scale
 
-        # Pie / firma area ---------------------------------------------------------------
-        starting_y -= total_height + margin_between_lines + 0.25 * cm
-        rect_height = total_height * 1.1
-
-        pie_pagina_y = starting_y + rect_height - 0.45 * cm
-        self.coordinates["pie_pagina_y"] = pie_pagina_y
-        self.coordinates["pie_pagina_height"] = rect_height
+        self.coordinates["pie_pagina_y"] = y + footer_height - cfg.pie_pagina_y_offset_cm * cm
+        self.coordinates["pie_pagina_height"] = footer_height
         self.coordinates["pie_pagina_width"] = conceptos_width
 
         c.roundRect(
             margin_x,
-            starting_y,
+            y,
             conceptos_width,
-            rect_height,
-            radius=def_radius,
+            footer_height,
+            radius=cfg.corner_radius,
             stroke=1,
             fill=0,
         )
 
-        c.line(
-            margin_x + conceptos_width / 2 + 2 * cm,
-            starting_y,
-            margin_x + conceptos_width / 2 + 2 * cm,
-            starting_y + rect_height,
-        )
+        split_x = margin_x + conceptos_width * cfg.footer_split_ratio + cfg.footer_split_offset_cm * cm
+        c.line(split_x, y, split_x, y + footer_height)
 
         c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
         self.coordinates["canvas"] = c

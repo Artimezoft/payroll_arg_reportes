@@ -7,6 +7,7 @@ config_constants = {
     'FONT_SIZE_HEADER': 12,
     'FONT_SIZE_BODY': 8,
     'FONT_SIZE_SMALL': 7,
+    'RECIBO_3_LAYOUT': {},
 
     # Excel
     'EXCEL_FONT_FAMILY': 'Arial',
