@@ -1,14 +1,14 @@
+import pytest
 import json
-import unittest
 from pathlib import Path
 import openpyxl
 from py_arg_reports.reporters.acreditaciones.galicia import AcreditacionGalicia
 
 
-class TestAcreditacionGalicia(unittest.TestCase):
+class TestAcreditacionGalicia:
     """ Testing para Acreditaciones Santander """
 
-    def setUp(self):
+    def setup_method(self):
         self.samples_folder = Path('py_arg_reports/reporters/acreditaciones/data')
         self.temp_folder = self.samples_folder / 'temp'
         # Crear la carpeta temporal
@@ -16,24 +16,24 @@ class TestAcreditacionGalicia(unittest.TestCase):
 
     def test_acreditacion_galicia_no_data(self):
         data = {}
-        with self.assertRaises(ValueError):
+        with pytest.raises(ValueError):
             AcreditacionGalicia(data=data)
 
     def test_acreditacion_galicia_no_nro_cuenta(self):
         file_data = self.samples_folder / 'sample-galicia-missing-nro-cuenta.json'
         data = json.load(open(file_data))
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             AcreditacionGalicia(data)
         expected = 'No hay un nro_cuenta de empleado'
-        self.assertIn(expected, str(e.exception))
+        assert expected in str(e.value)
 
     def test_acreditacion_galicia_no_pago(self):
         file_data = self.samples_folder / 'sample-galicia-missing-importe-pago.json'
         data = json.load(open(file_data))
-        with self.assertRaises(ValueError) as e:
+        with pytest.raises(ValueError) as e:
             AcreditacionGalicia(data)
         expected = 'No hay un importe_pago de empleado'
-        self.assertIn(expected, str(e.exception))
+        assert expected in str(e.value)
 
     def test_acreditacion_galicia_ok(self):
         file_data = self.samples_folder / 'sample-galicia.json'
@@ -41,9 +41,9 @@ class TestAcreditacionGalicia(unittest.TestCase):
         acreditacion = AcreditacionGalicia(data)
         destination = self.temp_folder / 'galicia.xlsx'
         process, error = acreditacion.generate_file(destination)
-        self.assertTrue(process, error)
+        assert process, error
         # test results excel file
-        self.assertTrue(destination.exists())
+        assert destination.exists()
         # test the content of the excel file
         expected = [
             ['Cuenta', 'Nombre', 'Importe', 'Concepto'],
@@ -55,5 +55,5 @@ class TestAcreditacionGalicia(unittest.TestCase):
         ws = wb.active
         for row, values in enumerate(expected):
             for col, value in enumerate(values):
-                self.assertEqual(ws.cell(row=row+1, column=col+1).value, value)
+                assert ws.cell(row=row+1, column=col+1).value == value
         wb.close()
