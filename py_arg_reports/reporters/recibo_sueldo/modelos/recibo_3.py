@@ -372,6 +372,23 @@ class ReciboSueldo3(ReciboSueldo):
         pie_de_pagina_y = coords['pie_de_pagina_y']
         pie_linea_4_y = pie_de_pagina_y - self.base_line_between * 3
 
+        # ── Extract values ─────────────────────────────────────────────────────
+        totales = self.info_recibo['totales_liquidacion'][self.legajo]
+        conceptos = self.info_recibo['conceptos_liquidados'][self.legajo]
+        main_agrupadores = totales.get('main_agrupadores', {})
+
+        ap_inssjp = next((item['importe'] for item in conceptos if item['code'] == 'INSSJP'), 0)
+        ct_inssjp = next((item['importe'] for item in conceptos if item['code'] == 'CTINSS'), 0)
+        art = next((item['importe'] for item in conceptos if item['code'] == 'CTRART'), 0)
+        svida = next((item['importe'] for item in conceptos if item['code'] == 'SEGOBL'), 0)
+
+        ct_sin = main_agrupadores.get('CT_SIN', 0)
+        ap_sin = main_agrupadores.get('AP_SIN', 0)
+        ct_ss = main_agrupadores.get('CT_SS', 0) - ct_inssjp
+        ap_ss = main_agrupadores.get('AP_SS', 0) - ap_inssjp
+        ct_os = main_agrupadores.get('CT_OS', 0)
+        ap_os = main_agrupadores.get('AP_OS', 0)
+
         # ── Title ─────────────────────────────────────────────────────────────
         self._set_font(bold=True, size=self.font_size_body)
         self.c.drawString(
@@ -388,52 +405,66 @@ class ReciboSueldo3(ReciboSueldo):
             pie_x,
             pie_y,
             pie_size,
-            self.info_recibo['totales_liquidacion'][self.legajo],
-            self.info_recibo['conceptos_liquidados'][self.legajo],
+            totales,
+            conceptos,
             font_delta=2,
         )
 
-        # ── Two-column breakdown (hardcoded labels — values wired later) ───────
+        # ── Two-column breakdown — (label, bold, value) ────────────────────────
         ROW_H = 0.32 * cm
         GAP_H = 0.19 * cm
         col1_x = pie_de_pagina_x + 0.3 * cm
         col2_x = pie_de_pagina_x + 5.5 * cm
+        col1_right = col2_x - 0.2 * cm
+        col2_right = pie_de_pagina_x + 10.5 * cm
         start_y = pie_de_pagina_y - 0.4 * cm
 
         COL1 = [
-            ("Total Costo Sindical", True),
-            ("Empleador", False),
-            ("Trabajador", False),
+            ("Total Costo Sindical", True, ct_sin + ap_sin),
+            ("Empleador", False, ct_sin),
+            ("Trabajador", False, ap_sin),
             None,
-            ("Total Seguridad Social", True),
-            ("Empleador", False),
-            ("Trabajador", False),
+            ("Total Seguridad Social", True, ct_ss + ap_ss),
+            ("Empleador", False, ct_ss),
+            ("Trabajador", False, ap_ss),
             None,
-            ("Total Obra Social", True),
-            ("Empleador", False),
-            ("Trabajador", False),
+            ("Total Obra Social", True, ct_os + ap_os),
+            ("Empleador", False, ct_os),
+            ("Trabajador", False, ap_os),
         ]
         COL2 = [
-            ("Total INSSJP (PAMI)", True),
-            ("Empleador", False),
-            ("Trabajador", False),
+            ("Total INSSJP (PAMI)", True, ct_inssjp + ap_inssjp),
+            ("Empleador", False, ct_inssjp),
+            ("Trabajador", False, ap_inssjp),
             None,
-            ("Total ART", True),
-            ("Empleador", False),
+            ("Total ART", True, art),
+            ("Empleador", False, art),
             None,
-            ("Total Seguro Vida (SCVO)", True),
-            ("Empleador", False),
+            ("Total Seguro Vida (SCVO)", True, svida),
+            ("Empleador", False, svida),
         ]
 
-        for col_x, items in ((col1_x, COL1), (col2_x, COL2)):
+        for (col_x, col_right), items in (
+            ((col1_x, col1_right), COL1),
+            ((col2_x, col2_right), COL2),
+        ):
             cur_y = start_y
             for entry in items:
                 if entry is None:
                     cur_y -= GAP_H
                     continue
-                label, bold = entry
+                label, bold, value = entry
+                font_family = self.FONT_FAMILY_BOLD if bold else self.FONT_FAMILY
                 self._set_font(bold=bold, size=self.font_size_small)
                 self.c.drawString(col_x, cur_y, label)
+                self.draw_text_with_end_coordinate(
+                    self.c,
+                    col_right,
+                    cur_y,
+                    float_to_format_currency(value, include_currency=False),
+                    font_family=font_family,
+                    font_size=self.font_size_small,
+                )
                 cur_y -= ROW_H
 
         self._set_font(bold=False, size=self.font_size_body)
