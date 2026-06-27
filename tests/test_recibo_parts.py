@@ -61,5 +61,3 @@ class TestReciboParts:
             assert isinstance(bounds, ReciboPartBounds)
             assert bounds.from_x < bounds.to_x
             assert bounds.from_y < bounds.to_y
-
-

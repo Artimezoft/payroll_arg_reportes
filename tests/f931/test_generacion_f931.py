@@ -96,5 +96,3 @@ class TestGeneracionF931:
         )
 
         assert resp_descarga == (False, 'El campo situacion no fue encontrado en los datos')
-
-

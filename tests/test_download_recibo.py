@@ -227,5 +227,3 @@ class TestDownloadRecibo:
 
         # Should have at least 1 page
         assert num_sheets >= 1
-
-

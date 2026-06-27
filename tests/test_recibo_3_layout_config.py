@@ -61,5 +61,3 @@ class TestRecibo3LayoutConfig:
             assert coords["margin_x"] == pytest.approx(1.2 * cm)
         finally:
             config_constants["RECIBO_3_LAYOUT"] = original
-
-

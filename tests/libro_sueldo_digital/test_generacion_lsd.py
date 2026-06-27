@@ -167,5 +167,3 @@ class TestGeneracionLSD:
 
         expected_resp = 'No se puede generar el txt, dato esencial empleados_liquidados no encontrado en liquidaciones'
         assert resp_descarga == (False, expected_resp)
-
-
