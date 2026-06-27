@@ -359,23 +359,31 @@ class ReciboSueldo3(ReciboSueldo):
         self.c.drawString(coords['conceptos_x'] + 0.5 * cm, total_label_y, "Total Contribuciones Empleador:")
         self.draw_text_with_end_coordinate(
             self.c,
-            coords['concepto_titles_x_ap_ends'],
+            coords['concepto_titles_x_ap_ends'] - 0.3 * cm,
             total_label_y,
-            float_to_format_currency(self.total_contribuciones, include_currency=False),
+            float_to_format_currency(self.total_contribuciones),
         )
         self._set_font(bold=False, size=self.font_size_body)
 
     def draw_composition_salario(self) -> None:
-        """Pie chart with 20% larger size than the base layout."""
+        """Detalle de la Composición Salarial: title, two-column breakdown, pie chart."""
         coords = self.coordinates
         pie_de_pagina_x = coords['pie_de_pagina_x']
         pie_de_pagina_y = coords['pie_de_pagina_y']
         pie_linea_4_y = pie_de_pagina_y - self.base_line_between * 3
 
-        pie_size = 1.8 * cm  # base is 1.5 cm × 1.2
+        # ── Title ─────────────────────────────────────────────────────────────
+        self._set_font(bold=True, size=self.font_size_body)
+        self.c.drawString(
+            pie_de_pagina_x + 0.3 * cm,
+            pie_de_pagina_y,
+            "Detalle de la Composición Salarial",
+        )
+
+        # ── Pie chart (unchanged) ──────────────────────────────────────────────
+        pie_size = 1.8 * cm
         pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm + 3.0 * cm
         pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
-
         self.draw_pie_chart(
             pie_x,
             pie_y,
@@ -384,3 +392,48 @@ class ReciboSueldo3(ReciboSueldo):
             self.info_recibo['conceptos_liquidados'][self.legajo],
             font_delta=2,
         )
+
+        # ── Two-column breakdown (hardcoded labels — values wired later) ───────
+        ROW_H = 0.32 * cm
+        GAP_H = 0.19 * cm
+        col1_x = pie_de_pagina_x + 0.3 * cm
+        col2_x = pie_de_pagina_x + 5.5 * cm
+        start_y = pie_de_pagina_y - 0.4 * cm
+
+        COL1 = [
+            ("Total Costo Sindical", True),
+            ("Empleador", False),
+            ("Trabajador", False),
+            None,
+            ("Total Seguridad Social", True),
+            ("Empleador", False),
+            ("Trabajador", False),
+            None,
+            ("Total Obra Social", True),
+            ("Empleador", False),
+            ("Trabajador", False),
+        ]
+        COL2 = [
+            ("Total INSSJP (PAMI)", True),
+            ("Empleador", False),
+            ("Trabajador", False),
+            None,
+            ("Total ART", True),
+            ("Empleador", False),
+            None,
+            ("Total Seguro Vida (SCVO)", True),
+            ("Empleador", False),
+        ]
+
+        for col_x, items in ((col1_x, COL1), (col2_x, COL2)):
+            cur_y = start_y
+            for entry in items:
+                if entry is None:
+                    cur_y -= GAP_H
+                    continue
+                label, bold = entry
+                self._set_font(bold=bold, size=self.font_size_small)
+                self.c.drawString(col_x, cur_y, label)
+                cur_y -= ROW_H
+
+        self._set_font(bold=False, size=self.font_size_body)

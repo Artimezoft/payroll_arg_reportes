@@ -561,7 +561,7 @@ class ReciboSueldo:
             this_contribucion = name
             if cantidad:
                 this_contribucion += f" ({cantidad})"
-            this_contribucion += f": {float_to_format_currency(importe, include_currency=False)}"
+            this_contribucion += f": {float_to_format_currency(importe)}"
             self.total_contribuciones += importe
 
             self._set_font(bold=False, size=self.font_size_small)
@@ -583,7 +583,7 @@ class ReciboSueldo:
         self.c.drawString(
             coords['conceptos_x'] + 3 * cm,
             coords['contribuciones_titles_y'],
-            float_to_format_currency(self.total_contribuciones, include_currency=False)
+            float_to_format_currency(self.total_contribuciones)
         )
         self._set_font(bold=False, size=self.font_size_body)
 
@@ -614,9 +614,9 @@ class ReciboSueldo:
         )
         self._set_font(bold=True, size=self.font_size_main)
         self.c.drawString(
-            coords['totales_x_ap'] - 0.5 * cm,
+            coords['totales_x_ap'] - 0.8 * cm,
             coords['starting_y_totales_neto'],
-            float_to_format_currency(neto_liquidacion, include_currency=False)
+            float_to_format_currency(neto_liquidacion)
         )
         self._set_font(bold=False, size=self.font_size_body)
 
