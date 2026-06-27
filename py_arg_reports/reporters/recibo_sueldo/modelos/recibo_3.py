@@ -6,7 +6,8 @@ from typing import Mapping
 from reportlab.lib.units import cm
 
 from py_arg_reports.config import config_constants
-from py_arg_reports.reporters.recibo_sueldo.base import FormatoReciboSueldo
+from py_arg_reports.reporters.recibo_sueldo.base import EXCLUDED_CONCEPTS, FormatoReciboSueldo, ReciboSueldo
+from py_arg_reports.tools.num_n_date_tools import float_to_format_currency
 
 FONT_FAMILY = config_constants["FONT_FAMILY"]
 FONT_FAMILY_BOLD = config_constants["FONT_FAMILY_BOLD"]
@@ -36,10 +37,10 @@ class Recibo3LayoutConfig:
     gray_fill: float = 0.93
 
     company_share: float = 0.07
-    employee_share: float = 0.13
-    conceptos_share: float = 0.58
-    contribuciones_share: float = 0.11
-    footer_share: float = 0.11
+    employee_share: float = 0.10
+    conceptos_share: float = 0.46
+    contribuciones_share: float = 0.24
+    footer_share: float = 0.13
 
     company_width_ratio: float = 0.78
     liquidacion_gap_cm: float = 0.1
@@ -289,7 +290,7 @@ class FormatoRecibo3(FormatoReciboSueldo):
 
         contribuciones_titles_y = self.coordinates["contribuciones_y"] - cfg.conceptos_title_y_offset_cm * cm
         self.coordinates["contribuciones_titles_y"] = contribuciones_titles_y
-        c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, contribuciones_titles_y, "Contribuciones")
+        c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, contribuciones_titles_y, "Contribuciones Empleador")
 
         y -= section_heights["footer"] + section_gap + cfg.footer_extra_gap_cm * cm
         footer_height = section_heights["footer"] * cfg.footer_height_scale
@@ -313,3 +314,70 @@ class FormatoRecibo3(FormatoReciboSueldo):
 
         c.setFont(FONT_FAMILY, FONT_SIZE_BODY)
         self.coordinates["canvas"] = c
+
+
+class ReciboSueldo3(ReciboSueldo):
+    """Version-3-specific drawing overrides for ReciboSueldo."""
+
+    def draw_contribuciones(self) -> None:
+        """Column format matching conceptos_part: name | cant | importe right-aligned."""
+        coords = self.coordinates
+        conceptos_liquidados = self.info_recibo['conceptos_liquidados'][self.legajo]
+        self.total_contribuciones = 0.0
+
+        this_y = coords['starting_y_contribuciones']
+        for concepto in conceptos_liquidados:
+            code = concepto['code']
+            name = concepto['name']
+            tipo_concepto = concepto['tipo_concepto']
+            cantidad = f"{concepto['cantidad']:.2f}" if concepto['cantidad'] != 0.0 else ''
+            importe = concepto['importe']
+
+            if code in EXCLUDED_CONCEPTS or tipo_concepto != 4 or importe == 0.0:
+                continue
+
+            self.total_contribuciones += importe
+            self._set_font(bold=False, size=self.font_size_body)
+            self.c.drawString(coords['conceptos_x'], this_y, name)
+            self.c.drawString(coords['concepto_titles_x_cant'], this_y, str(cantidad))
+            self.draw_text_with_end_coordinate(
+                self.c,
+                coords['concepto_titles_x_ap_ends'],
+                this_y,
+                float_to_format_currency(importe, include_currency=False),
+            )
+            this_y -= 0.4 * cm
+
+        # Separator line + total — mirrors "Neto a Pagar:" in conceptos
+        line_y = this_y - 0.1 * cm
+        self.c.line(coords['conceptos_x'], line_y, coords['concepto_titles_x_ap_ends'], line_y)
+        total_label_y = line_y - 0.4 * cm
+        self._set_font(bold=True, size=self.font_size_main)
+        self.c.drawString(coords['conceptos_x'] + 0.5 * cm, total_label_y, "Total Contribuciones Empleador:")
+        self.draw_text_with_end_coordinate(
+            self.c,
+            coords['concepto_titles_x_ap_ends'],
+            total_label_y,
+            float_to_format_currency(self.total_contribuciones, include_currency=False),
+        )
+        self._set_font(bold=False, size=self.font_size_body)
+
+    def draw_composition_salario(self) -> None:
+        """Pie chart with 20% larger size than the base layout."""
+        coords = self.coordinates
+        pie_de_pagina_x = coords['pie_de_pagina_x']
+        pie_de_pagina_y = coords['pie_de_pagina_y']
+        pie_linea_4_y = pie_de_pagina_y - self.base_line_between * 3
+
+        pie_size = 1.8 * cm  # base is 1.5 cm × 1.2
+        pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm + 3.0 * cm
+        pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
+
+        self.draw_pie_chart(
+            pie_x,
+            pie_y,
+            pie_size,
+            self.info_recibo['totales_liquidacion'][self.legajo],
+            self.info_recibo['conceptos_liquidados'][self.legajo],
+            font_delta=2,
+        )

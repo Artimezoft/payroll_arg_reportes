@@ -579,6 +579,14 @@ class ReciboSueldo:
             else:
                 this_contribuciones_y -= 0.4 * cm
 
+        self._set_font(bold=True, size=self.font_size_main)
+        self.c.drawString(
+            coords['conceptos_x'] + 3 * cm,
+            coords['contribuciones_titles_y'],
+            float_to_format_currency(self.total_contribuciones, include_currency=False)
+        )
+        self._set_font(bold=False, size=self.font_size_body)
+
     def draw_total(self) -> None:
         coords = self.coordinates
         totales = self.info_recibo['totales_liquidacion'][self.legajo]
@@ -609,11 +617,6 @@ class ReciboSueldo:
             coords['totales_x_ap'] - 0.5 * cm,
             coords['starting_y_totales_neto'],
             float_to_format_currency(neto_liquidacion, include_currency=False)
-        )
-        self.c.drawString(
-            coords['conceptos_x'] + 3 * cm,
-            coords['contribuciones_titles_y'],
-            float_to_format_currency(self.total_contribuciones, include_currency=False)
         )
         self._set_font(bold=False, size=self.font_size_body)
 
@@ -1118,7 +1121,8 @@ class ReciboDownloader:
                 my_recibo_info = layout.draw_background(c)
                 coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
 
-            recibo_sueldo = ReciboSueldo(
+            recibo_cls = layout.recibo_cls or ReciboSueldo
+            recibo_sueldo = recibo_cls(
                 c=c,
                 coordinates=coordinates,
                 info_recibo=info_recibo,

@@ -31,6 +31,11 @@ class ReciboLayout(ABC):
     def draw_background(self, canvas: Canvas) -> dict:
         """Draw static layout and return coordinate metadata."""
 
+    @property
+    def recibo_cls(self) -> type | None:
+        """Return a ReciboSueldo subclass to use, or None for the default."""
+        return None
+
 
 @dataclass(frozen=True)
 class LegacyFunctionLayout(ReciboLayout):
@@ -53,10 +58,15 @@ class ClassBasedLayout(ReciboLayout):
 
     _pagesize: tuple[float, float]
     layout_cls: type[FormatoReciboProtocol]
+    _recibo_cls: type | None = None
 
     @property
     def pagesize(self):
         return self._pagesize
+
+    @property
+    def recibo_cls(self) -> type | None:
+        return self._recibo_cls
 
     def draw_background(self, canvas: Canvas) -> dict:
         layout = self.layout_cls(canvas)
@@ -80,8 +90,8 @@ def get_layout_for_version(base_version: int) -> ReciboLayout:
         return LegacyFunctionLayout(_pagesize=A4, base_fn=my_base_recibo)
 
     if base_version == 3:
-        from py_arg_reports.reporters.recibo_sueldo.modelos.recibo_3 import FormatoRecibo3
+        from py_arg_reports.reporters.recibo_sueldo.modelos.recibo_3 import FormatoRecibo3, ReciboSueldo3
 
-        return ClassBasedLayout(_pagesize=A4, layout_cls=FormatoRecibo3)
+        return ClassBasedLayout(_pagesize=A4, layout_cls=FormatoRecibo3, _recibo_cls=ReciboSueldo3)
 
     raise ValueError(f"base_version no soportada: {base_version}")
