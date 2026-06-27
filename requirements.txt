@@ -1,6 +1,7 @@
 build==1.0.3
 numero-a-letras>=0.0.7
 flake8>=7.3.0
+pytest>=9.0.0
 openpyxl>=3.1.5
 PyPDF2>=3.0.1
 reportlab>=5.0.0

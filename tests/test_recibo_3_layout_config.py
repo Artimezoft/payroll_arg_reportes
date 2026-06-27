@@ -1,5 +1,5 @@
+import pytest
 import io
-import unittest
 
 from reportlab.lib.pagesizes import A4
 from reportlab.lib.units import cm
@@ -9,7 +9,7 @@ from py_arg_reports.config import config_constants
 from py_arg_reports.reporters.recibo_sueldo.modelos.recibo_3 import FormatoRecibo3
 
 
-class TestRecibo3LayoutConfig(unittest.TestCase):
+class TestRecibo3LayoutConfig:
     def _build_layout(self):
         buffer = io.BytesIO()
         canvas = Canvas(buffer, pagesize=A4)
@@ -46,8 +46,8 @@ class TestRecibo3LayoutConfig(unittest.TestCase):
             "margin_x",
             "has_duplicate",
         }
-        self.assertTrue(required_keys.issubset(set(coords.keys())))
-        self.assertFalse(coords["has_duplicate"])
+        assert required_keys.issubset(set(coords.keys()))
+        assert not coords["has_duplicate"]
 
     def test_recibo_3_allows_global_overrides_from_config(self):
         original = dict(config_constants.get("RECIBO_3_LAYOUT", {}))
@@ -58,10 +58,8 @@ class TestRecibo3LayoutConfig(unittest.TestCase):
             layout.draw_background()
             coords = layout.get_coordinates()
 
-            self.assertAlmostEqual(coords["margin_x"], 1.2 * cm, places=3)
+            assert coords["margin_x"] == pytest.approx(1.2 * cm)
         finally:
             config_constants["RECIBO_3_LAYOUT"] = original
 
 
-if __name__ == "__main__":
-    unittest.main()

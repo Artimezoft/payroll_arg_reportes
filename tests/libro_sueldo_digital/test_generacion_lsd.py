@@ -1,16 +1,15 @@
 import json
 import os
 import tempfile
-import unittest
 
 from py_arg_reports.reporters.libro_sueldo_digital.reporter import genera_txt_lsd
 
 
-class TestGeneracionLSD(unittest.TestCase):
+class TestGeneracionLSD:
     """ Testing para Generación Libro Sueldos Digital
     """
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         # Specify the path where the temporary folder should be created
         temp_folder_path = './tests/temp/'
         # Create a temporary folder for testing in the specified path
@@ -39,7 +38,7 @@ class TestGeneracionLSD(unittest.TestCase):
         }
 
     @classmethod
-    def tearDownClass(cls):
+    def teardown_class(cls):
         # Clean up: Delete the temporary folder and its contents
         if os.path.exists(cls.temp_folder):
             for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
@@ -58,13 +57,13 @@ class TestGeneracionLSD(unittest.TestCase):
             filename='txt_lsd_prueba',
         )
 
-        self.assertEqual(resp_descarga, (True, None))
+        assert resp_descarga == (True, None)
         # Le agrega el "_1" por ser liquidacion 1
         full_path = self.temp_folder + 'txt_lsd_prueba_1.txt'
         print("full_path: ", full_path)
 
         # Check if the file exists
-        self.assertTrue(os.path.exists(full_path))
+        assert os.path.exists(full_path)
 
         # Check the number of lines in the txt file
         with open(self.temp_folder + 'txt_lsd_prueba_1.txt', 'r') as file:
@@ -81,22 +80,22 @@ class TestGeneracionLSD(unittest.TestCase):
             # 1 línea de tipo 02
             # 13 línea de tipo 03
             # 1 línea de tipo 04
-            self.assertEqual(len(lines), 16)
+            assert len(lines) == 16
 
         for line in lines:
             # le remuevo el salto de carro si tiene
             line = line.replace('\n', '')
 
             if line[:2] == '01':
-                self.assertEqual(len(line), 35)
+                assert len(line) == 35
             elif line[:2] == '02':
-                self.assertEqual(len(line), 115)
+                assert len(line) == 115
             elif line[:2] == '03':
-                self.assertEqual(len(line), 51)
+                assert len(line) == 51
             elif line[:2] == '04':
-                self.assertEqual(len(line), 370)
+                assert len(line) == 370
             elif line[:2] == '05':
-                self.assertEqual(len(line), 65)
+                assert len(line) == 65
 
     def test_descarga_empty_json(self):
         """ Prueba la descarga del archivo para un json vacío
@@ -104,14 +103,14 @@ class TestGeneracionLSD(unittest.TestCase):
         resp_descarga = genera_txt_lsd(
             json_data=self.empty_json,
             output_path=self.temp_folder,
-            filename='txt_lsd_prueba',
+            filename='txt_lsd_empty_test',
         )
 
-        self.assertEqual(resp_descarga, (False, 'No se puede generar el txt para Libro Sueldo Digital, no hay datos'))
-        full_path = self.temp_folder + 'txt_lsd_prueba_1.txt'
+        assert resp_descarga == (False, 'No se puede generar el txt para Libro Sueldo Digital, no hay datos')
+        full_path = self.temp_folder + 'txt_lsd_empty_test_1.txt'
 
         # Check if the file not exists
-        self.assertFalse(os.path.exists(full_path))
+        assert not os.path.exists(full_path)
 
     def test_key_missing_conceptos(self):
         """ Prueba la descarga del archivo para un json con conceptos faltantes
@@ -122,7 +121,7 @@ class TestGeneracionLSD(unittest.TestCase):
             filename='txt_lsd_prueba',
         )
 
-        self.assertEqual(resp_descarga, (False, 'Falta la clave conceptos_liquidados en el diccionario de empleados'))
+        assert resp_descarga == (False, 'Falta la clave conceptos_liquidados en el diccionario de empleados')
 
     def test_key_missing_infof931(self):
         """ Prueba la descarga del archivo para un json con info_f931 faltante
@@ -133,7 +132,7 @@ class TestGeneracionLSD(unittest.TestCase):
             filename='txt_lsd_prueba',
         )
 
-        self.assertEqual(resp_descarga, (False, 'Falta la clave info_f931 en el diccionario de empleados'))
+        assert resp_descarga == (False, 'Falta la clave info_f931 en el diccionario de empleados')
 
     def test_key_missing_infof931_campos(self):
         """ Prueba la descarga del archivo para un json con algunos campos de info_f931 faltantes
@@ -144,7 +143,7 @@ class TestGeneracionLSD(unittest.TestCase):
             filename='txt_lsd_prueba',
         )
 
-        self.assertEqual(resp_descarga, (False, 'Falta el campo convencionado en el diccionario de info_931'))
+        assert resp_descarga == (False, 'Falta el campo convencionado en el diccionario de info_931')
 
     def test_broken_json(self):
         """ Prueba la descarga del archivo para un json roto
@@ -155,7 +154,7 @@ class TestGeneracionLSD(unittest.TestCase):
             filename='txt_lsd_prueba',
         )
 
-        self.assertEqual(resp_descarga, (False, 'No se puede generar el txt, dato esencial liquidaciones no encontrado'))
+        assert resp_descarga == (False, 'No se puede generar el txt, dato esencial liquidaciones no encontrado')
 
     def test_key_missing_empleados(self):
         """ Prueba la descarga del archivo para un json con empleados faltantes
@@ -167,8 +166,6 @@ class TestGeneracionLSD(unittest.TestCase):
         )
 
         expected_resp = 'No se puede generar el txt, dato esencial empleados_liquidados no encontrado en liquidaciones'
-        self.assertEqual(resp_descarga, (False, expected_resp))
+        assert resp_descarga == (False, expected_resp)
 
 
-if __name__ == '__main__':
-    unittest.main()

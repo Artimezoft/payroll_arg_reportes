@@ -35,3 +35,9 @@ Issues = "https://github.com/Artimezoft/payroll_arg_reportes/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["py_arg_reports"]
+
+[project.optional-dependencies]
+dev = ["pytest>=9.0.0"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
