@@ -1054,12 +1054,18 @@ class ReciboDownloader:
             'totales_x_ap': my_recibo_info['concepto_titles_x_ap'] - ap_column_shift,
             'contribuciones_titles_y': my_recibo_info['contribuciones_titles_y'],
             'neto_letras_y': my_recibo_info['starting_y_totales_neto'] - base_line_between_2 + 0.05 * cm,
+        }
+        if 'contribuciones_y' in my_recibo_info and 'contribuciones_height' in my_recibo_info:
+            resp['contribuciones_section_bottom_y'] = (
+                my_recibo_info['contribuciones_y'] - my_recibo_info['contribuciones_height']
+            )
+        resp.update({
 
             'pie_de_pagina_x': base_x,
             'pie_de_pagina_y': my_recibo_info['pie_pagina_y'],
             'pie_de_pagina_width': my_recibo_info['pie_pagina_width'],
             'pie_de_pagina_height': my_recibo_info['pie_pagina_height'],
-        }
+        })
 
         if has_duplicate:
             base_duplicate_x = my_recibo_info['duplicate_x'] + 0.2 * cm

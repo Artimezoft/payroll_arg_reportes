@@ -348,10 +348,13 @@ class ReciboSueldo3(ReciboSueldo):
             )
             this_y -= 0.4 * cm
 
-        # Separator line + total — mirrors "Neto a Pagar:" in conceptos
-        line_y = this_y - 0.1 * cm
-        self.c.line(coords['conceptos_x'], line_y, coords['concepto_titles_x_ap_ends'], line_y)
-        total_label_y = line_y - 0.4 * cm
+        # Separator line + total anchored to the bottom of the contribuciones section box
+        section_bottom = coords['contribuciones_section_bottom_y']
+        section_left = coords['conceptos_x'] - 0.2 * cm   # = margin_x, matches box edge
+        section_right = section_left + coords['pie_de_pagina_width']
+        line_y = section_bottom + 0.7 * cm
+        total_label_y = section_bottom + 0.25 * cm
+        self.c.line(section_left, line_y, section_right, line_y)
         self._set_font(bold=True, size=self.font_size_main)
         self.c.drawString(coords['conceptos_x'] + 0.5 * cm, total_label_y, "Total Contribuciones Empleador:")
         self.draw_text_with_end_coordinate(
