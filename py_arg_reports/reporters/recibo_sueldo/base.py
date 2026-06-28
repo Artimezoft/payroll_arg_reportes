@@ -1,13 +1,15 @@
 import logging
 import os
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
 from pathlib import Path
-from numero_a_letras import numero_a_letras
-from reportlab.lib.pagesizes import A4, landscape
-from reportlab.lib.units import cm
-from reportlab.pdfgen import canvas
 
-from py_arg_reports.base_reports.recibo_base_2 import my_base_recibo
+from numero_a_letras import numero_a_letras
+from reportlab.lib.units import cm
+from reportlab.pdfgen.canvas import Canvas
+
 from py_arg_reports.config import config_constants
+from py_arg_reports.reporters.recibo_sueldo.layouts import get_layout_for_version
 from py_arg_reports.tools.num_n_date_tools import (
     float_to_format_currency,
     formatted_date_str,
@@ -24,6 +26,104 @@ FONT_SIZE_SMALL = config_constants['FONT_SIZE_SMALL']
 EXCLUDED_CONCEPTS = [
     'CREFIS',
 ]
+
+
+class FormatoReciboSueldo(ABC):
+    """Base class for all salary receipt layouts."""
+
+    def __init__(self, canvas: Canvas):
+        self.canvas = canvas
+        self.coordinates = {}
+
+    @abstractmethod
+    def draw_background(self) -> None:
+        """Draw rectangles, lines and static labels."""
+        ...
+
+    def get_coordinates(self) -> dict:
+        return self.coordinates
+
+
+@dataclass(frozen=True)
+class ReciboPartBounds:
+    from_x: float
+    from_y: float
+    to_x: float
+    to_y: float
+
+
+class ReciboPart(ABC):
+    """Reusable drawing unit inside a salary receipt with explicit bounds."""
+
+    name: str
+
+    def __init__(self, recibo: "ReciboSueldo") -> None:
+        self.recibo = recibo
+
+    @property
+    def bounds(self) -> ReciboPartBounds:
+        return self.recibo.get_part_bounds(self.name)
+
+    @classmethod
+    def applies_to(cls, recibo: "ReciboSueldo") -> bool:
+        return True
+
+    @abstractmethod
+    def draw(self) -> None:
+        ...
+
+
+class TitlePart(ReciboPart):
+    name = 'title'
+
+    def draw(self) -> None:
+        self.recibo.draw_titles()
+
+
+class EmployeePart(ReciboPart):
+    name = 'employee'
+
+    def draw(self) -> None:
+        self.recibo.draw_employee_info()
+
+
+class ConceptosPart(ReciboPart):
+    name = 'conceptos'
+
+    def draw(self) -> None:
+        self.recibo.draw_conceptos()
+        self.recibo.draw_total()
+
+
+class ContribucionesPart(ReciboPart):
+    name = 'contribuciones'
+
+    def draw(self) -> None:
+        self.recibo.draw_contribuciones()
+
+
+class CompositionSalarioPart(ReciboPart):
+    name = 'composition_salario'
+
+    @classmethod
+    def applies_to(cls, recibo: "ReciboSueldo") -> bool:
+        return recibo.base_version == 3
+
+    def draw(self) -> None:
+        self.recibo.draw_composition_salario()
+
+
+class SignaturePart(ReciboPart):
+    name = 'signature'
+
+    @classmethod
+    def applies_to(cls, recibo: "ReciboSueldo") -> bool:
+        return recibo.base_version != 3
+
+    def draw(self) -> None:
+        self.recibo.draw_signature()
+        # Legacy layouts historically rendered salary composition in this area.
+        self.recibo.draw_composition_salario()
 
 
 def get_recibo_info(json_data: dict) -> dict:
@@ -212,7 +312,7 @@ class ReciboSueldo:
     FONT_FAMILY = config_constants['FONT_FAMILY']
     FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']
 
-    def __init__(self, c: canvas.Canvas, coordinates: dict, info_recibo: dict, legajo: str, base_version: int = 1) -> None:
+    def __init__(self, c: Canvas, coordinates: dict, info_recibo: dict, legajo: str, base_version: int = 1) -> None:
         self.c = c
         self.coordinates = coordinates
         self.info_recibo = info_recibo
@@ -319,6 +419,11 @@ class ReciboSueldo:
         self.draw_liquidacion_info()
         self._set_font(bold=False, size=self.font_size_body)
 
+    def draw_employee_info(self) -> None:
+        coords = self.coordinates
+
+        self._set_font(bold=False, size=self.font_size_body)
+
         data = self._get_employee_data()
         self.c.drawString(coords['nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
         self.c.drawString(coords['categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
@@ -385,11 +490,6 @@ class ReciboSueldo:
         conceptos_liquidados = self.info_recibo['conceptos_liquidados'][self.legajo]
 
         this_y = coords['starting_y_conceptos']
-        this_contribuciones_y = coords['starting_y_contribuciones']
-        max_contribuciones_per_column = 5
-        contribuciones_count = 0
-        contribuciones_x = coords['conceptos_x']
-        dupl_contribuciones_x = coords.get('dupl_conceptos_x')
 
         for concepto in conceptos_liquidados:
             code = concepto['code']
@@ -433,30 +533,59 @@ class ReciboSueldo:
                     )
                 this_y -= 0.4 * cm
 
-            elif tipo_concepto == 4:
-                if contribuciones_count >= max_contribuciones_per_column * 2 or importe == 0.0:
-                    continue
+    def draw_contribuciones(self) -> None:
+        coords = self.coordinates
+        conceptos_liquidados = self.info_recibo['conceptos_liquidados'][self.legajo]
 
-                this_contribucion = name
-                if cantidad:
-                    this_contribucion += f" ({cantidad})"
-                this_contribucion += f": {float_to_format_currency(importe, include_currency=False)}"
-                self.total_contribuciones += importe
+        this_contribuciones_y = coords['starting_y_contribuciones']
+        max_contribuciones_per_column = 5
+        contribuciones_count = 0
+        contribuciones_x = coords['conceptos_x']
+        dupl_contribuciones_x = coords.get('dupl_conceptos_x')
 
-                self._set_font(bold=False, size=self.font_size_small)
-                self.c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
+        self.total_contribuciones = 0.0
+
+        for concepto in conceptos_liquidados:
+            code = concepto['code']
+            name = concepto['name']
+            tipo_concepto = concepto['tipo_concepto']
+            cantidad = f"{concepto['cantidad']:.2f}" if concepto['cantidad'] != 0.0 else ''
+            importe = concepto['importe']
+
+            if code in EXCLUDED_CONCEPTS or tipo_concepto != 4:
+                continue
+
+            if contribuciones_count >= max_contribuciones_per_column * 2 or importe == 0.0:
+                continue
+
+            this_contribucion = name
+            if cantidad:
+                this_contribucion += f" ({cantidad})"
+            this_contribucion += f": {float_to_format_currency(importe)}"
+            self.total_contribuciones += importe
+
+            self._set_font(bold=False, size=self.font_size_small)
+            self.c.drawString(contribuciones_x, this_contribuciones_y, this_contribucion)
+            if self.has_duplicate:
+                self.c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
+            contribuciones_count += 1
+            self._set_font(bold=False, size=self.font_size_body)
+
+            if contribuciones_count % max_contribuciones_per_column == 0:
+                this_contribuciones_y = coords['starting_y_contribuciones']
+                contribuciones_x += 7 * cm
                 if self.has_duplicate:
-                    self.c.drawString(dupl_contribuciones_x, this_contribuciones_y, this_contribucion)
-                contribuciones_count += 1
-                self._set_font(bold=False, size=self.font_size_body)
+                    dupl_contribuciones_x += 7 * cm
+            else:
+                this_contribuciones_y -= 0.4 * cm
 
-                if contribuciones_count % max_contribuciones_per_column == 0:
-                    this_contribuciones_y = coords['starting_y_contribuciones']
-                    contribuciones_x += 7 * cm
-                    if self.has_duplicate:
-                        dupl_contribuciones_x += 7 * cm
-                else:
-                    this_contribuciones_y -= 0.4 * cm
+        self._set_font(bold=True, size=self.font_size_main)
+        self.c.drawString(
+            coords['conceptos_x'] + 3 * cm,
+            coords['contribuciones_titles_y'],
+            float_to_format_currency(self.total_contribuciones)
+        )
+        self._set_font(bold=False, size=self.font_size_body)
 
     def draw_total(self) -> None:
         coords = self.coordinates
@@ -485,14 +614,9 @@ class ReciboSueldo:
         )
         self._set_font(bold=True, size=self.font_size_main)
         self.c.drawString(
-            coords['totales_x_ap'] - 0.5 * cm,
+            coords['totales_x_ap'] - 0.8 * cm,
             coords['starting_y_totales_neto'],
-            float_to_format_currency(neto_liquidacion, include_currency=False)
-        )
-        self.c.drawString(
-            coords['conceptos_x'] + 3 * cm,
-            coords['contribuciones_titles_y'],
-            float_to_format_currency(self.total_contribuciones, include_currency=False)
+            float_to_format_currency(neto_liquidacion)
         )
         self._set_font(bold=False, size=self.font_size_body)
 
@@ -564,25 +688,6 @@ class ReciboSueldo:
             self.c.drawString(pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
         if self.has_duplicate:
-            pie_size = 1.0 * cm
-            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.58 - 2.0 * cm
-            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
-        else:
-            pie_size = 1.5 * cm
-            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm + 3.0 * cm
-            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm) - 1.0 * cm + 1.0 * cm
-
-        font_delta = 2 if not self.has_duplicate else 0
-        self.draw_pie_chart(
-            pie_x,
-            pie_y,
-            pie_size,
-            self.info_recibo['totales_liquidacion'][self.legajo],
-            self.info_recibo['conceptos_liquidados'][self.legajo],
-            font_delta=font_delta,
-        )
-
-        if self.has_duplicate:
             self.c.drawString(dupl_pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
             self._set_font(bold=True, size=self.font_size_body)
             self.c.drawString(dupl_pie_de_pagina_x, pie_linea_2_y, "Último Depósito Aportes y Contribuciones")
@@ -595,12 +700,107 @@ class ReciboSueldo:
                 self.c.drawString(dupl_pie_de_pagina_x, pie_linea_3_y, f'Período: {periodo_ss} - {fecha_pago_ss}')
                 self.c.drawString(dupl_pie_de_pagina_x, pie_linea_4_y, f'Banco: {banco_ss}')
 
+    def draw_composition_salario(self) -> None:
+        coords = self.coordinates
+        pie_de_pagina_x = coords['pie_de_pagina_x']
+        pie_de_pagina_y = coords['pie_de_pagina_y']
+        pie_linea_4_y = pie_de_pagina_y - self.base_line_between * 3
+
+        if self.has_duplicate:
+            pie_size = 1.0 * cm
+            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.58 - 2.0 * cm
+            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
+        else:
+            pie_size = 1.5 * cm
+            pie_x = pie_de_pagina_x + coords['pie_de_pagina_width'] * 0.42 + 0.5 * cm - 1.0 * cm + 3.0 * cm
+            pie_y = max(0.2 * cm, pie_linea_4_y + 0.2 * cm)
+
+        font_delta = 2 if not self.has_duplicate else 0
+        self.draw_pie_chart(
+            pie_x,
+            pie_y,
+            pie_size,
+            self.info_recibo['totales_liquidacion'][self.legajo],
+            self.info_recibo['conceptos_liquidados'][self.legajo],
+            font_delta=font_delta,
+        )
+
     def draw_empleado(self) -> None:
         """Compat layer over ReciboSueldo to preserve current public API."""
-        self.draw_titles()
-        self.draw_conceptos()
-        self.draw_total()
-        self.draw_signature()
+        for part in self.get_parts():
+            part.draw()
+
+    def get_parts(self) -> list[ReciboPart]:
+        part_classes: list[type[ReciboPart]] = [
+            TitlePart,
+            EmployeePart,
+            ContribucionesPart,
+            ConceptosPart,
+            CompositionSalarioPart,
+            SignaturePart,
+        ]
+        return [part_cls(self) for part_cls in part_classes if part_cls.applies_to(self)]
+
+    def get_part_bounds(self, part_name: str) -> ReciboPartBounds:
+        coords = self.coordinates
+        left = min(coords['company_x'], coords.get('dupl_company_x', coords['company_x']))
+        right = max(coords['concepto_titles_x_ap_ends'], coords.get('dupl_concepto_titles_x_ap_ends', 0))
+
+        if part_name == 'title':
+            return ReciboPartBounds(
+                from_x=left,
+                from_y=coords['company_cuit_y'] - 0.2 * cm,
+                to_x=right,
+                to_y=coords['company_y'] + 0.35 * cm,
+            )
+
+        if part_name == 'employee':
+            return ReciboPartBounds(
+                from_x=left,
+                from_y=coords['obra_social_y'] - 0.2 * cm,
+                to_x=max(coords['legajo_e_ingreso_x_ends'], coords.get('dupl_legajo_e_ingreso_x_ends', 0)),
+                to_y=coords['nombre_y'] + 0.25 * cm,
+            )
+
+        if part_name == 'conceptos':
+            return ReciboPartBounds(
+                from_x=coords['conceptos_x'],
+                from_y=coords['starting_y_totales_neto'] - 0.1 * cm,
+                to_x=max(coords['concepto_titles_x_ap_ends'], coords.get('dupl_concepto_titles_x_ap_ends', 0)),
+                to_y=coords['starting_y_conceptos'] + 0.25 * cm,
+            )
+
+        if part_name == 'contribuciones':
+            return ReciboPartBounds(
+                from_x=coords['conceptos_x'],
+                from_y=coords['contribuciones_titles_y'] - 1.3 * cm,
+                to_x=max(coords['concepto_titles_x_ap_ends'], coords.get('dupl_concepto_titles_x_ap_ends', 0)),
+                to_y=coords['contribuciones_titles_y'] + 0.2 * cm,
+            )
+
+        if part_name == 'composition_salario':
+            if self.has_duplicate:
+                from_x = coords['pie_de_pagina_x'] + coords['pie_de_pagina_width'] * 0.58 - 2.0 * cm
+                to_x = from_x + 4.5 * cm
+            else:
+                from_x = coords['pie_de_pagina_x'] + coords['pie_de_pagina_width'] * 0.42 + 2.5 * cm
+                to_x = from_x + 5.5 * cm
+            return ReciboPartBounds(
+                from_x=from_x,
+                from_y=coords['pie_de_pagina_y'] - 1.6 * cm,
+                to_x=to_x,
+                to_y=coords['pie_de_pagina_y'] + 0.8 * cm,
+            )
+
+        if part_name == 'signature':
+            return ReciboPartBounds(
+                from_x=coords['pie_de_pagina_x'],
+                from_y=coords['pie_de_pagina_y'] - self.base_line_between * 3 - 0.2 * cm,
+                to_x=coords['pie_de_pagina_x'] + coords['pie_de_pagina_width'],
+                to_y=coords['pie_de_pagina_y'] + 0.2 * cm,
+            )
+
+        raise ValueError(f'Parte de recibo no soportada: {part_name}')
 
     def draw_pie_chart(
         self,
@@ -866,12 +1066,18 @@ class ReciboDownloader:
             'totales_x_ap': my_recibo_info['concepto_titles_x_ap'] - ap_column_shift,
             'contribuciones_titles_y': my_recibo_info['contribuciones_titles_y'],
             'neto_letras_y': my_recibo_info['starting_y_totales_neto'] - base_line_between_2 + 0.05 * cm,
+        }
+        if 'contribuciones_y' in my_recibo_info and 'contribuciones_height' in my_recibo_info:
+            resp['contribuciones_section_bottom_y'] = (
+                my_recibo_info['contribuciones_y'] - my_recibo_info['contribuciones_height']
+            )
+        resp.update({
 
             'pie_de_pagina_x': base_x,
             'pie_de_pagina_y': my_recibo_info['pie_pagina_y'],
             'pie_de_pagina_width': my_recibo_info['pie_pagina_width'],
             'pie_de_pagina_height': my_recibo_info['pie_pagina_height'],
-        }
+        })
 
         if has_duplicate:
             base_duplicate_x = my_recibo_info['duplicate_x'] + 0.2 * cm
@@ -909,18 +1115,12 @@ class ReciboDownloader:
     def draw_recibo(self, my_file_path):
         """ Dibuja el recibo de sueldo en un archivo PDF.
         """
-
-        if self.base_version == 1:
-            from py_arg_reports.base_reports.recibo_base_1 import my_base_recibo as base_fn
-            pagesize = landscape(A4)
-        else:
-            base_fn = my_base_recibo
-            pagesize = A4
+        layout = get_layout_for_version(self.base_version)
 
         # Create a canvas
-        c = canvas.Canvas(
+        c = Canvas(
             filename=my_file_path,
-            pagesize=pagesize,
+            pagesize=layout.pagesize,
         )
         c.setTitle("Recibo de Sueldo")
         c.setAuthor("PayrollJE")
@@ -929,17 +1129,18 @@ class ReciboDownloader:
         info_recibo = get_info_final_for_recibo(self.recibo_info)
 
         # Add the format to the file
-        my_recibo_info = base_fn(c)
+        my_recibo_info = layout.draw_background(c)
 
         # Get coordinates for recibo
         coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
         legajos = info_recibo['legajos']
         for index, legajo in enumerate(legajos):
             if index > 0:
-                my_recibo_info = base_fn(c)
+                my_recibo_info = layout.draw_background(c)
                 coordinates = self.get_coordinates_for_recibo(my_recibo_info=my_recibo_info)
 
-            recibo_sueldo = ReciboSueldo(
+            recibo_cls = layout.recibo_cls or ReciboSueldo
+            recibo_sueldo = recibo_cls(
                 c=c,
                 coordinates=coordinates,
                 info_recibo=info_recibo,

@@ -40,5 +40,4 @@ jobs:
 
     - name: Run Tests
       run: |
-        # export PYTHONPATH=$PYTHONPATH:$(pwd)/py_arg_reports
-        python -m unittest -v
+        python -m pytest tests/ -v

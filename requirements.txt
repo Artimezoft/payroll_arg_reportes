@@ -1,8 +1,9 @@
 build==1.0.3
 numero-a-letras>=0.0.7
-flake8==7.3.0
-openpyxl==3.1.5
-PyPDF2==3.0.1
-reportlab==4.4.10
-twine==6.2.0
-XlsxWriter==3.2.9
+flake8>=7.3.0
+pytest>=9.0.0
+openpyxl>=3.1.5
+PyPDF2>=3.0.1
+reportlab>=5.0.0
+twine>=6.2.0
+XlsxWriter>=3.2.9

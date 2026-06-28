@@ -1,16 +1,15 @@
 import json
 import os
 import tempfile
-import unittest
 
 from py_arg_reports.reporters.f931.reporter import genera_txt_f931
 
 
-class TestGeneracionF931(unittest.TestCase):
+class TestGeneracionF931:
     """ Testing para Generación F931
     """
     @classmethod
-    def setUpClass(cls):
+    def setup_class(cls):
         # Specify the path where the temporary folder should be created
         temp_folder_path = './tests/temp/'
         # Create a temporary folder for testing in the specified path
@@ -35,7 +34,7 @@ class TestGeneracionF931(unittest.TestCase):
         }
 
     @classmethod
-    def tearDownClass(cls):
+    def teardown_class(cls):
         # Clean up: Delete the temporary folder and its contents
         if os.path.exists(cls.temp_folder):
             for root, dirs, files in os.walk(cls.temp_folder, topdown=False):
@@ -54,11 +53,11 @@ class TestGeneracionF931(unittest.TestCase):
             filename='txt_f931_prueba_1',
         )
 
-        self.assertEqual(resp_descarga, (True, None))
+        assert resp_descarga == (True, None)
         full_path = self.temp_folder + 'txt_f931_prueba_1.txt'
 
         # Check if the file exists
-        self.assertTrue(os.path.exists(full_path))
+        assert os.path.exists(full_path)
 
         # Check the number of lines in the txt file
         with open(self.temp_folder + 'txt_f931_prueba_1.txt', 'r', encoding='latin-1') as file:
@@ -68,8 +67,8 @@ class TestGeneracionF931(unittest.TestCase):
 
         # La línea debe tener 500 caracteres (incluyendo el salto de línea)
         # y el archivo 2 líneas por 2 empleados
-        self.assertEqual(largo_linea, 500)
-        self.assertEqual(num_lines, 2)
+        assert largo_linea == 500
+        assert num_lines == 2
 
     def test_descarga_empty_json(self):
         """ Prueba la descarga del archivo para un json vacío
@@ -80,12 +79,12 @@ class TestGeneracionF931(unittest.TestCase):
             filename='txt_f931_prueba_2',
         )
 
-        self.assertEqual(resp_descarga, (False, 'No se puede generar el txt para el F931, no hay datos'))
+        assert resp_descarga == (False, 'No se puede generar el txt para el F931, no hay datos')
 
         full_path = self.temp_folder + 'txt_f931_prueba_2.txt'
 
         # Check if the file not exists
-        self.assertFalse(os.path.exists(full_path))
+        assert not os.path.exists(full_path)
 
     def test_key_missing_json(self):
         """ Prueba la descarga del archivo para un json con datos faltantes
@@ -96,8 +95,4 @@ class TestGeneracionF931(unittest.TestCase):
             filename='txt_f931_prueba_3',
         )
 
-        self.assertEqual(resp_descarga, (False, 'El campo situacion no fue encontrado en los datos'))
-
-
-if __name__ == '__main__':
-    unittest.main()
+        assert resp_descarga == (False, 'El campo situacion no fue encontrado en los datos')

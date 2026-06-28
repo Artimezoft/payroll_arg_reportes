@@ -1,14 +1,13 @@
 from pathlib import Path
 import json
-import unittest
 from PyPDF2 import PdfReader
 from py_arg_reports.reporters.libro_sueldo import descargar_libro
 
 
-class TestLibroSueldo(unittest.TestCase):
+class TestLibroSueldo:
     """ Testing para Descargar libro sueldo """
 
-    def setUp(self):
+    def setup_method(self):
         self.samples_folder = 'py_arg_reports/reporters/libro_sueldo/samples'
         self.temp_folder = Path(self.samples_folder) / 'temp/'
 
@@ -23,19 +22,19 @@ class TestLibroSueldo(unittest.TestCase):
             filename='pdf1',
         )
 
-        self.assertIsNone(error)
-        self.assertTrue(ok)
+        assert error is None
+        assert ok
         expected_path = Path(self.temp_folder) / 'pdf1.pdf'
 
         # Check if the file exists
-        self.assertTrue(expected_path.exists())
+        assert expected_path.exists()
 
         # Check content
         f = open(str(expected_path), 'rb')
         # Check the number of pages in the PDF file
         pdf = PdfReader(f)
         pages = len(pdf.pages)
-        self.assertEqual(pages, 1)
+        assert pages == 1
 
         # Probar que el contenido del archivo sea el esperado
         page = pdf.pages[0]
@@ -51,4 +50,4 @@ class TestLibroSueldo(unittest.TestCase):
             # Agregue cosas y ya no se el total 'Neto a cobrar $ 329.181,77'
         ]
         for text in expected:
-            self.assertIn(text, page_1_text)
+            assert text in page_1_text
