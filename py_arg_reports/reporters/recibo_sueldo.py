@@ -633,8 +633,17 @@ class ReciboSueldo:
         obra_social = main_agrupadores.get('AP_OS', 0) + main_agrupadores.get('CT_OS', 0)
         sindical = main_agrupadores.get('AP_SIN', 0) + main_agrupadores.get('CT_SIN', 0)
 
-        art = next((item['importe'] for item in conceptos if item['code'] == 'CTRART'), 0)
-        svida = next((item['importe'] for item in conceptos if item['code'] == 'SEGOBL'), 0)
+        art = sum(
+            item["importe"]
+            for item in conceptos
+            if item["code"].startswith("CTRART")
+        )
+
+        svida = sum(
+            item["importe"]
+            for item in conceptos
+            if item["code"].startswith("SEGOBL")
+        )
 
         total_rem = totales.get('total_remunerativo', 0)
         total_no_rem = totales.get('total_no_remunerativo', 0)
@@ -642,7 +651,10 @@ class ReciboSueldo:
             item['importe'] for item in conceptos if item.get('tipo_concepto') == 4
         )
         total = totales.get('costo_conceptos') or (total_rem + total_no_rem + total_contribuciones)
-        otros = max(0, total - neto - seg_social - obra_social - sindical - art - svida)
+        otros = total - neto - seg_social - obra_social - sindical - art - svida
+        # Evito redondeos que generen slices muy pequeños, que no se ven bien en el gráfico
+        if abs(otros) < 1:
+            otros = 0
 
         LABELS = {
             'Neto': {
