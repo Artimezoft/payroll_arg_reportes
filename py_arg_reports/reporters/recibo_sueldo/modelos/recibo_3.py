@@ -379,8 +379,17 @@ class ReciboSueldo3(ReciboSueldo):
 
         ap_inssjp = next((item['importe'] for item in conceptos if item['code'] == 'INSSJP'), 0)
         ct_inssjp = next((item['importe'] for item in conceptos if item['code'] == 'CTINSS'), 0)
-        art = next((item['importe'] for item in conceptos if item['code'] == 'CTRART'), 0)
-        svida = next((item['importe'] for item in conceptos if item['code'] == 'SEGOBL'), 0)
+        art = sum(
+            item["importe"]
+            for item in conceptos
+            if item["code"].startswith("CTRART")
+        )
+
+        svida = sum(
+            item["importe"]
+            for item in conceptos
+            if item["code"].startswith("SEGOBL")
+        )
 
         ct_sin = main_agrupadores.get('CT_SIN', 0)
         ap_sin = main_agrupadores.get('AP_SIN', 0)
