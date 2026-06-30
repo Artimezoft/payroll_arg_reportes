@@ -194,3 +194,15 @@ recibo_dwn_3 = ReciboDownloader(
 )
 path, error = recibo_dwn_3.descargar_recibo()
 print(f'[recibo_3|base3] path: {path}  error: {error}')
+
+
+# recibo_4 -> Base 4 (portrait, contribuciones above conceptos)
+recibo_4_name = 'recibo_4_base4_portrait'
+recibo_dwn_4 = ReciboDownloader(
+    json_data=liquidacion_for_preview,
+    output_path=str(downloads_dir),
+    filename=recibo_4_name,
+    base_version=4,
+)
+path, error = recibo_dwn_4.descargar_recibo()
+print(f'[recibo_4|base4] path: {path}  error: {error}')

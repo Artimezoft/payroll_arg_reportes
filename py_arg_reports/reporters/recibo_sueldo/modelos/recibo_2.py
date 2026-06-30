@@ -120,7 +120,9 @@ def my_base_recibo(c: Canvas) -> dict:
         starting_y_totales,
     )
     c.drawString(margin_x + 0.5 * cm, starting_y_totales_texto, "Totales:")
+    c.setFillColorRGB(0.0078, 0.0863, 0.3961)
     c.drawString(margin_x + conceptos_width - 5.2 * cm, starting_y_totales_neto, "Neto a Pagar:")
+    c.setFillColorRGB(0, 0, 0)
 
     # Contribuciones --------------------------------------------------------------------------------
     starting_y -= contribuciones_height + margin_between_lines

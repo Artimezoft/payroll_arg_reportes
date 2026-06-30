@@ -16,8 +16,8 @@ FONT_SIZE_BODY = config_constants["FONT_SIZE_BODY"]
 
 
 @dataclass(frozen=True)
-class Recibo3LayoutConfig:
-    """Configuracion parametrica para el layout de recibo_3.
+class Recibo4LayoutConfig:
+    """Configuracion parametrica para el layout de recibo_4.
 
     Todas las medidas en cm salvo corner_radius (puntos), y los campos *_share
     y *_ratio que son proporciones.
@@ -68,7 +68,7 @@ class Recibo3LayoutConfig:
     footer_split_offset_cm: float = 2.0
 
     @classmethod
-    def from_mapping(cls, overrides: Mapping[str, float] | None = None) -> "Recibo3LayoutConfig":
+    def from_mapping(cls, overrides: Mapping[str, float] | None = None) -> "Recibo4LayoutConfig":
         if not overrides:
             return cls()
 
@@ -76,34 +76,34 @@ class Recibo3LayoutConfig:
         filtered = {k: v for k, v in overrides.items() if k in known_keys}
         return cls(**filtered)
 
-    def with_overrides(self, overrides: Mapping[str, float] | None = None) -> "Recibo3LayoutConfig":
+    def with_overrides(self, overrides: Mapping[str, float] | None = None) -> "Recibo4LayoutConfig":
         if not overrides:
             return self
         payload = asdict(self)
         for key, value in overrides.items():
             if key in payload:
                 payload[key] = value
-        return Recibo3LayoutConfig(**payload)
+        return Recibo4LayoutConfig(**payload)
 
 
-class FormatoRecibo3(FormatoReciboSueldo):
+class FormatoRecibo4(FormatoReciboSueldo):
     """Layout class-based con coordenadas configurables.
 
     Mantiene el contrato de salida esperado por ReciboDownloader.get_coordinates_for_recibo.
-    Soporta configuracion via config_constants['RECIBO_3_LAYOUT'] y via argumento explicito.
+    Igual a recibo_3 pero con la seccion Contribuciones por encima de Conceptos.
     """
 
-    _default_config = Recibo3LayoutConfig()
+    _default_config = Recibo4LayoutConfig()
 
     def __init__(self, canvas, config_overrides: Mapping[str, float] | None = None):
         super().__init__(canvas)
-        constants_overrides = config_constants.get("RECIBO_3_LAYOUT", {})
+        constants_overrides = config_constants.get("RECIBO_4_LAYOUT", {})
         self.config = self._default_config.with_overrides(constants_overrides).with_overrides(config_overrides)
 
     @classmethod
     def configure_defaults(cls, overrides: Mapping[str, float] | None = None) -> None:
         """Permite ajustar defaults en runtime para nuevos layouts/versiones."""
-        cls._default_config = cls._default_config.with_overrides(overrides)
+        cls._default_config = cls._default_config.with_overrides(overrides)  # type: ignore[assignment]
 
     def _get_section_heights(self, available_height: float) -> dict[str, float]:
         cfg = self.config
@@ -199,6 +199,26 @@ class FormatoRecibo3(FormatoReciboSueldo):
             fill=0,
         )
 
+        y -= section_heights["contribuciones"] + section_gap
+        self.coordinates["contribuciones_y"] = y + section_heights["contribuciones"]
+        self.coordinates["contribuciones_height"] = section_heights["contribuciones"]
+
+        c.roundRect(
+            margin_x,
+            y,
+            employee_width,
+            section_heights["contribuciones"],
+            radius=cfg.corner_radius,
+            stroke=1,
+            fill=0,
+        )
+
+        c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
+        c.setFillColorRGB(0, 0, 0)
+
+        contribuciones_titles_y = self.coordinates["contribuciones_y"] - cfg.conceptos_title_y_offset_cm * cm
+        self.coordinates["contribuciones_titles_y"] = contribuciones_titles_y
+
         y -= section_heights["conceptos"] + section_gap
         conceptos_width = employee_width
         self.coordinates["conceptos_y"] = y + section_heights["conceptos"]
@@ -215,7 +235,6 @@ class FormatoRecibo3(FormatoReciboSueldo):
         )
 
         c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
-        c.setFillColorRGB(0, 0, 0)
 
         conceptos_titles_y = self.coordinates["conceptos_y"] - cfg.conceptos_title_y_offset_cm * cm
         concepto_titles_x_cant = margin_x + conceptos_width * cfg.conceptos_title_cant_ratio
@@ -273,27 +292,6 @@ class FormatoRecibo3(FormatoReciboSueldo):
         )
         c.setFillColorRGB(0, 0, 0)
 
-        y -= section_heights["contribuciones"] + section_gap
-        self.coordinates["contribuciones_y"] = y + section_heights["contribuciones"]
-        self.coordinates["contribuciones_height"] = section_heights["contribuciones"]
-
-        c.roundRect(
-            margin_x,
-            y,
-            employee_width,
-            section_heights["contribuciones"],
-            radius=cfg.corner_radius,
-            stroke=1,
-            fill=0,
-        )
-
-        c.setFont(FONT_FAMILY_BOLD, FONT_SIZE_MAIN)
-        c.setFillColorRGB(0, 0, 0)
-
-        contribuciones_titles_y = self.coordinates["contribuciones_y"] - cfg.conceptos_title_y_offset_cm * cm
-        self.coordinates["contribuciones_titles_y"] = contribuciones_titles_y
-        c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, contribuciones_titles_y, "Contribuciones Empleador")
-
         y -= section_heights["footer"] + section_gap + cfg.footer_extra_gap_cm * cm
         footer_height = section_heights["footer"] * cfg.footer_height_scale
 
@@ -318,8 +316,8 @@ class FormatoRecibo3(FormatoReciboSueldo):
         self.coordinates["canvas"] = c
 
 
-class ReciboSueldo3(ReciboSueldo):
-    """Version-3-specific drawing overrides for ReciboSueldo."""
+class ReciboSueldo4(ReciboSueldo):
+    """Version-4-specific drawing overrides for ReciboSueldo (contribuciones section above conceptos)."""
 
     def draw_contribuciones(self) -> None:
         """Column format matching conceptos_part: name | cant | importe right-aligned."""
@@ -350,21 +348,69 @@ class ReciboSueldo3(ReciboSueldo):
             )
             this_y -= 0.4 * cm
 
-        # Separator line + total anchored to the bottom of the contribuciones section box
-        section_bottom = coords['contribuciones_section_bottom_y']
-        section_left = coords['conceptos_x'] - 0.2 * cm   # = margin_x, matches box edge
-        section_right = section_left + coords['pie_de_pagina_width']
-        line_y = section_bottom + 0.7 * cm
-        total_label_y = section_bottom + 0.25 * cm
-        self.c.line(section_left, line_y, section_right, line_y)
+        # Compute totals for header and Sueldo Bruto row
+        totales = self.info_recibo['totales_liquidacion'][self.legajo]
+        sueldo_bruto = totales.get('total_remunerativo', 0) + totales.get('total_no_remunerativo', 0)
+        costo_total = self.total_contribuciones + sueldo_bruto
+
+        # Header: "COSTO TOTAL EMPLEADOR" in blue + total right-aligned
+        header_y = coords['contribuciones_titles_y']
         self._set_font(bold=True, size=self.font_size_main)
-        self.c.drawString(coords['conceptos_x'] + 0.5 * cm, total_label_y, "Total Contribuciones Empleador:")
+        self.c.setFillColorRGB(0.0078, 0.0863, 0.3961)
+        self.c.drawString(coords['conceptos_x'] + 0.3 * cm, header_y, "COSTO TOTAL EMPLEADOR")
         self.draw_text_with_end_coordinate(
             self.c,
             coords['concepto_titles_x_ap_ends'] - 0.3 * cm,
-            total_label_y,
+            header_y,
+            float_to_format_currency(costo_total),
+            font_family=self.FONT_FAMILY_BOLD,
+            font_size=self.font_size_main,
+        )
+        self.c.setFillColorRGB(0, 0, 0)
+
+        # Two footer rows anchored to the bottom of the contribuciones section box
+        section_bottom = coords['contribuciones_section_bottom_y']
+        section_left = coords['conceptos_x'] - 0.2 * cm   # = margin_x, matches box edge
+        section_width = coords['pie_de_pagina_width']
+        section_right = section_left + section_width
+
+        ROW_H = 0.45 * cm
+        TEXT_OFFSET = 0.20 * cm
+
+        # Row 1 (bottom): "Sueldo Bruto"
+        row1_bottom = section_bottom
+        row1_text_y = row1_bottom + TEXT_OFFSET
+
+        # Row 2 (above row 1): "Total Contribuciones Empleador"
+        row2_bottom = row1_bottom + ROW_H
+        row2_text_y = row2_bottom + TEXT_OFFSET
+
+        self._set_font(bold=True, size=self.font_size_main)
+        # Main separator above both footer rows
+        self.c.line(
+            section_left,
+            row2_bottom + ROW_H + 0.2 * cm,
+            section_right,
+            row2_bottom + ROW_H + 0.2 * cm,
+        )
+        # Row 2: "Total Contribuciones Empleador"
+        self.c.drawString(coords['conceptos_x'] + 0.5 * cm, row2_text_y, "Total Contribuciones Empleador:")
+        self.draw_text_with_end_coordinate(
+            self.c,
+            coords['concepto_titles_x_ap_ends'] - 0.3 * cm,
+            row2_text_y,
             float_to_format_currency(self.total_contribuciones),
         )
+
+        # Row 1: "Sueldo Bruto" (total remunerativo + total no remunerativo)
+        self.c.drawString(coords['conceptos_x'] + 0.5 * cm, row1_text_y, "Sueldo Bruto:")
+        self.draw_text_with_end_coordinate(
+            self.c,
+            coords['concepto_titles_x_ap_ends'] - 0.3 * cm,
+            row1_text_y,
+            float_to_format_currency(sueldo_bruto),
+        )
+
         self._set_font(bold=False, size=self.font_size_body)
 
     def draw_composition_salario(self) -> None:

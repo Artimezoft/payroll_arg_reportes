@@ -165,7 +165,9 @@ def my_base_recibo(c: Canvas) -> dict:
         starting_y_totales,
     )
     c.drawString(0.5 * cm, starting_y_totales_texto, "Totales:")
+    c.setFillColorRGB(0.0078, 0.0863, 0.3961)
     c.drawString(conceptos_width - 5 * cm, starting_y_totales_neto, "Neto a Pagar:")
+    c.setFillColorRGB(0, 0, 0)
 
     c.line(
         half_of_width + mid_margin,
@@ -174,7 +176,9 @@ def my_base_recibo(c: Canvas) -> dict:
         starting_y_totales,
     )
     c.drawString(half_of_width + mid_margin + 0.5 * cm, starting_y_totales_texto, "Totales:")
+    c.setFillColorRGB(0.0078, 0.0863, 0.3961)
     c.drawString(half_of_width + mid_margin + conceptos_width - 5 * cm, starting_y_totales_neto, "Neto a Pagar:")
+    c.setFillColorRGB(0, 0, 0)
 
     # Contribuciones --------------------------------------------------------------------------------
     starting_y -= contribuciones_height + margin_between_lines

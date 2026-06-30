@@ -94,4 +94,9 @@ def get_layout_for_version(base_version: int) -> ReciboLayout:
 
         return ClassBasedLayout(_pagesize=A4, layout_cls=FormatoRecibo3, _recibo_cls=ReciboSueldo3)
 
+    if base_version == 4:
+        from py_arg_reports.reporters.recibo_sueldo.modelos.recibo_4 import FormatoRecibo4, ReciboSueldo4
+
+        return ClassBasedLayout(_pagesize=A4, layout_cls=FormatoRecibo4, _recibo_cls=ReciboSueldo4)
+
     raise ValueError(f"base_version no soportada: {base_version}")
