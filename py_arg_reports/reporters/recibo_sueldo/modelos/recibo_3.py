@@ -265,11 +265,13 @@ class FormatoRecibo3(FormatoReciboSueldo):
             starting_y_totales,
         )
         c.drawString(margin_x + cfg.conceptos_title_left_x_offset_cm * cm, starting_y_totales_text, "Totales:")
+        c.setFillColorRGB(0.0078, 0.0863, 0.3961)
         c.drawString(
             margin_x + conceptos_width - cfg.neto_label_right_padding_cm * cm,
             starting_y_totales_neto,
             "Neto a Pagar:",
         )
+        c.setFillColorRGB(0, 0, 0)
 
         y -= section_heights["contribuciones"] + section_gap
         self.coordinates["contribuciones_y"] = y + section_heights["contribuciones"]

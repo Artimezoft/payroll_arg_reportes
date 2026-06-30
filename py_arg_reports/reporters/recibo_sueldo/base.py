@@ -107,7 +107,7 @@ class CompositionSalarioPart(ReciboPart):
 
     @classmethod
     def applies_to(cls, recibo: "ReciboSueldo") -> bool:
-        return recibo.base_version == 3
+        return recibo.base_version in (3, 4)
 
     def draw(self) -> None:
         self.recibo.draw_composition_salario()
@@ -118,7 +118,7 @@ class SignaturePart(ReciboPart):
 
     @classmethod
     def applies_to(cls, recibo: "ReciboSueldo") -> bool:
-        return recibo.base_version != 3
+        return recibo.base_version not in (3, 4)
 
     def draw(self) -> None:
         self.recibo.draw_signature()
@@ -613,11 +613,13 @@ class ReciboSueldo:
             float_to_format_currency(totales_retenciones, include_currency=False)
         )
         self._set_font(bold=True, size=self.font_size_main)
+        self.c.setFillColorRGB(0.0078, 0.0863, 0.3961)
         self.c.drawString(
             coords['totales_x_ap'] - 0.8 * cm,
             coords['starting_y_totales_neto'],
             float_to_format_currency(neto_liquidacion)
         )
+        self.c.setFillColorRGB(0, 0, 0)
         self._set_font(bold=False, size=self.font_size_body)
 
         if self.has_duplicate:
