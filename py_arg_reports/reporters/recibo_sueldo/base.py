@@ -674,8 +674,14 @@ class ReciboSueldo:
         pagado_como = "Abonado en Efectivo"
         if forma_pago.lower()[:2] == 'ch':
             pagado_como = "Abonado con Cheque"
-        if numero_cuenta or cbu:
-            pagado_como = f'CBU: {cbu}' if cbu else f'Cuenta: {numero_cuenta}'
+        if numero_cuenta:
+            pagado_como = f'Cuenta: {numero_cuenta}'
+        elif cbu:
+            clean_cbu = cbu.replace('0', '')
+            if not clean_cbu:
+                pagado_como = 'Abonado en cuenta bancaria'
+            else:
+                pagado_como = f'CBU: {cbu}'
 
         self.c.drawString(pie_de_pagina_x, pie_linea_1_y, f'{pagado_como} - Fecha: {fecha_pago}')
         self._set_font(bold=True, size=self.font_size_body)
