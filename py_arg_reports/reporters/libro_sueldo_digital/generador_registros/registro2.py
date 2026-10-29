@@ -37,10 +37,10 @@ def process_reg2(empleados_liquidados: dict, fecha_pago: datetime.date) -> tuple
         cuil = info_empleado['info_f931']['fijos']['cuil']
         cbu = info_empleado['info_f931']['fijos']['cbu']
         # En caso de que venga un CBU todo de 0s, quitarlo
-        clean_cbu = cbu.replace('0', '')
+        clean_cbu = None if not cbu else cbu.replace('0', '')
         forma_pago = info_empleado['info_f931']['fijos']['forma_pago']
 
-        if not clean_cbu:
+        if not clean_cbu == '':
             # Default a Efectivo si no hay CBU
             cbu = None
             forma_pago = '1'
