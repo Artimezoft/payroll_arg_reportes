@@ -40,7 +40,7 @@ def process_reg2(empleados_liquidados: dict, fecha_pago: datetime.date) -> tuple
         clean_cbu = None if not cbu else cbu.replace('0', '')
         forma_pago = info_empleado['info_f931']['fijos']['forma_pago']
 
-        if not clean_cbu == '':
+        if clean_cbu == '':
             # Default a Efectivo si no hay CBU
             cbu = None
             forma_pago = '1'
