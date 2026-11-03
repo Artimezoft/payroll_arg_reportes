@@ -80,6 +80,33 @@ class TestDownloadRecibo:
 
         assert num_sheets == 3
 
+    def test_area_y_posicion_are_printed_by_default(self):
+        recibo_downloader = ReciboDownloader(
+            json_data=self.short_json,
+            output_path=self.temp_folder,
+            filename='recibo_campos_empleado_default',
+        )
+        full_path, error = recibo_downloader.descargar_recibo()
+
+        assert error is None
+        pdf_text = self.extract_pdf_text(full_path)
+        assert "Posición:" in pdf_text
+        assert "Area:" in pdf_text
+
+    def test_area_y_posicion_can_be_hidden(self):
+        recibo_downloader = ReciboDownloader(
+            json_data=self.short_json,
+            output_path=self.temp_folder,
+            filename='recibo_campos_empleado_ocultos',
+            mostrar_area_y_posicion=False,
+        )
+        full_path, error = recibo_downloader.descargar_recibo()
+
+        assert error is None
+        pdf_text = self.extract_pdf_text(full_path)
+        assert "Posición:" not in pdf_text
+        assert "Area:" not in pdf_text
+
     def test_descarga_recibo_2(self):
         """ Prueba la descarga del archivo full
         """

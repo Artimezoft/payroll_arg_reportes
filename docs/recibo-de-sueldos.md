@@ -19,6 +19,22 @@ recibo_path, error = descargar_recibo(
 )
 ```
 
+Para omitir los campos **Area** y **Posición** en el recibo, se puede pasar
+`mostrar_area_y_posicion=False` al `ReciboDownloader`. El valor predeterminado
+es `True`, por lo que la impresión actual se mantiene si no se especifica:
+
+```python
+from py_arg_reports.reporters.recibo_sueldo.base import ReciboDownloader
+
+recibo = ReciboDownloader(
+    json_data=liquidacion,
+    output_path='./downloads/',
+    filename='recibo_prueba',
+    mostrar_area_y_posicion=False,
+)
+recibo_path, error = recibo.descargar_recibo()
+```
+
 #### Descarga de Excel
 Genera la información binaria para descargar un archivo excel.
 

@@ -312,7 +312,15 @@ class ReciboSueldo:
     FONT_FAMILY = config_constants['FONT_FAMILY']
     FONT_FAMILY_BOLD = config_constants['FONT_FAMILY_BOLD']
 
-    def __init__(self, c: Canvas, coordinates: dict, info_recibo: dict, legajo: str, base_version: int = 1) -> None:
+    def __init__(
+        self,
+        c: Canvas,
+        coordinates: dict,
+        info_recibo: dict,
+        legajo: str,
+        base_version: int = 1,
+        mostrar_area_y_posicion: bool = True,
+    ) -> None:
         self.c = c
         self.coordinates = coordinates
         self.info_recibo = info_recibo
@@ -320,6 +328,7 @@ class ReciboSueldo:
         self.has_duplicate = coordinates.get('has_duplicate', True)
         self.total_contribuciones = 0.0
         self.base_version = base_version
+        self.mostrar_area_y_posicion = mostrar_area_y_posicion
 
         if self.has_duplicate:
             self.font_size_main = FONT_SIZE_MAIN
@@ -427,8 +436,9 @@ class ReciboSueldo:
         data = self._get_employee_data()
         self.c.drawString(coords['nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
         self.c.drawString(coords['categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
-        self.c.drawString(coords['posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
-        self.c.drawString(coords['area_x'], coords['area_y'], f"Area: {data['area']}")
+        if self.mostrar_area_y_posicion:
+            self.c.drawString(coords['posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
+            self.c.drawString(coords['area_x'], coords['area_y'], f"Area: {data['area']}")
         self.c.drawString(coords['contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
         self.c.drawString(coords['obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}", charSpace=-0.1)
         self.draw_text_with_end_coordinate(
@@ -455,8 +465,9 @@ class ReciboSueldo:
         if self.has_duplicate:
             self.c.drawString(coords['dupl_nombre_x'], coords['nombre_y'], f"Nombre: {data['nombre_completo']}")
             self.c.drawString(coords['dupl_categoria_x'], coords['categoria_y'], f"Categoria: {data['categoria']}")
-            self.c.drawString(coords['dupl_posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
-            self.c.drawString(coords['dupl_area_x'], coords['area_y'], f"Area: {data['area']}")
+            if self.mostrar_area_y_posicion:
+                self.c.drawString(coords['dupl_posicion_x'], coords['posicion_y'], f"Posición: {data['posicion']}")
+                self.c.drawString(coords['dupl_area_x'], coords['area_y'], f"Area: {data['area']}")
             self.c.drawString(coords['dupl_contrato_x'], coords['contrato_y'], f"Contrato: {data['contrato']}")
             self.c.drawString(coords['dupl_obra_social_x'], coords['obra_social_y'], f"O.Social: {data['obra_social']}")
             self.draw_text_with_end_coordinate(
@@ -994,8 +1005,16 @@ class ReciboSueldo:
 
 
 class ReciboDownloader:
-    def __init__(self, json_data: list[dict] | dict, output_path: str, filename: str, base_version: int = 1):
+    def __init__(
+        self,
+        json_data: list[dict] | dict,
+        output_path: str,
+        filename: str,
+        base_version: int = 1,
+        mostrar_area_y_posicion: bool = True,
+    ):
         self.base_version = base_version
+        self.mostrar_area_y_posicion = mostrar_area_y_posicion
         self.json_data = json_data
         self.output_path = output_path
         self.filename = filename
@@ -1153,7 +1172,8 @@ class ReciboDownloader:
                 coordinates=coordinates,
                 info_recibo=info_recibo,
                 legajo=legajo,
-                base_version=self.base_version
+                base_version=self.base_version,
+                mostrar_area_y_posicion=self.mostrar_area_y_posicion,
             )
             recibo_sueldo.draw_empleado()
 
