@@ -62,7 +62,12 @@ def process_reg2(empleados_liquidados: dict, fecha_pago: datetime.date) -> tuple
         area_norm = " " * 50 if not area else area.ljust(50)
         fecha_pago_str = fecha_pago.strftime('%Y%m%d')
 
-        item = f'02{cuil}{legajo_norm}{area_norm}{cbu}030{fecha_pago_str}{fecha_rubrica}{forma_pago}'
+        # Dias Tope
+        # Informado o llevo default a 30
+        dias_tope = info_empleado['info_f931']['importes'].get('k_dias_tope', 30)
+        dias_tope_norm = str(dias_tope).zfill(3)
+
+        item = f'02{cuil}{legajo_norm}{area_norm}{cbu}{dias_tope_norm}{fecha_pago_str}{fecha_rubrica}{forma_pago}'
 
         resp.append(item)
 
